@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review Your Cut</title>
+<style>
+  :root { --bg: #f6f4f0; --panel: #fff; --ink: #1d1b19; --muted: #6f6a64; --line: #e4dfd8; --accent: #2f6bff; --off: #c9c3bb; --warn: #e4572e; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #151413; --panel: #1f1d1b; --ink: #f2efe9; --muted: #a39d95; --line: #34302c; --off: #5a544e; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+  @media (max-width: 760px) { .wrap { grid-template-columns: 1fr; } }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  video { width: 100%; border-radius: 12px; background: #000; aspect-ratio: 9/16; }
+  .stats { display: flex; gap: 14px; flex-wrap: wrap; margin: 10px 0; color: var(--muted); font-size: 14px; }
+  .stats b { color: var(--ink); }
+  .line { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+  .line.off .txt { color: var(--off); text-decoration: line-through; }
+  .tools { display: flex; gap: 4px; }
+  .tools button { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 15px; }
+  .tools button.on { border-color: var(--accent); }
+  .dur { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; padding-top: 6px; }
+  .dur.long { color: var(--warn); }
+  .num { color: var(--muted); margin-right: 6px; }
+  .reason { font-size: 12px; color: var(--muted); }
+  textarea, select, input { width: 100%; margin-top: 6px; font: inherit; color: inherit; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+  .send { display: flex; gap: 8px; margin-top: 14px; position: sticky; bottom: 0; background: var(--bg); padding: 10px 0; }
+  .send button { border: 0; background: var(--accent); color: #fff; border-radius: 10px; padding: 10px 18px; font: inherit; font-weight: 600; cursor: pointer; }
+  .send button.ghost { background: var(--panel); color: var(--ink); border: 1px solid var(--line); }
+  .done { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-top: 10px; display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <h1>Your rough cut</h1>
+    <p class="reason">Watch it, then keep or remove lines on the right.</p>
+    <video id="vid" controls playsinline></video>
+    <div class="stats">
+      <span>Now <b id="now">–</b></span>
+      <span>Goal <input id="goal" type="number" min="5" step="1" style="width:70px;display:inline;margin:0"> s</span>
+      <span id="trim"></span>
+    </div>
+  </div>
+  <div>
+    <div id="lines"></div>
+    <div class="send">
+      <button id="sendBtn">Send my edits ↗</button>
+      <button id="resetBtn" class="ghost">Reset</button>
+    </div>
+    <div class="done" id="done"></div>
+  </div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const slug = new URLSearchParams(location.search).get("p");
+let rc = null, state = {}, inbox = [];
+async function api(p, b) { const r = await fetch(p, b ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) } : {}); return r.json(); }
+
+async function init() {
+  rc = await api(`/api/p/${slug}/roughcut`);
+  inbox = (await api("/api/library")).inbox;
+  $("#vid").src = `/api/p/${slug}/rough.mp4`;
+  rc.lines.forEach(l => state[l.id] = { id: l.id, keep: l.keep, note: l.note || "", attach: l.attach || null });
+  const saved = localStorage.getItem("goal-" + slug);
+  $("#goal").value = saved || 60;
+  $("#goal").oninput = e => { try { localStorage.setItem("goal-" + slug, e.target.value); } catch (_) {} stats(); };
+  draw();
+}
+function draw() {
+  $("#lines").innerHTML = rc.lines.map(l => {
+    const s = state[l.id], long = l.duration > 6;
+    return `<div class="line ${s.keep ? "" : "off"}" data-id="${l.id}">
+      <div class="tools">
+        <button title="Attach an image or clip for this line" class="${s.attach ? "on" : ""}" data-act="attach">📎</button>
+        <button title="Add a note for Claude" class="${s.note ? "on" : ""}" data-act="note">💬</button>
+        <button title="${s.keep ? "Remove this line" : "Bring it back"}" data-act="keep">${s.keep ? "🗑" : "↩︎"}</button>
+      </div>
+      <div><span class="num">${l.id}</span><span class="txt">${l.text}</span>
+        ${!s.keep && l.reason ? `<div class="reason">${l.reason}</div>` : ""}
+        <div class="extra" id="x${l.id}"></div></div>
+      <div class="dur ${long ? "long" : ""}" title="${long ? "Long line — viewers may drift" : ""}">${l.duration.toFixed(1)}s</div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll("[data-act]").forEach(b => b.onclick = e => act(+b.closest(".line").dataset.id, b.dataset.act));
+  rc.lines.forEach(l => { if (state[l.id].note || state[l.id].attach) extra(l.id); });
+  stats();
+}
+function extra(id) {
+  const s = state[id], x = $("#x" + id);
+  x.innerHTML = `<textarea placeholder="e.g. too big a gap here, tighten it · put my product photo here · make this a big full-screen moment">${s.note}</textarea>
+    <select><option value="">📎 no attachment</option>${inbox.map(f => `<option ${s.attach === f ? "selected" : ""}>${f}</option>`).join("")}</select>`;
+  x.querySelector("textarea").oninput = e => { s.note = e.target.value; };
+  x.querySelector("select").onchange = e => { s.attach = e.target.value || null; };
+}
+function act(id, what) {
+  if (what === "keep") { state[id].keep = !state[id].keep; draw(); }
+  else extra(id);
+}
+function stats() {
+  const now = rc.lines.filter(l => state[l.id].keep).reduce((a, l) => a + l.duration, 0);
+  const goal = +$("#goal").value || 0;
+  $("#now").textContent = now.toFixed(0) + "s";
+  $("#trim").innerHTML = goal && now > goal ? `Trim <b>${(now - goal).toFixed(0)}s</b> more to hit your goal` : goal ? "✓ On target" : "";
+}
+$("#resetBtn").onclick = () => { rc.lines.forEach(l => state[l.id] = { id: l.id, keep: l.keep, note: "", attach: null }); draw(); };
+$("#sendBtn").onclick = async () => {
+  const r = await api(`/api/p/${slug}/review`, { lines: Object.values(state), goal_s: +$("#goal").value || null });
+  $("#done").style.display = "block";
+  $("#done").innerHTML = `<b>Sent ✓</b> Now go back to Claude and say <b>“I sent my edits”</b>.<pre style="white-space:pre-wrap;font-size:12px;color:var(--muted)">${r.summary || ""}</pre>`;
+  $("#vid").src = `/api/p/${slug}/rough.mp4?rebuild=1&v=${Date.now()}`;
+};
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "laptop": {
+    "tags": [
+      "laptop",
+      "computer",
+      "editing",
+      "edit",
+      "work",
+      "desk",
+      "online",
+      "business"
+    ],
+    "author": "claude",
+    "note": "drawn for a reel that mentioned editing on a laptop"
+  },
+  "sunscreen": {
+    "tags": [
+      "sunscreen",
+      "spf",
+      "sun cream",
+      "sunblock",
+      "skincare",
+      "summer",
+      "beach"
+    ],
+    "author": "claude",
+    "note": "drawn after an unmatched request"
+  },
+  "perfume": {
+    "tags": [
+      "perfume",
+      "fragrance",
+      "scent",
+      "cologne",
+      "beauty",
+      "luxury"
+    ],
+    "author": "claude",
+    "note": "drawn after an unmatched request"
+  }
+}

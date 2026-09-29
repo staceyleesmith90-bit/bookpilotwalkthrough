@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reel Studio · Systems Pilot</title>
+<style>
+  @font-face { font-family: "Poppins"; src: url("/fonts/Poppins-ExtraBold.ttf"); font-weight: 800; }
+  @font-face { font-family: "Inter"; src: url("/fonts/Inter-Variable.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "Script"; src: url("/fonts/Caveat-Variable.ttf"); font-weight: 400 700; }
+  /* Systems Pilot brand: navy, teal → blue → purple → pink */
+  :root {
+    --navy: #06123D; --teal: #14B8A6; --cyan: #00B5D9; --blue: #1E63FF; --purple: #6A11CB; --pink: #EC4899;
+    --grad: linear-gradient(115deg, #00B5D9 0%, #1E63FF 38%, #6A11CB 70%, #EC4899 100%);
+    --bg: #F6F8FC; --card: #FFFFFF; --ink: #06123D; --muted: #5E6A8A; --line: #E3E8F3; --soft: #EEF2FA;
+    --accent: #1E63FF; --r: 18px; --shadow: 0 12px 32px -20px rgba(6, 18, 61, .45);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #040B26; --card: #0B1740; --ink: #EEF2FF; --muted: #9AA6CC; --line: #1B2A5C; --soft: #0F1D4D; --accent: #4C8BFF; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 "Inter", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  h1, h2, h3, .logo b { font-family: "Poppins", "Inter", sans-serif; letter-spacing: -.02em; }
+  button { font: inherit; cursor: pointer; color: inherit; }
+  .top { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 18px; padding: 12px 24px;
+         background: var(--navy); color: #fff; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .mark { width: 32px; height: 32px; border-radius: 9px; background: var(--grad); display: grid; place-items: center;
+          font: 800 18px "Poppins"; color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,.12) inset; }
+  .logo b { font-size: 17px; } .logo small { display: block; font-size: 11px; opacity: .7; letter-spacing: .08em; text-transform: uppercase; }
+  nav { display: flex; gap: 4px; margin-left: 10px; }
+  nav button { border: 0; background: none; padding: 8px 14px; border-radius: 999px; color: rgba(255,255,255,.7); font-weight: 600; }
+  nav button.on { background: rgba(255,255,255,.12); color: #fff; }
+  .grow { flex: 1; }
+  .cta { border: 0; border-radius: 999px; padding: 11px 20px; font-weight: 700; color: #fff; background: var(--grad); box-shadow: 0 10px 24px -12px #6A11CB; }
+  .ghost { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 9px 16px; font-weight: 600; }
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 24px 80px; }
+  .hero { border-radius: 26px; padding: 34px; margin-bottom: 30px; color: #fff; background: var(--navy); position: relative; overflow: hidden; }
+  .hero::after { content: ""; position: absolute; inset: auto -10% -60% 40%; height: 140%; background: var(--grad); filter: blur(70px); opacity: .55; }
+  .hero > * { position: relative; z-index: 1; }
+  .hero h1 { font-size: 36px; margin: 0 0 6px; }
+  .hero h1 em { font-family: "Script"; font-style: normal; font-weight: 700; font-size: 1.3em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { color: rgba(255,255,255,.75); margin: 0 0 22px; max-width: 620px; }
+  .formats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .fmt { text-align: left; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color: #fff; border-radius: 16px; padding: 16px; transition: transform .15s, background .15s; }
+  .fmt:hover { transform: translateY(-2px); background: rgba(255,255,255,.12); }
+  .fmt .ic { font-size: 24px; } .fmt b { display: block; margin: 6px 0 2px; } .fmt span { color: rgba(255,255,255,.7); font-size: 13px; }
+  h2 { font-size: 21px; margin: 0 0 14px; } h2 small { font: 500 14px "Inter"; color: var(--muted); margin-left: 8px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }
+  .reel { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
+  .reel .cover { aspect-ratio: 9/16; background: var(--soft) center/cover no-repeat; display: flex; align-items: flex-end; }
+  .chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(6,18,61,.7); color: #fff; margin: 10px; }
+  .reel .meta { padding: 10px 12px 12px; } .reel .meta b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .acts { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .acts a, .acts button { font-size: 12px; font-weight: 700; text-decoration: none; padding: 5px 10px; border-radius: 999px; background: var(--soft); border: 0; color: var(--ink); }
+  .empty { border: 2px dashed var(--line); border-radius: var(--r); padding: 36px; text-align: center; color: var(--muted); }
+  .tpls { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .tpl { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
+  .tpl .cat { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tpl h3 { margin: 0; font-size: 18px; } .tpl p { margin: 0; color: var(--muted); font-size: 13.5px; }
+  .tpl ul { margin: 4px 0 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
+  .tpl .row { display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px; }
+  .tpl .row span { background: var(--soft); padding: 3px 9px; border-radius: 999px; }
+  .tpl .go { margin-top: auto; align-self: flex-start; }
+  .filters { display: flex; gap: 14px; flex-wrap: wrap; }
+  .look { border: 2px solid transparent; border-radius: 14px; background: var(--card); padding: 0; overflow: hidden; width: 128px; text-align: left; box-shadow: var(--shadow); }
+  .look img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: var(--soft); }
+  .look span { display: block; padding: 6px 8px; font-size: 12px; font-weight: 600; }
+  .look.on { border-color: var(--accent); }
+  .caps { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+  .cap { border: 2px solid transparent; border-radius: 12px; overflow: hidden; background: var(--card); padding: 0; text-align: left; box-shadow: var(--shadow); }
+  .cap img { width: 100%; display: block; } .cap span { display: block; padding: 6px 10px; font-size: 12px; }
+  .cap.on { border-color: var(--accent); }
+  .titles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .tcard { border: 2px solid transparent; border-radius: 16px; overflow: hidden; background: var(--card); padding: 0; text-align: left; box-shadow: var(--shadow); }
+  .tcard img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #3a3430; }
+  .tcard span { display: block; padding: 8px 10px; font-size: 12px; color: var(--muted); } .tcard.on { border-color: var(--accent); }
+  .brandcard { display: grid; grid-template-columns: 240px 1fr; gap: 24px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); }
+  .brandcard img { width: 100%; border-radius: 14px; } .sw { display: flex; gap: 8px; margin: 10px 0 16px; } .sw i { width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--line); }
+  section h3.sub { margin: 26px 0 10px; font-size: 16px; }
+  /* wizard */
+  dialog { border: 0; padding: 0; border-radius: 26px; width: min(820px, 95vw); background: var(--card); color: var(--ink); box-shadow: 0 30px 80px -30px rgba(0,0,0,.6); }
+  dialog::backdrop { background: rgba(6, 18, 61, .55); backdrop-filter: blur(4px); }
+  .wz-head { padding: 22px 26px 0; display: flex; align-items: center; gap: 12px; }
+  .dots { display: flex; gap: 6px; flex: 1; } .dots i { height: 5px; flex: 1; border-radius: 9px; background: var(--line); } .dots i.on { background: var(--grad); }
+  .x { border: 0; background: var(--soft); width: 34px; height: 34px; border-radius: 50%; }
+  .wz-body { padding: 18px 26px; max-height: 68vh; overflow: auto; }
+  .wz-body h3 { font-size: 24px; margin: 6px 0 4px; } .wz-body p.sub { color: var(--muted); margin: 0 0 18px; }
+  .wz-foot { display: flex; justify-content: space-between; padding: 14px 26px 22px; border-top: 1px solid var(--line); }
+  .opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .opt { border: 1.5px solid var(--line); background: var(--card); border-radius: 16px; padding: 14px; text-align: left; }
+  .opt b { display: block; } .opt span { color: var(--muted); font-size: 12.5px; }
+  .opt.on, .pill.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--card)); }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .pill { border: 1.5px solid var(--line); background: var(--card); border-radius: 999px; padding: 7px 14px; font-weight: 600; font-size: 13.5px; }
+  label.f { display: block; font-weight: 700; font-size: 13px; margin: 14px 0 6px; }
+  input[type=text], textarea { width: 100%; font: inherit; color: inherit; background: var(--soft); border: 1.5px solid transparent; border-radius: 12px; padding: 11px 13px; }
+  input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  .drop { border: 2px dashed var(--line); border-radius: 18px; padding: 34px; text-align: center; color: var(--muted); } .drop.hover { border-color: var(--accent); background: var(--soft); }
+  .note { font-size: 12.5px; color: var(--muted); background: var(--soft); border-radius: 12px; padding: 10px 12px; margin-top: 12px; }
+  .toggle { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-weight: 600; }
+  .bar { height: 8px; background: var(--soft); border-radius: 9px; overflow: hidden; margin-top: 10px; } .bar i { display: block; height: 100%; width: 0; background: var(--grad); transition: width .2s; }
+  .seg { display: inline-flex; background: var(--soft); border-radius: 999px; padding: 4px; gap: 4px; flex-wrap: wrap; }
+  .seg button { border: 0; background: none; padding: 7px 14px; border-radius: 999px; font-weight: 600; } .seg button.on { background: var(--card); box-shadow: 0 2px 8px -4px rgba(0,0,0,.3); }
+  audio { width: 100%; margin-top: 10px; }
+  .hidden { display: none !important; }
+  .sndform { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
+  .sndform input[type=text] { flex: 1; min-width: 200px; }
+  .snd { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px; background: var(--card, #fff); margin-bottom: 8px; border: 1px solid rgba(0,0,0,.06); }
+  .snd .x { margin-left: auto; }
+  .snd .chip { margin: 0; }
+  #tab-sounds a.cta, #tab-sounds a.ghost { text-decoration: none; display: inline-block; color: inherit; }
+  #tab-sounds a.cta { color: #fff; }
+  .chip.ok { background: #16a34a; color: #fff; }
+  .fontcard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; background: var(--card); border-radius: 18px; padding: 20px; border: 1px solid var(--line); }
+  .fontcard select { width: 100%; padding: 9px; border-radius: 10px; border: 1px solid var(--line); }
+  .fprev { font-size: 40px; color: #EC4899; margin-top: 12px; line-height: 1.2; min-height: 54px; }
+  @media (max-width: 820px) { .fontcard { grid-template-columns: 1fr; } }
+  #tab-sounds ol { padding-left: 20px; line-height: 1.7; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+  @media (max-width: 820px) { .formats { grid-template-columns: 1fr 1fr; } .brandcard { grid-template-columns: 1fr; } nav { display: none; } }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo"><div class="mark">S</div><div><b>Reel Studio</b><small>by Systems Pilot</small></div></div>
+  <nav>
+    <button data-tab="home" class="on">Home</button>
+    <button data-tab="templates">Templates</button>
+    <button data-tab="looks">Looks</button>
+    <button data-tab="sounds">Trending sounds</button>
+    <button data-tab="brand">My brand</button>
+  </nav>
+  <span class="grow"></span>
+  <button class="cta" id="newBtn">＋ New reel</button>
+</div>
+
+<main>
+  <section id="tab-home">
+    <div class="hero">
+      <h1>What are we <em>making</em> today?</h1>
+      <p>Pick a format, or start from a template. A few quick questions, then Claude edits it in your brand.</p>
+      <div class="formats">
+        <button class="fmt" data-fmt="talking-head"><div class="ic">🎙️</div><b>Talk to camera</b><span>Pauses cut, styled in your brand.</span></button>
+        <button class="fmt" data-fmt="voiceover"><div class="ic">🎬</div><b>Clips + voice</b><span>Your b-roll, cut to your words.</span></button>
+        <button class="fmt" data-fmt="faceless"><div class="ic">✍️</div><b>Text & photos</b><span>No camera needed.</span></button>
+        <button class="fmt" data-nav="templates"><div class="ic">✨</div><b>From a template</b><span>Copy a proven idea.</span></button>
+      </div>
+    </div>
+    <h2>Your reels</h2>
+    <div class="grid" id="reels"></div>
+  </section>
+
+  <section id="tab-templates" class="hidden">
+    <h2>Templates <small>proven reel ideas, done your way</small></h2>
+    <div class="pills" id="tplCats"></div>
+    <div class="tpls" id="tplGrid"></div>
+  </section>
+
+  <section id="tab-looks" class="hidden">
+    <h2>Looks <small>everything is shown in your brand</small></h2>
+    <h3 class="sub">Title styles</h3>
+    <div class="pills"><input type="text" id="tText" value="A Day With Me" style="max-width:320px"></div>
+    <div class="titles" id="titleGallery"></div>
+    <h3 class="sub">Caption styles</h3>
+    <div class="caps" id="capGallery"></div>
+    <h3 class="sub">Filters</h3>
+    <div id="gradeGallery"></div>
+    <h3 class="sub">Stickers</h3>
+    <p class="sub">1,500+ stickers in 12 styles, glossy 3D and animated emoji, stamps and badges, all in your colours.
+      <b>Not in the library? Reel Studio creates your own:</b> instantly as a lettered sticker in your brand font,
+      then Claude draws an illustrated one that stays in your library for every future reel.</p>
+  </section>
+
+  <section id="tab-sounds" class="hidden">
+    <h2>Trending sounds <small>we suggest, you add it in TikTok</small></h2>
+    <p class="sub">TikTok keeps trending songs inside its app (they're licensed there), so Reel Studio never downloads them.
+      Instead: save the sounds you see trending, Claude matches the best one to each reel, and you get a
+      <b>“for trending sound”</b> version of your reel (your voice + sound effects, no background music) ready to post.</p>
+    <div class="pills">
+      <a class="cta" id="ccLink" target="_blank" rel="noopener">Open TikTok's trending sounds ↗</a>
+      <a class="ghost" id="clLink" target="_blank" rel="noopener">Business-safe music ↗</a>
+    </div>
+    <div class="sndform">
+      <input type="text" id="sndText" placeholder="Song — Artist (as shown in TikTok)">
+      <input type="text" id="sndMood" placeholder="Mood, e.g. cosy, playful" style="max-width:220px">
+      <label style="font-size:13px"><input type="checkbox" id="sndBiz"> Approved for business</label>
+      <button class="cta" id="sndAdd">Save sound</button>
+    </div>
+    <div id="sndList"></div>
+    <h3 class="sub">How to add the sound in TikTok</h3><ol id="sndHowTo"></ol>
+    <h3 class="sub">…or on Instagram</h3><ol id="sndHowToIg"></ol>
+    <p class="sub" style="font-size:12px">Tip: ask Claude “what's trending on TikTok this week?” and it will look up public round-ups and save the ones that fit your brand.</p>
+  </section>
+
+  <section id="tab-brand" class="hidden"><h2>My brand</h2><div id="brandBox"></div>
+    <h2 style="margin-top:34px">Fonts <small>your own fonts work too, even ones that aren't on Google</small></h2>
+    <div class="fontcard">
+      <div>
+        <h3 class="sub" style="margin-top:0">Sticker lettering</h3>
+        <p class="note">Used when Reel Studio makes a word sticker. Automatic picks the font that matches your brand.</p>
+        <select id="fStk"></select>
+        <div class="fprev" id="fStkPrev">glow up ✦</div>
+      </div>
+      <div>
+        <h3 class="sub" style="margin-top:0">Badge &amp; stamp text</h3>
+        <p class="note">For labels like NEW, TIP #1, $49, LIMITED.</p>
+        <select id="fLbl"></select>
+        <div class="fprev" id="fLblPrev">NEW DROP</div>
+      </div>
+      <div>
+        <h3 class="sub" style="margin-top:0">Upload your own font</h3>
+        <p class="note">A .ttf or .otf file (bought or custom fonts too; check your licence allows video/social use).</p>
+        <select id="fRole">
+          <option value="">Just add it to my fonts</option><option value="sticker">Use for sticker lettering</option>
+          <option value="sticker_label">Use for badges &amp; stamps</option><option value="headline">Use for headlines</option>
+          <option value="script">Use as my script (titles)</option><option value="serif">Use as my serif (titles)</option>
+          <option value="caption">Use for captions</option>
+        </select>
+        <label class="cta" style="display:inline-block;margin-top:10px;cursor:pointer">Choose font file<input type="file" id="fFile" accept=".ttf,.otf" hidden></label>
+        <p class="note" id="fMsg"></p>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>Reel Studio · a Systems Pilot product · runs on your computer</footer>
+
+<dialog id="wz">
+  <div class="wz-head"><div class="dots" id="dots"></div><button class="x" id="wzClose" aria-label="Close">✕</button></div>
+  <div class="wz-body" id="wzBody"></div>
+  <div class="wz-foot"><button class="ghost" id="back">Back</button><button class="cta" id="next">Next</button></div>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+let O = null, TPL = {}, B = {}, step = 0, file = null;
+const api = async (p, b) => { const r = await fetch(p, b ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) } : {}); return r.json(); };
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const q = o => new URLSearchParams(o).toString();
+
+// ------------------------------------------------------------ navigation
+function tab(name) {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x.dataset.tab === name));
+  ["home", "templates", "looks", "sounds", "brand"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
+  if (name === "looks") drawLooks();
+}
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => tab(b.dataset.tab));
+document.querySelector("[data-nav=templates]").onclick = () => tab("templates");
+
+// ------------------------------------------------------------ home
+async function load() {
+  O = await api("/api/overview");
+  TPL = await api("/api/templates");
+  const g = $("#reels");
+  g.innerHTML = !O.projects.length ? `<div class="empty">No reels yet. Tap <b>＋ New reel</b> or pick a template.</div>` :
+    O.projects.map(p => {
+      const st = p.job?.state === "roughcut" ? "Cutting…" : p.job?.state === "rendering" ? "Rendering…" : p.has_final ? "Finished" : p.has_timeline ? "Styled" : p.job?.state === "ready-for-review" ? "Ready to review" : "Draft";
+      const cover = p.has_cover ? `style="background-image:url(/api/p/${p.slug}/cover.jpg)"` : "";
+      const acts = [!p.faceless ? `<a href="/review?p=${p.slug}">Review cut</a>` : "", p.has_timeline ? `<a href="/editor?p=${p.slug}">Edit</a>` : "",
+        p.has_final ? `<a href="/api/p/${p.slug}/render/final.mp4" download>Download</a>` : "",
+        p.has_nomusic ? `<a href="/api/p/${p.slug}/render/final-for-trending-sound.mp4" download title="Your voice + sound effects, no music: add a trending sound in TikTok">For TikTok sound</a>` : ""].join("");
+      return `<div class="reel"><div class="cover" ${cover}><span class="chip">${st}</span></div><div class="meta"><b>${esc(p.brief.topic || p.slug)}</b>
+        <span style="color:var(--muted);font-size:12px">${esc(p.created || "")}</span><div class="acts">${acts}</div></div></div>`;
+    }).join("");
+  drawTemplates(); drawBrand(); drawSounds(); drawFonts();
+}
+
+// ------------------------------------------------------------ fonts
+const loadedFonts = new Set();
+function previewFont(el, name) {
+  if (!loadedFonts.has(name)) {
+    const f = new FontFace("p-" + name, `url(/api/font-file?name=${encodeURIComponent(name)})`);
+    f.load().then(ff => document.fonts.add(ff)).catch(() => {}); loadedFonts.add(name);
+  }
+  el.style.fontFamily = `"p-${name}", sans-serif`;
+}
+async function drawFonts() {
+  const F = await api("/api/fonts");
+  const opts = (auto, cur, isAuto) => `<option value="auto" ${isAuto ? "selected" : ""}>Automatic: matches my brand (${esc(auto)})</option>` +
+    F.fonts.map(f => `<option value="${esc(f.name)}" ${!isAuto && f.name === cur ? "selected" : ""}>${f.mine ? "★ " : ""}${esc(f.name)}</option>`).join("");
+  $("#fStk").innerHTML = opts(F.sticker, F.sticker, F.sticker_auto);
+  $("#fLbl").innerHTML = opts(F.sticker_label, F.sticker_label, F.label_auto);
+  previewFont($("#fStkPrev"), F.sticker); previewFont($("#fLblPrev"), F.sticker_label);
+  $("#fStk").onchange = async e => { await api("/api/font-role", { role: "sticker", font: e.target.value }); drawFonts(); };
+  $("#fLbl").onchange = async e => { await api("/api/font-role", { role: "sticker_label", font: e.target.value }); drawFonts(); };
+}
+$("#fFile").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  $("#fMsg").textContent = "Adding " + f.name + "…";
+  const r = await (await fetch(`/api/font-upload?${q({ name: f.name, role: $("#fRole").value })}`, { method: "POST", body: f })).json();
+  $("#fMsg").textContent = r.ok ? `✅ ${r.font} added${$("#fRole").value ? " and in use" : ""}.` : "⚠️ " + r.error;
+  e.target.value = ""; drawFonts();
+};
+
+// ------------------------------------------------------------ trending sounds
+async function drawSounds() {
+  const S = await api("/api/sounds");
+  $("#ccLink").href = S.creative_center; $("#clLink").href = S.commercial;
+  $("#sndHowTo").innerHTML = S.how_to.tiktok.map(x => `<li>${esc(x)}</li>`).join("");
+  $("#sndHowToIg").innerHTML = S.how_to.instagram.map(x => `<li>${esc(x)}</li>`).join("");
+  $("#sndList").innerHTML = !S.sounds.length ? `<div class="empty">No sounds saved yet. Open TikTok's trending list, then save 3–5 that suit your brand.</div>` :
+    S.sounds.map(i => `<div class="snd"><b>${esc(i.title)}</b> <span>${esc(i.artist || "")}</span>
+      ${i.mood.length ? `<span class="chip">${esc(i.mood.join(", "))}</span>` : ""}${i.business_ok ? `<span class="chip ok">business-safe</span>` : ""}
+      <span style="color:var(--muted);font-size:12px">added ${esc(i.added)}</span>
+      <button class="x" data-rm="${esc(i.title)}" aria-label="Remove">✕</button></div>`).join("");
+  document.querySelectorAll("[data-rm]").forEach(b => b.onclick = async () => { await api("/api/sounds", { remove: b.dataset.rm }); drawSounds(); });
+}
+$("#sndAdd").onclick = async () => {
+  const text = $("#sndText").value.trim(); if (!text) return;
+  await api("/api/sounds", { text, mood: $("#sndMood").value, business: $("#sndBiz").checked });
+  $("#sndText").value = ""; $("#sndMood").value = ""; $("#sndBiz").checked = false; drawSounds();
+};
+
+// ------------------------------------------------------------ templates
+let tplCat = "All";
+function drawTemplates() {
+  const cats = ["All", ...new Set(Object.values(TPL).map(t => t.category))];
+  $("#tplCats").innerHTML = cats.map(c => `<button class="pill ${c === tplCat ? "on" : ""}" data-cat="${c}">${c}</button>`).join("");
+  document.querySelectorAll("[data-cat]").forEach(b => b.onclick = () => { tplCat = b.dataset.cat; drawTemplates(); });
+  const fmtName = { "talking-head": "🎙️ talk to camera", voiceover: "🎬 clips + voice", faceless: "✍️ text & photos" };
+  $("#tplGrid").innerHTML = Object.entries(TPL).filter(([, t]) => tplCat === "All" || t.category === tplCat).map(([id, t]) => `
+    <div class="tpl"><span class="cat">${esc(t.category)}</span><h3>${esc(t.name)}</h3><p>${esc(t.why)}</p>
+      <div class="row"><span>${fmtName[t.format] || t.format}</span><span>${esc(t.length)}</span><span>${esc(t.grade)}</span><span>${esc(t.captions)} captions</span></div>
+      <b style="font-size:13px;margin-top:6px">What to film</b><ul>${t.film.map(f => `<li>${esc(f)}</li>`).join("")}</ul>
+      <button class="cta go" data-tpl="${id}">Use this template</button></div>`).join("");
+  document.querySelectorAll("[data-tpl]").forEach(b => b.onclick = () => fromTemplate(b.dataset.tpl));
+}
+function fromTemplate(id) {
+  const t = TPL[id];
+  openWizard(t.format, { template: id, idea: id, title: t.title.template, titleText: (t.title.title || "").replace(/\{.*?\}/g, "").trim(),
+    grade: t.grade, captions: t.captions, transition: t.transition, music: "free", mood: t.music.mood, genre: t.music.genre, tempo: t.music.tempo || "medium" });
+}
+
+// ------------------------------------------------------------ looks
+const SAMPLE = { "with-me": { kicker: "mini vlog", sub: "January 2026" }, diary: { kicker: "visual diary" }, episode: { kicker: "mini vlog", tag: "Eps #1", location: "your location" },
+  sparkle: { tag: "new chapter" }, headline: { script: "vlog" }, location: { sub: "September 2026" }, chapter: { kicker: "part one", number: "01" }, typed: {} };
+const titleImg = (t, text) => `/api/title-preview?${q(Object.assign({ template: t, title: t === "location" ? "Cape Town" : t === "typed" ? "POV: " + text : text }, SAMPLE[t] || {}))}`;
+function drawLooks() {
+  const text = $("#tText").value || "A Day With Me";
+  $("#titleGallery").innerHTML = Object.keys(O.titles).map(t => `<div class="tcard"><img loading="lazy" src="${titleImg(t, text)}"><span><b>${t}</b></span></div>`).join("");
+  $("#capGallery").innerHTML = Object.entries(O.captions).map(([k, d]) => `<div class="cap"><img loading="lazy" src="/api/caption-preview?style=${k}"><span><b>${k}</b> · ${esc(d)}</span></div>`).join("");
+  $("#gradeGallery").innerHTML = Object.entries(O.grades).map(([g, list]) => `<h3 class="sub" style="margin-top:14px">${g}</h3><div class="filters">${list.map(k =>
+    `<div class="look"><img loading="lazy" src="/api/grade-preview?grade=${k}"><span>${k}</span></div>`).join("")}</div>`).join("");
+}
+let tt; $("#tText").oninput = () => { clearTimeout(tt); tt = setTimeout(drawLooks, 400); };
+function drawBrand() {
+  const b = O.brand;
+  if (!b) { $("#brandBox").innerHTML = `<div class="empty">Your brand isn't set up yet.<br>Open Claude and say <b>"set up my brand"</b> (about 10 minutes; START-HERE.md lists what to have ready).</div>`; return; }
+  const sw = ["bg", "ink", "pop", "accent", "paper"].map(k => `<i title="${k} ${b.colors[k]}" style="background:${b.colors[k]}"></i>`).join("");
+  $("#brandBox").innerHTML = `<div class="brandcard"><img src="/api/brand-preview?v=${Date.now()}" alt="Brand preview"><div><h2 style="margin:0">${esc(b.label || "My brand")}</h2>
+    <p style="color:var(--muted);margin:4px 0">${esc(b.vibe || "")}</p><div class="sw">${sw}</div>
+    <p><b>Fonts</b><br><span style="color:var(--muted)">Headlines ${esc(b.fonts.main)} · Accent ${esc(b.fonts.accent)} · Captions ${esc(b.fonts.caption)}</span></p>
+    <p><b>Logo</b><br><span style="color:var(--muted)">${b.has_logo ? "On every reel (move it any time in the editor)" : "Not added yet"}</span></p>
+    <p class="note">Want changes? Tell Claude, e.g. "make my colours warmer" or "use my new logo".</p></div></div>`;
+}
+
+// ------------------------------------------------------------ wizard
+const IDEAS = [["tips", "Tips / list", "\"3 ways to…\""], ["story", "Story time", "something that happened"], ["day", "Day in my life", "vlog, routine"],
+  ["before-after", "Before → after", "a transformation"], ["product", "Product / offer", "sell something"], ["hot-take", "Hot take / myth", "an opinion"],
+  ["tutorial", "How-to", "teach a skill"], ["bts", "Behind the scenes", "the real process"], ["quote", "Motivation / quote", "a feeling"]];
+const VIBES = ["calm", "cosy", "energetic", "funny", "luxe", "bold", "dreamy", "clean"];
+const vidFile = () => B.file && /\.(mp4|mov|m4v)$/i.test(B.file) ? B.file : "";
+const STEPS = [
+  { id: "format", show: () => true, ok: () => !!B.format, html: () => `<h3>What are we making?</h3><p class="sub">Choose the kind of reel.</p>
+      <div class="opts">${[["talking-head", "🎙️ Talk to camera", "you on camera"], ["voiceover", "🎬 Clips + voice", "your voice over b-roll"], ["faceless", "✍️ Text & photos", "no camera needed"], ["batch", "🗂️ A batch", "many clips at once"]]
+      .map(([v, a, b]) => `<button class="opt ${B.format === v ? "on" : ""}" data-set="format" data-v="${v}"><b>${a}</b><span>${b}</span></button>`).join("")}</div>` },
+  { id: "video", show: () => B.format !== "faceless", ok: () => !!(file || B.file), html: () => `<h3>Add your video</h3><p class="sub">Drop it here or pick one from your inbox. Messy takes are fine: pauses and retakes get cut.</p>
+      <div class="drop" id="drop">${file ? `✅ <b>${esc(file.name)}</b> (${(file.size / 1e6).toFixed(0)} MB)` : B.file ? `✅ <b>${esc(B.file)}</b>` : "Drag your video here or <u>choose a file</u>"}<input type="file" id="fileIn" accept="video/*" hidden></div>
+      ${O.inbox.filter(f => /\.(mp4|mov|m4v)$/i.test(f)).length ? `<label class="f">Or from your inbox</label><div class="pills">${O.inbox.filter(f => /\.(mp4|mov|m4v)$/i.test(f)).map(f => `<button class="pill ${B.file === f ? "on" : ""}" data-set="file" data-v="${esc(f)}">${esc(f.split("/").pop())}</button>`).join("")}</div>` : ""}` },
+  { id: "script", show: () => B.format === "faceless", ok: () => (B.script || "").trim().length > 3 || !!B.template, html: () => `<h3>Your words${B.template ? " (optional)" : ""}</h3><p class="sub">One line = one screen. Claude can polish them. Add photos/clips to your inbox to use them.</p>
+      <textarea id="script" rows="7" placeholder="Stop editing for hours&#10;Your coffee deserves better&#10;Here's what I do instead…">${esc(B.script || "")}</textarea>` },
+  { id: "idea", show: () => !B.template, ok: () => !!B.idea, html: () => `<h3>What's it about?</h3><p class="sub">This decides how it's edited: pacing, titles, stickers. No editing words needed.</p>
+      <div class="opts">${IDEAS.map(([v, a, b]) => `<button class="opt ${B.idea === v ? "on" : ""}" data-set="idea" data-v="${v}"><b>${a}</b><span>${b}</span></button>`).join("")}</div>
+      <label class="f">In one sentence</label><input type="text" id="topic" placeholder="e.g. my 5am morning routine as a mom of two" value="${esc(B.topic || "")}">` },
+  { id: "vibe", show: () => true, ok: () => (B.vibe || []).length > 0, html: () => `<h3>How should it feel?</h3><p class="sub">Pick one or two.</p>
+      ${B.template ? `<label class="f">Topic (one sentence)</label><input type="text" id="topic" value="${esc(B.topic || "")}" placeholder="what's this one about?">` : ""}
+      <div class="pills" style="margin-top:12px">${VIBES.map(v => `<button class="pill ${(B.vibe || []).includes(v) ? "on" : ""}" data-multi="vibe" data-v="${v}">${v}</button>`).join("")}</div>
+      <label class="f">Love a reel's style? Paste its link (optional)</label><input type="text" id="insp" placeholder="https://www.instagram.com/reel/…" value="${esc(B.inspiration || "")}">
+      <p class="note">I'll study its pacing, colours and text style and use them with <b>your</b> brand.</p>` },
+  { id: "look", show: () => true, ok: () => !!B.grade, html: () => `<h3>Pick a filter</h3><p class="sub">${vidFile() ? "Shown on your own video." : "Shown on a sample; it adapts to your footage."}</p>
+      ${Object.entries(O.grades).map(([g, list]) => `<label class="f">${g}</label><div class="filters">${list.map(k =>
+        `<button class="look ${B.grade === k ? "on" : ""}" data-set="grade" data-v="${k}"><img loading="lazy" src="/api/grade-preview?${q({ grade: k, file: vidFile() })}"><span>${k}</span></button>`).join("")}</div>`).join("")}` },
+  { id: "title", show: () => true, ok: () => !!B.title, html: () => {
+      const text = B.titleText || (B.topic ? B.topic.split(" ").slice(0, 4).join(" ") : "A Day With Me");
+      return `<h3>Pick a title style</h3><p class="sub">Shown in your brand. Change the words any time.</p><input type="text" id="titleText" value="${esc(text)}" style="margin-bottom:12px">
+      <div class="titles">${Object.keys(O.titles).filter(t => t !== "location").map(t => `<button class="tcard ${B.title === t ? "on" : ""}" data-set="title" data-v="${t}"><img loading="lazy" src="${titleImg(t, text)}"><span>${t}</span></button>`).join("")}
+      <button class="tcard ${B.title === "none" ? "on" : ""}" data-set="title" data-v="none"><div style="aspect-ratio:9/16;display:grid;place-items:center;color:var(--muted)">No title</div><span>none</span></button></div>
+      ${B.format === "talking-head" ? `<label class="toggle"><input type="checkbox" id="behind" ${B.behind ? "checked" : ""}> Put the big word <b>behind me</b></label>` : ""}`; } },
+  { id: "captions", show: () => B.format !== "faceless", ok: () => true, html: () => `<h3>Captions & motion</h3><p class="sub">How your words appear, and how clips change.</p>
+      <div class="caps">${Object.entries(O.captions).map(([k, d]) => `<button class="cap ${(B.captions || "karaoke") === k ? "on" : ""}" data-set="captions" data-v="${k}"><img loading="lazy" src="/api/caption-preview?style=${k}"><span><b>${k}</b> · ${esc(d)}</span></button>`).join("")}
+        <button class="cap ${B.captions === "off" ? "on" : ""}" data-set="captions" data-v="off"><div style="height:70px;display:grid;place-items:center;color:var(--muted)">No captions</div><span>off</span></button></div>
+      <label class="f">Transitions</label><div class="pills">${Object.entries(O.transitions).map(([k, d]) => `<button class="pill ${(B.transition || "") === k ? "on" : ""}" data-set="transition" data-v="${k}" title="${esc(d)}">${k}</button>`).join("")}</div>
+      <label class="f">Zooms</label><div class="pills">${[["punch", "quick punch-ins"], ["push", "slow push-in"], ["whip", "fast whip zoom"], ["pulse", "beat pulse"], ["focus", "zoom to face"], ["none", "no zooms"]].map(([k, d]) => `<button class="pill ${(B.zoom || "") === k ? "on" : ""}" data-set="zoom" data-v="${k}">${d}</button>`).join("")}</div>` },
+  { id: "music", show: () => true, ok: () => true, html: () => `<h3>Music</h3><p class="sub">Describe it and get a track made for this reel, free. Or use your own.</p>
+      <div class="seg">${[["none", "No music"], ["free", "✨ Make music (free)"], ...(O.music.providers.elevenlabs ? [["eleven", "✨ ElevenLabs (premium)"]] : []), ["own", "My own track"]].map(([v, a]) => `<button class="${(B.music || "free") === v ? "on" : ""}" data-set="music" data-v="${v}">${a}</button>`).join("")}</div>
+      <div class="${B.music === "own" ? "" : "hidden"}"><label class="f">Choose a track from your inbox</label>
+        <div class="pills">${O.inbox.filter(f => /\.(mp3|wav|m4a)$/i.test(f)).map(f => `<button class="pill ${B.musicFile === f ? "on" : ""}" data-set="musicFile" data-v="${esc(f)}">${esc(f.split("/").pop())}</button>`).join("") || `<span class="note">Drop an mp3 into the <b>inbox</b> folder, then reopen this step.</span>`}</div></div>
+      <div class="${["free", "eleven", undefined].includes(B.music) ? "" : "hidden"}">
+        <label class="f">Mood</label><div class="pills">${O.music.moods.map(v => `<button class="pill ${(B.mood || []).includes(v) ? "on" : ""}" data-multi="mood" data-v="${v}">${v}</button>`).join("")}</div>
+        <label class="f">Style</label><div class="pills">${O.music.genres.map(v => `<button class="pill ${(B.genre || []).includes(v) ? "on" : ""}" data-multi="genre" data-v="${v}">${v}</button>`).join("")}</div>
+        <label class="f">Speed</label><div class="seg">${["slow", "medium", "fast"].map(v => `<button class="${(B.tempo || "medium") === v ? "on" : ""}" data-set="tempo" data-v="${v}">${v}</button>`).join("")}</div>
+        <label class="f">Energy</label><div class="seg">${[["steady", "steady"], ["build", "builds up"], ["drop", "drops in the middle"]].map(([v, a]) => `<button class="${(B.energy || "steady") === v ? "on" : ""}" data-set="energy" data-v="${v}">${a}</button>`).join("")}</div>
+        <label class="f">Describe it in your words (optional)</label><input type="text" id="mdesc" placeholder="like a rainy Sunday morning with soft piano" value="${esc(B.describe || "")}">
+        ${(B.music || "free") === "free" ? `<button class="ghost" id="hear" style="margin-top:12px">▶︎ Hear a preview</button><audio id="aud" controls class="hidden"></audio>
+          <p class="note">Made on your computer, royalty-free, yours to use anywhere. Want studio-grade AI music? Connect ElevenLabs (paid, cleared for social media).</p>`
+          : `<p class="note">ElevenLabs makes 2 options to choose from (paid per track by ElevenLabs, cleared for social media).</p>`}
+      </div>` },
+  { id: "finish", show: () => true, ok: () => true, html: () => `<h3>Last touches</h3><p class="sub">Almost done.</p>
+      <label class="toggle"><input type="checkbox" id="logo" ${B.logo !== false ? "checked" : ""}> Show my logo</label>
+      <label class="f">Target length: <span id="lenOut">${B.goal || 45}</span> seconds</label><input type="range" id="goal" min="8" max="90" step="1" value="${B.goal || 45}" style="width:100%">
+      <p class="note">Everything you picked is saved as a brief. Claude designs the reel from it and shows you the plan before building.</p>` },
+  { id: "done", show: () => true, ok: () => false, html: () => `<h3 id="doneTitle">Creating your reel…</h3><p class="sub" id="doneSub">Uploading and preparing. This runs on your computer.</p><div class="bar"><i id="doneBar" style="width:15%"></i></div><div id="doneActs" style="margin-top:18px"></div>` },
+];
+const visible = () => STEPS.filter(s => s.show());
+function openWizard(fmt, preset) { B = Object.assign(fmt ? { format: fmt } : {}, preset || {}); file = null; step = fmt ? 1 : 0; $("#wz").showModal(); render(); }
+$("#newBtn").onclick = () => openWizard();
+document.querySelectorAll(".fmt[data-fmt]").forEach(b => b.onclick = () => openWizard(b.dataset.fmt));
+$("#wzClose").onclick = () => { $("#wz").close(); load(); };
+function render() {
+  const vs = visible(), s = vs[step];
+  $("#dots").innerHTML = vs.slice(0, -1).map((_, i) => `<i class="${i <= step ? "on" : ""}"></i>`).join("");
+  $("#wzBody").innerHTML = (B.template && step < 2 ? `<p class="note" style="margin-top:0">Template: <b>${esc(TPL[B.template]?.name)}</b>, film: ${esc(TPL[B.template]?.film.join(" · "))}</p>` : "") + s.html();
+  $("#back").style.visibility = step > 0 && s.id !== "done" ? "visible" : "hidden";
+  $("#next").textContent = s.id === "finish" ? "Create my reel ✨" : "Next";
+  $("#next").style.display = s.id === "done" ? "none" : "";
+  $("#next").disabled = !s.ok(); $("#next").style.opacity = s.ok() ? 1 : .45;
+  bind(s);
+}
+function collect() {
+  const v = id => document.getElementById(id);
+  for (const [id, k] of [["topic", "topic"], ["script", "script"], ["insp", "inspiration"], ["titleText", "titleText"], ["mdesc", "describe"]]) if (v(id)) B[k] = v(id).value;
+  if (v("behind")) B.behind = v("behind").checked;
+  if (v("logo")) B.logo = v("logo").checked;
+  if (v("goal")) B.goal = +v("goal").value;
+}
+function bind(s) {
+  document.querySelectorAll("[data-set]").forEach(b => b.onclick = () => { collect(); B[b.dataset.set] = b.dataset.v; if (b.dataset.set === "file") file = null; render(); });
+  document.querySelectorAll("[data-multi]").forEach(b => b.onclick = () => { collect(); const k = b.dataset.multi; B[k] = B[k] || []; B[k] = B[k].includes(b.dataset.v) ? B[k].filter(x => x !== b.dataset.v) : [...B[k], b.dataset.v].slice(-3); render(); });
+  ["topic", "script", "insp", "mdesc"].forEach(id => { const el = document.getElementById(id); if (el) el.oninput = () => { collect(); $("#next").disabled = !s.ok(); $("#next").style.opacity = s.ok() ? 1 : .45; }; });
+  const tt = document.getElementById("titleText"); if (tt) { let h; tt.oninput = () => { collect(); clearTimeout(h); h = setTimeout(render, 500); }; }
+  const g = document.getElementById("goal"); if (g) g.oninput = () => { $("#lenOut").textContent = g.value; };
+  const hear = document.getElementById("hear");
+  if (hear) hear.onclick = () => { collect(); const a = $("#aud"); a.classList.remove("hidden"); hear.textContent = "Making a preview…";
+    a.src = `/api/music-preview?${q({ mood: (B.mood || ["cosy"]).join(","), genre: (B.genre || ["lo-fi"]).join(","), tempo: B.tempo || "medium", energy: B.energy || "steady", seed: Math.floor(Math.random() * 99) })}`;
+    a.oncanplay = () => { hear.textContent = "▶︎ Try another"; a.play(); }; };
+  const drop = document.getElementById("drop"), fin = document.getElementById("fileIn");
+  if (drop) { drop.onclick = () => fin.click(); fin.onchange = () => { file = fin.files[0]; B.file = null; render(); };
+    drop.ondragover = e => { e.preventDefault(); drop.classList.add("hover"); }; drop.ondragleave = () => drop.classList.remove("hover");
+    drop.ondrop = e => { e.preventDefault(); file = e.dataTransfer.files[0]; B.file = null; render(); }; }
+}
+$("#back").onclick = () => { collect(); step = Math.max(0, step - 1); render(); };
+$("#next").onclick = async () => { collect(); const vs = visible();
+  if (vs[step].id === "finish") { step++; render(); return submit(); }
+  if (vs[step].id === "video" && file) { $("#next").disabled = true; $("#next").textContent = "Uploading…"; B.file = (await upload(file)).file; file = null; }
+  step = Math.min(vs.length - 1, step + 1); render(); };
+function upload(f) { return new Promise((res, rej) => { const x = new XMLHttpRequest(); x.open("POST", "/api/upload?name=" + encodeURIComponent(f.name));
+  x.upload.onprogress = e => { const b = $("#doneBar"); if (b) b.style.width = (10 + 50 * e.loaded / e.total) + "%"; };
+  x.onload = () => res(JSON.parse(x.responseText)); x.onerror = rej; x.send(f); }); }
+async function submit() {
+  try {
+    const r = await api("/api/new", { file: B.format === "faceless" ? null : B.file, brief: Object.assign({}, B), name: (B.topic || TPL[B.template]?.name || "").split(" ").slice(0, 5).join(" ") });
+    const slug = r.slug;
+    if (B.format === "faceless") return finished(slug, false);
+    $("#doneSub").textContent = "Cutting out pauses and retakes…";
+    const poll = setInterval(async () => { const j = await api(`/api/p/${slug}/job`); $("#doneBar").style.width = j.state === "roughcut" ? "75%" : "100%";
+      if (j.state === "ready-for-review") { clearInterval(poll); finished(slug, true); }
+      if (j.state === "error") { clearInterval(poll); $("#doneTitle").textContent = "Something went wrong"; $("#doneSub").textContent = j.error + " (tell Claude \"my reel failed\" and it will fix it)"; } }, 1500);
+  } catch (e) { $("#doneTitle").textContent = "Upload failed"; $("#doneSub").textContent = String(e); }
+}
+function finished(slug, review) {
+  $("#doneBar").style.width = "100%"; $("#doneTitle").textContent = review ? "Your rough cut is ready ✨" : "Your reel is set up ✨";
+  $("#doneSub").innerHTML = review ? `Check the lines, remove anything you don't want, then press <b>Send my edits</b>.<br>Then tell Claude: <b>"my reel ${esc(slug)} is ready"</b>.`
+    : `Now tell Claude: <b>"my reel ${esc(slug)} is ready"</b>. It will design it from your answers.`;
+  $("#doneActs").innerHTML = review ? `<a class="cta" style="text-decoration:none;display:inline-block" href="/review?p=${slug}">Review my cut →</a>` : "";
+}
+load();
+</script>
+</body>
+</html>

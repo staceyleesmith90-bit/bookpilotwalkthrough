@@ -1,0 +1,166 @@
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: Systems Pilot review room — player column + feedback column (stacks on phones) */
+:root {
+  --navy: #06123D; --bg: #F4F6FC; --surface: #FFFFFF; --fg: #0B1433; --muted: #56617F; --line: #DCE2F0;
+  --cyan: #00B5D9; --blue: #1E63FF; --violet: #6A11CB; --pink: #EC4899;
+  --grad: linear-gradient(100deg, var(--cyan), var(--blue) 38%, var(--violet) 70%, var(--pink));
+  --display: "Poppins", "Segoe UI", system-ui, sans-serif; --body: "Inter", system-ui, -apple-system, sans-serif;
+  --chip: #EEF2FF; --ok: #0E9F6E;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #050B26; --surface: #0C1638; --fg: #EEF2FF; --muted: #A5B0CF; --line: #1C2A55; --chip: #16224A; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #050B26; --surface: #0C1638; --fg: #EEF2FF; --muted: #A5B0CF; --line: #1C2A55; --chip: #16224A; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.top { background: var(--navy); color: #fff; padding-inline: 16px; padding-block: 12px; display: flex; align-items: center; gap: 10px; }
+.mark { width: 30px; height: 30px; border-radius: 9px; background: var(--grad); display: grid; place-items: center; font: 700 15px var(--display); }
+.brand b { font-family: var(--display); font-weight: 700; display: block; line-height: 1.1; }
+.brand small { color: #AFC0EC; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.wrap { max-width: 1060px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px;
+  display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (max-width: 820px) { .wrap { grid-template-columns: minmax(0, 1fr); } }
+h1 { font-family: var(--display); font-weight: 700; font-size: 1.45rem; line-height: 1.2; margin: 0 0 4px; text-wrap: balance; }
+.meta { color: var(--muted); margin: 0 0 14px; font-size: .9rem; }
+.ver { display: inline-block; background: var(--grad); color: #fff; font: 600 11px var(--body); padding: 2px 9px; border-radius: 999px; margin-left: 6px; vertical-align: 2px; }
+video { width: 100%; max-width: 100%; aspect-ratio: 9 / 16; background: #000; border-radius: 16px; display: block; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
+.card h2 { font-family: var(--display); font-weight: 600; font-size: 1.05rem; margin: 0; }
+.col { display: grid; gap: 16px; min-width: 0; }
+.now { font: 600 13px var(--body); color: var(--blue); font-variant-numeric: tabular-nums; }
+textarea { width: 100%; min-height: 76px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font: 400 14px var(--body); background: var(--bg); color: var(--fg); box-sizing: border-box; }
+.quick { display: flex; flex-wrap: wrap; gap: 6px; }
+.quick button { background: var(--chip); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; font: 500 12.5px var(--body); cursor: pointer; }
+.go { background: var(--grad); color: #fff; border: 0; border-radius: 999px; padding: 10px 18px; font: 600 14px var(--body); cursor: pointer; justify-self: start; }
+button:focus-visible, textarea:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.note { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px; border: 1px solid var(--line); border-radius: 10px; }
+.note .t { font: 600 12.5px var(--body); color: var(--blue); background: var(--chip); border: 0; border-radius: 7px; padding: 3px 8px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.note p { margin: 0; overflow-wrap: anywhere; }
+.note .st { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.note.done p { color: var(--muted); text-decoration: line-through; }
+.note.done .st { color: var(--ok); }
+.empty, .hint { color: var(--muted); font-size: .9rem; margin: 0; }
+.did { margin: 0; padding-left: 18px; color: var(--muted); font-size: .9rem; display: grid; gap: 3px; }
+details summary { cursor: pointer; font-weight: 600; }
+details audio { width: 100%; margin-top: 10px; }
+</style>
+
+<header class="top">
+  <div class="mark" aria-hidden="true">S</div>
+  <div class="brand"><b>Reel Studio</b><small>by Systems Pilot</small></div>
+</header>
+
+<main class="wrap">
+  <section class="col">
+    <div>
+      <h1>__TITLE__<span class="ver">__VERSION__</span></h1>
+      <p class="meta">__DURATION__ · tap play for sound</p>
+    </div>
+    <video id="reel" controls playsinline preload="metadata">
+      <source src="reel-opus.mp4" type='video/mp4; codecs="avc1.640028, opus"'>
+      <source src="reel.mp4" type="video/mp4">
+    </video>
+    <details class="card">
+      <summary>No sound?</summary>
+      <p class="hint">Play the soundtrack on its own. If this plays, your speakers are fine.</p>
+      <audio controls preload="none" src="soundtrack.mp3"></audio>
+    </details>
+  </section>
+
+  <section class="col">
+    <div class="card">
+      <h2>Feedback</h2>
+      <p class="hint">Pause where you want a change, write it in your own words, and add it. Claude reads these and makes the changes.</p>
+      <div class="now" id="now">At 0:00</div>
+      <div class="quick" id="quick">
+        <button type="button">Love this part</button>
+        <button type="button">Text too big</button>
+        <button type="button">Text too small</button>
+        <button type="button">Remove this sticker</button>
+        <button type="button">Change the sound here</button>
+        <button type="button">Cut this part</button>
+        <button type="button">Zoom in here</button>
+      </div>
+      <label for="noteText" class="hint">Your note</label>
+      <textarea id="noteText" placeholder="e.g. make the title bigger, use a softer sound here"></textarea>
+      <button class="go" id="addNote" type="button">Add note</button>
+      <p class="hint" id="status" role="status"></p>
+    </div>
+
+    <div class="card">
+      <h2>Notes so far</h2>
+      <ul class="notes" id="notes"><li class="empty">No notes yet. Your notes show up here with the moment they belong to.</li></ul>
+    </div>
+
+    <div class="card">
+      <h2>What Reel Studio did</h2>
+      <ul class="did" id="did"></ul>
+    </div>
+  </section>
+</main>
+
+<script id="reel-data" type="application/json">__DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById("reel-data").textContent);
+const video = document.getElementById("reel");
+const fmt = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+const did = document.getElementById("did");
+(DATA.did || []).forEach(line => { const li = document.createElement("li"); li.textContent = line; did.appendChild(li); });
+video.addEventListener("timeupdate", () => { document.getElementById("now").textContent = "At " + fmt(video.currentTime); });
+document.getElementById("quick").addEventListener("click", e => {
+  if (e.target.tagName !== "BUTTON") return;
+  const box = document.getElementById("noteText");
+  box.value = box.value ? box.value + " · " + e.target.textContent : e.target.textContent;
+  box.focus();
+});
+
+function renderNotes(list) {
+  const ul = document.getElementById("notes");
+  ul.replaceChildren();
+  if (!list.length) {
+    const li = document.createElement("li"); li.className = "empty";
+    li.textContent = "No notes yet. Your notes show up here with the moment they belong to.";
+    ul.appendChild(li); return;
+  }
+  list.sort((a, b) => a.t - b.t).forEach(n => {
+    const li = document.createElement("li"); li.className = "note" + (n.status === "done" ? " done" : "");
+    const t = document.createElement("button"); t.type = "button"; t.className = "t"; t.textContent = fmt(n.t);
+    t.addEventListener("click", () => { video.currentTime = n.t; video.pause(); });
+    const p = document.createElement("p"); p.textContent = n.note;
+    const st = document.createElement("span"); st.className = "st";
+    st.textContent = n.status === "done" ? "Done" : "Waiting for Claude";
+    li.append(t, p, st); ul.appendChild(li);
+  });
+}
+
+(async () => {
+  const status = document.getElementById("status");
+  const db = await (window.claude?.use ? claude.use("db") : null);
+  const add = document.getElementById("addNote");
+  if (!db) {
+    status.textContent = "Notes can't be saved in this view. Write your feedback in the chat instead.";
+    add.disabled = true; return;
+  }
+  const col = db.collection("feedback");
+  col.onSnapshot(snap => renderNotes(snap.docs.map(d => d.data())),
+                 () => { status.textContent = "Notes couldn't load. Refresh the page to try again."; });
+  add.addEventListener("click", async () => {
+    const box = document.getElementById("noteText");
+    const note = box.value.trim();
+    if (!note) { status.textContent = "Write a note first."; return; }
+    add.disabled = true;
+    try {
+      await col.add({ t: Math.round(video.currentTime * 10) / 10, note, status: "open",
+                      version: DATA.version, created: new Date().toISOString() });
+      box.value = ""; status.textContent = "Added. Claude will see it.";
+    } catch (e) {
+      status.textContent = e && e.code === "invalid_argument"
+        ? "You can watch this reel but not leave notes. Ask the owner for edit access."
+        : "That note didn't save. Try again in a moment.";
+    }
+    add.disabled = false;
+  });
+})();
+</script>

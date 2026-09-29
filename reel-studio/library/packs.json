@@ -1,0 +1,475 @@
+{
+  "bold": {
+    "label": "Bold",
+    "vibe": "loud, modern, punchy \u2014 for tips, hot takes, business",
+    "fonts": {
+      "main": {
+        "file": "library/fonts/Poppins-ExtraBold.ttf",
+        "case": "upper"
+      },
+      "accent": {
+        "file": "library/fonts/Caveat-Variable.ttf",
+        "weight": 700
+      },
+      "caption": {
+        "file": "library/fonts/Poppins-ExtraBold.ttf"
+      }
+    },
+    "colors": {
+      "bg": "#F4EFE6",
+      "ink": "#1E1E1E",
+      "pop": "#F2B705",
+      "accent": "#E4572E",
+      "paper": "#FFFFFF"
+    },
+    "sticker": {
+      "style": "doodle",
+      "stroke": 9,
+      "wobble": 3,
+      "fill": "paper",
+      "die_cut": true
+    },
+    "sfx": {
+      "text_in": "pop",
+      "sticker_in": "pop",
+      "transition": "whoosh",
+      "reveal": "ding",
+      "hook": "hit",
+      "cta": "ding",
+      "title": "hit"
+    },
+    "captions": {
+      "style": "karaoke",
+      "words_per_line": 3
+    },
+    "grade": "clean-bright",
+    "title_fonts": {
+      "serif": {
+        "file": "library/fonts/DMSerifDisplay-Regular.ttf"
+      },
+      "serif_bold": {
+        "file": "library/fonts/AbrilFatface-Regular.ttf"
+      },
+      "script": {
+        "file": "library/fonts/Yellowtail-Regular.ttf"
+      },
+      "brush": {
+        "file": "library/fonts/KaushanScript-Regular.ttf"
+      },
+      "sans": {
+        "file": "library/fonts/Montserrat-Variable.ttf",
+        "weight": 700
+      }
+    },
+    "transition": "whip",
+    "zoom": "whip"
+  },
+  "editorial": {
+    "label": "Editorial",
+    "vibe": "calm, classic, elegant \u2014 for stories, reflection, premium brands",
+    "fonts": {
+      "main": {
+        "file": "library/fonts/PlayfairDisplay-Variable.ttf",
+        "weight": 800,
+        "case": "lower"
+      },
+      "accent": {
+        "file": "library/fonts/PlayfairDisplay-Italic-Variable.ttf",
+        "weight": 500
+      },
+      "caption": {
+        "file": "library/fonts/Inter-Variable.ttf",
+        "weight": 600
+      }
+    },
+    "colors": {
+      "bg": "#1F3B2D",
+      "ink": "#F4EFE6",
+      "pop": "#E8A0A8",
+      "accent": "#E8A0A8",
+      "paper": "#F4EFE6",
+      "bubble_text": "#1F3B2D"
+    },
+    "sticker": {
+      "style": "doodle",
+      "stroke": 6,
+      "wobble": 2,
+      "fill": "none",
+      "die_cut": false
+    },
+    "sfx": {
+      "text_in": "click",
+      "sticker_in": "swish",
+      "transition": "whoosh",
+      "reveal": "ding",
+      "hook": "swish",
+      "cta": "ding",
+      "title": "swish"
+    },
+    "captions": {
+      "style": "line",
+      "words_per_line": 4
+    },
+    "grade": "soft-matte",
+    "title_fonts": {
+      "serif": {
+        "file": "library/fonts/BodoniModa-Variable.ttf",
+        "weight": 500
+      },
+      "serif_bold": {
+        "file": "library/fonts/PlayfairDisplay-Variable.ttf",
+        "weight": 800
+      },
+      "script": {
+        "file": "library/fonts/PinyonScript-Regular.ttf"
+      },
+      "brush": {
+        "file": "library/fonts/Allura-Regular.ttf"
+      },
+      "sans": {
+        "file": "library/fonts/Montserrat-Variable.ttf",
+        "weight": 500
+      }
+    },
+    "transition": "dip-white",
+    "zoom": "push"
+  },
+  "sunny": {
+    "label": "Sunny",
+    "vibe": "soft, warm, friendly \u2014 lifestyle, family, wellness",
+    "fonts": {
+      "main": {
+        "file": "library/fonts/Nunito-Variable.ttf",
+        "weight": 900,
+        "case": "lower"
+      },
+      "accent": {
+        "file": "library/fonts/ShadowsIntoLight.ttf"
+      },
+      "caption": {
+        "file": "library/fonts/Nunito-Variable.ttf",
+        "weight": 800
+      }
+    },
+    "colors": {
+      "bg": "#FFF6D8",
+      "ink": "#3B2F2A",
+      "pop": "#F6A93B",
+      "accent": "#E86A58",
+      "paper": "#FFFFFF"
+    },
+    "sticker": {
+      "style": "flat",
+      "stroke": 7,
+      "wobble": 2,
+      "die_cut": true
+    },
+    "sfx": {
+      "text_in": "pop",
+      "sticker_in": "pop",
+      "transition": "swish",
+      "reveal": "ding",
+      "hook": "pop",
+      "cta": "notify",
+      "title": "swish"
+    },
+    "captions": {
+      "style": "karaoke",
+      "words_per_line": 3
+    },
+    "grade": "warm-film",
+    "title_fonts": {
+      "serif": {
+        "file": "library/fonts/DMSerifDisplay-Regular.ttf"
+      },
+      "serif_bold": {
+        "file": "library/fonts/AbrilFatface-Regular.ttf"
+      },
+      "script": {
+        "file": "library/fonts/Satisfy-Regular.ttf"
+      },
+      "brush": {
+        "file": "library/fonts/Satisfy-Regular.ttf"
+      },
+      "sans": {
+        "file": "library/fonts/Nunito-Variable.ttf",
+        "weight": 800
+      }
+    },
+    "transition": "light-leak",
+    "zoom": "push"
+  },
+  "playful": {
+    "label": "Playful",
+    "vibe": "bouncy, colourful, fun \u2014 kids, humour, creators",
+    "fonts": {
+      "main": {
+        "file": "library/fonts/Baloo2-Variable.ttf",
+        "weight": 800,
+        "case": "upper"
+      },
+      "accent": {
+        "file": "library/fonts/Pacifico-Regular.ttf"
+      },
+      "caption": {
+        "file": "library/fonts/Baloo2-Variable.ttf",
+        "weight": 700
+      }
+    },
+    "colors": {
+      "bg": "#EDE7FF",
+      "ink": "#23104F",
+      "pop": "#FF5FA2",
+      "accent": "#2EC4B6",
+      "paper": "#FFFFFF"
+    },
+    "sticker": {
+      "style": "retro",
+      "stroke": 8,
+      "wobble": 2,
+      "die_cut": false
+    },
+    "sfx": {
+      "text_in": "pop",
+      "sticker_in": "boing",
+      "transition": "whoosh",
+      "reveal": "ding",
+      "hook": "hit",
+      "cta": "notify",
+      "title": "pop"
+    },
+    "captions": {
+      "style": "single-word",
+      "words_per_line": 1
+    },
+    "grade": "vivid",
+    "title_fonts": {
+      "serif": {
+        "file": "library/fonts/Baloo2-Variable.ttf",
+        "weight": 800
+      },
+      "serif_bold": {
+        "file": "library/fonts/Baloo2-Variable.ttf",
+        "weight": 800
+      },
+      "script": {
+        "file": "library/fonts/Pacifico-Regular.ttf"
+      },
+      "brush": {
+        "file": "library/fonts/KaushanScript-Regular.ttf"
+      },
+      "sans": {
+        "file": "library/fonts/Baloo2-Variable.ttf",
+        "weight": 700
+      }
+    },
+    "transition": "shape-wipe",
+    "zoom": "pulse"
+  },
+  "minimal": {
+    "label": "Minimal",
+    "vibe": "clean, quiet, confident \u2014 tech, coaching, B2B",
+    "fonts": {
+      "main": {
+        "file": "library/fonts/Inter-Variable.ttf",
+        "weight": 800,
+        "case": "sentence"
+      },
+      "accent": {
+        "file": "library/fonts/Inter-Variable.ttf",
+        "weight": 400
+      },
+      "caption": {
+        "file": "library/fonts/Inter-Variable.ttf",
+        "weight": 700
+      }
+    },
+    "colors": {
+      "bg": "#FFFFFF",
+      "ink": "#111111",
+      "pop": "#2F6BFF",
+      "accent": "#111111",
+      "paper": "#F2F2F2"
+    },
+    "sticker": {
+      "style": "doodle",
+      "stroke": 6,
+      "wobble": 0.5,
+      "fill": "none",
+      "die_cut": false
+    },
+    "sfx": {
+      "text_in": "click",
+      "sticker_in": "click",
+      "transition": "swish",
+      "reveal": "notify",
+      "hook": "click",
+      "cta": "notify",
+      "title": "swish"
+    },
+    "captions": {
+      "style": "line",
+      "words_per_line": 4
+    },
+    "grade": "clean-bright",
+    "title_fonts": {
+      "serif": {
+        "file": "library/fonts/Inter-Variable.ttf",
+        "weight": 300
+      },
+      "serif_bold": {
+        "file": "library/fonts/Inter-Variable.ttf",
+        "weight": 800
+      },
+      "script": {
+        "file": "library/fonts/Allura-Regular.ttf"
+      },
+      "brush": {
+        "file": "library/fonts/Allura-Regular.ttf"
+      },
+      "sans": {
+        "file": "library/fonts/Inter-Variable.ttf",
+        "weight": 600
+      }
+    },
+    "transition": "blur",
+    "zoom": "push"
+  },
+  "luxe": {
+    "label": "Luxe",
+    "vibe": "rich, moody, high-end \u2014 beauty, fashion, interiors",
+    "fonts": {
+      "main": {
+        "file": "library/fonts/CormorantGaramond-Variable.ttf",
+        "weight": 600,
+        "case": "upper"
+      },
+      "accent": {
+        "file": "library/fonts/DMSerifDisplay-Regular.ttf"
+      },
+      "caption": {
+        "file": "library/fonts/Inter-Variable.ttf",
+        "weight": 500
+      }
+    },
+    "colors": {
+      "bg": "#14110F",
+      "ink": "#F3E9DC",
+      "pop": "#C8A165",
+      "accent": "#C8A165",
+      "paper": "#F3E9DC",
+      "bubble_text": "#14110F"
+    },
+    "sticker": {
+      "style": "neon",
+      "stroke": 5,
+      "wobble": 1,
+      "fill": "none",
+      "die_cut": false
+    },
+    "sfx": {
+      "text_in": "swish",
+      "sticker_in": "ding",
+      "transition": "whoosh",
+      "reveal": "riser",
+      "hook": "swish",
+      "cta": "ding",
+      "title": "riser"
+    },
+    "captions": {
+      "style": "line",
+      "words_per_line": 3
+    },
+    "grade": "moody",
+    "title_fonts": {
+      "serif": {
+        "file": "library/fonts/Cinzel-Variable.ttf",
+        "weight": 500
+      },
+      "serif_bold": {
+        "file": "library/fonts/CormorantGaramond-Variable.ttf",
+        "weight": 700
+      },
+      "script": {
+        "file": "library/fonts/GreatVibes-Regular.ttf"
+      },
+      "brush": {
+        "file": "library/fonts/MrsSaintDelafield-Regular.ttf"
+      },
+      "sans": {
+        "file": "library/fonts/Montserrat-Variable.ttf",
+        "weight": 400
+      }
+    },
+    "transition": "zoom-blur",
+    "zoom": "push"
+  },
+  "systems-pilot": {
+    "label": "Systems Pilot",
+    "vibe": "smart, modern, confident \u2014 tech and small business",
+    "fonts": {
+      "main": {
+        "file": "library/fonts/Poppins-ExtraBold.ttf",
+        "case": "sentence"
+      },
+      "accent": {
+        "file": "library/fonts/Caveat-Variable.ttf",
+        "weight": 700
+      },
+      "caption": {
+        "file": "library/fonts/Poppins-ExtraBold.ttf"
+      }
+    },
+    "colors": {
+      "bg": "#06123D",
+      "ink": "#FFFFFF",
+      "pop": "#14B8A6",
+      "accent": "#EC4899",
+      "paper": "#FFFFFF",
+      "bubble_text": "#06123D",
+      "caption_active": "#00B5D9"
+    },
+    "sticker": {
+      "style": "chip",
+      "stroke": 7,
+      "wobble": 1,
+      "fill": "paper",
+      "die_cut": false
+    },
+    "sfx": {
+      "text_in": "pop",
+      "sticker_in": "pop",
+      "transition": "whoosh",
+      "reveal": "ding",
+      "hook": "hit",
+      "cta": "notify",
+      "title": "swish"
+    },
+    "captions": {
+      "style": "highlight",
+      "words_per_line": 3
+    },
+    "grade": "clean-bright",
+    "transition": "zoom-blur",
+    "zoom": "whip",
+    "title_fonts": {
+      "serif": {
+        "file": "library/fonts/Poppins-ExtraBold.ttf"
+      },
+      "serif_bold": {
+        "file": "library/fonts/Poppins-ExtraBold.ttf"
+      },
+      "script": {
+        "file": "library/fonts/Caveat-Variable.ttf",
+        "weight": 700
+      },
+      "brush": {
+        "file": "library/fonts/KaushanScript-Regular.ttf"
+      },
+      "sans": {
+        "file": "library/fonts/Inter-Variable.ttf",
+        "weight": 600
+      }
+    }
+  }
+}

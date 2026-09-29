@@ -1,0 +1,884 @@
+{
+  "day-in-my-life": {
+    "name": "A Day In My Life",
+    "category": "Lifestyle",
+    "format": "voiceover",
+    "length": "20-35s",
+    "why": "The most-copied vlog format: soft title, time stamps and cosy b-roll make people feel they're with you.",
+    "film": [
+      "Morning light / opening the curtains",
+      "Coffee or breakfast being made",
+      "You working (laptop, hands)",
+      "An outside moment (walk, errands)",
+      "Evening wind-down (candle, book, couch)"
+    ],
+    "script": "One short line per clip, like a diary: '6:30 \u2014 the house is still quiet'.",
+    "title": {
+      "template": "with-me",
+      "title": "A Day With Me",
+      "kicker": "mini vlog",
+      "sub": "{date}"
+    },
+    "beats": [
+      "title",
+      "label:{time}",
+      "label:{time}",
+      "label:{time}",
+      "label:{time}"
+    ],
+    "captions": "elegant",
+    "grade": "latte",
+    "transition": "dip-white",
+    "zoom": "push",
+    "stickers": "few, thin doodles or 3D emoji",
+    "music": {
+      "mood": [
+        "cosy"
+      ],
+      "genre": [
+        "lo-fi"
+      ],
+      "tempo": "slow"
+    }
+  },
+  "photo-dump": {
+    "name": "Photo Dump",
+    "category": "Lifestyle",
+    "format": "faceless",
+    "length": "8-15s",
+    "why": "Fast, satisfying, low effort \u2014 6 to 12 photos cut on the beat with a pretty title.",
+    "film": [
+      "6-12 photos or 1-second clips from your week/trip/event"
+    ],
+    "script": "No script \u2014 just a title and maybe one caption line.",
+    "title": {
+      "template": "mini",
+      "title": "Photo Dump"
+    },
+    "beats": [
+      "title",
+      "photo",
+      "photo",
+      "photo",
+      "photo",
+      "photo",
+      "photo",
+      "photo"
+    ],
+    "captions": "off",
+    "grade": "disposable",
+    "transition": "flash",
+    "zoom": "pulse",
+    "beat_seconds": 0.6,
+    "stickers": "a few stamps or sparkles",
+    "music": {
+      "mood": [
+        "playful"
+      ],
+      "genre": [
+        "indie pop"
+      ],
+      "tempo": "fast"
+    }
+  },
+  "week-recap": {
+    "name": "My Week in 20 Seconds",
+    "category": "Lifestyle",
+    "format": "faceless",
+    "length": "15-25s",
+    "why": "Recaps get saved and shared; day labels give structure and a reason to keep watching.",
+    "film": [
+      "One clip or photo per day (Monday to Sunday)"
+    ],
+    "script": "One word or short phrase per day: 'Monday \u2014 deadlines'.",
+    "title": {
+      "template": "chapter",
+      "title": "my week",
+      "kicker": "recap",
+      "number": "07"
+    },
+    "beats": [
+      "title",
+      "label:Monday",
+      "label:Tuesday",
+      "label:Wednesday",
+      "label:Thursday",
+      "label:Friday",
+      "label:Weekend"
+    ],
+    "captions": "off",
+    "grade": "portrait-film",
+    "transition": "whip",
+    "zoom": "push",
+    "stickers": "icon chips per day (coffee, laptop, gym\u2026)",
+    "music": {
+      "mood": [
+        "uplifting"
+      ],
+      "genre": [
+        "indie pop"
+      ]
+    }
+  },
+  "grwm": {
+    "name": "Get Ready With Me (+ chat)",
+    "category": "Lifestyle",
+    "format": "talking-head",
+    "length": "30-60s",
+    "why": "Talking while doing something keeps hands busy and viewers watching; perfect for sharing a story or tip.",
+    "film": [
+      "Phone propped at eye level while you get ready, talking about one topic"
+    ],
+    "script": "Open with the topic as a question ('Can we talk about\u2026?'), tell the story, end with your take.",
+    "title": {
+      "template": "typed",
+      "title": "GRWM + {topic}"
+    },
+    "beats": [
+      "title",
+      "zoom:push",
+      "note:{aside}",
+      "zoom:punch",
+      "cta:{cta}"
+    ],
+    "captions": "karaoke",
+    "grade": "clean-girl",
+    "transition": "blur",
+    "zoom": "push",
+    "stickers": "auto, puffy style",
+    "music": {
+      "mood": [
+        "chic"
+      ],
+      "genre": [
+        "r&b"
+      ],
+      "tempo": "slow"
+    }
+  },
+  "pov": {
+    "name": "POV",
+    "category": "Relatable",
+    "format": "faceless",
+    "length": "6-12s",
+    "why": "POV text over a relatable clip is the fastest way to get shares ('this is so me').",
+    "film": [
+      "One 5-10s clip that matches the feeling (walking, sighing, laptop, kids)"
+    ],
+    "script": "'POV: you ___' \u2014 specific beats generic.",
+    "title": {
+      "template": "typed",
+      "title": "POV: {topic}"
+    },
+    "beats": [
+      "title"
+    ],
+    "captions": "off",
+    "grade": "soft-matte",
+    "transition": "blur",
+    "zoom": "push",
+    "stickers": "none or one emoji",
+    "music": {
+      "mood": [
+        "emotional"
+      ],
+      "genre": [
+        "soft piano"
+      ],
+      "tempo": "slow"
+    }
+  },
+  "3-tips": {
+    "name": "3 Tips (talking)",
+    "category": "Education",
+    "format": "talking-head",
+    "length": "25-45s",
+    "why": "Numbered lists promise a payoff and get saved. Badges + punch-ins keep the pace up.",
+    "film": [
+      "You to camera: hook, tip 1, tip 2, tip 3, CTA \u2014 messy takes are fine"
+    ],
+    "script": "Hook with the result ('3 things that doubled my\u2026'), one sentence per tip, finish with 'save this'.",
+    "title": {
+      "template": "headline",
+      "title": "3 tips",
+      "script": "that work",
+      "behind": true
+    },
+    "beats": [
+      "title",
+      "badge:TIP 1",
+      "zoom:punch",
+      "badge:TIP 2",
+      "zoom:punch",
+      "badge:TIP 3",
+      "cta:Save this"
+    ],
+    "captions": "highlight",
+    "grade": "clean-bright",
+    "transition": "whip",
+    "zoom": "punch",
+    "stickers": "badges + icon chips",
+    "music": {
+      "mood": [
+        "confident"
+      ],
+      "genre": [
+        "house"
+      ],
+      "tempo": "medium"
+    }
+  },
+  "things-i-wish-i-knew": {
+    "name": "Things I Wish I Knew",
+    "category": "Education",
+    "format": "faceless",
+    "length": "15-30s",
+    "why": "Vulnerable + useful. Works as text-only with b-roll of your everyday.",
+    "film": [
+      "4-6 calm clips of you or your workspace"
+    ],
+    "script": "Title + 4-5 short lessons, each one line.",
+    "title": {
+      "template": "diary",
+      "title": "things I wish I knew",
+      "kicker": "note to self"
+    },
+    "beats": [
+      "title",
+      "takeover:{lesson}",
+      "takeover:{lesson}",
+      "takeover:{lesson}",
+      "takeover:{lesson}",
+      "cta:{cta}"
+    ],
+    "captions": "off",
+    "grade": "creamy-pastel",
+    "transition": "dip-white",
+    "zoom": "push",
+    "stickers": "few doodles",
+    "music": {
+      "mood": [
+        "nostalgic"
+      ],
+      "genre": [
+        "acoustic"
+      ],
+      "tempo": "slow"
+    }
+  },
+  "myth-vs-fact": {
+    "name": "Myth vs Fact",
+    "category": "Education",
+    "format": "talking-head",
+    "length": "20-40s",
+    "why": "Hot takes stop the scroll and start comments. Clear MYTH / FACT labels make it skimmable.",
+    "film": [
+      "You to camera stating the myth, then the truth"
+    ],
+    "script": "'Stop believing ___.' Myth \u2192 why it's wrong \u2192 the fact \u2192 what to do instead.",
+    "title": {
+      "template": "headline",
+      "title": "myth",
+      "script": "busted"
+    },
+    "beats": [
+      "title",
+      "badge:MYTH",
+      "sfx:hit",
+      "zoom:shake",
+      "badge:FACT",
+      "emoji:check",
+      "cta:{cta}"
+    ],
+    "captions": "outline",
+    "grade": "vivid",
+    "transition": "glitch",
+    "zoom": "whip",
+    "stickers": "badges, stamps",
+    "music": {
+      "mood": [
+        "confident"
+      ],
+      "genre": [
+        "synth-pop"
+      ]
+    }
+  },
+  "storytime": {
+    "name": "Storytime",
+    "category": "Story",
+    "format": "talking-head",
+    "length": "30-75s",
+    "why": "A story with a turn keeps people to the end. Notes and a big text moment at the twist.",
+    "film": [
+      "You to camera telling one story with a twist"
+    ],
+    "script": "Start at the tension ('So I almost quit\u2026'), not the backstory. Twist near the end.",
+    "title": {
+      "template": "typed",
+      "title": "storytime: {topic}"
+    },
+    "beats": [
+      "title",
+      "note:{aside}",
+      "zoom:push",
+      "reveal",
+      "takeover:{twist}",
+      "cta:{cta}"
+    ],
+    "captions": "karaoke",
+    "grade": "portrait-film",
+    "transition": "dip-black",
+    "zoom": "push",
+    "stickers": "few, emotional (eyes, heart)",
+    "music": {
+      "mood": [
+        "mysterious"
+      ],
+      "genre": [
+        "cinematic"
+      ],
+      "energy": "build"
+    }
+  },
+  "before-after": {
+    "name": "Before \u2192 After",
+    "category": "Transformation",
+    "format": "faceless",
+    "length": "8-20s",
+    "why": "Transformations are the most satisfying format on the platform. The reveal needs sound.",
+    "film": [
+      "The 'before' (photo or clip)",
+      "The process (2-3 quick clips)",
+      "The 'after' \u2014 hold it 2 seconds"
+    ],
+    "script": "'Before' \u2192 'wait for it' \u2192 'After'.",
+    "title": {
+      "template": "slice",
+      "title": "before and after"
+    },
+    "beats": [
+      "card:Before",
+      "label:the process",
+      "reveal",
+      "card:After",
+      "sticker:sparkle"
+    ],
+    "captions": "off",
+    "grade": "clean-bright",
+    "transition": "flash",
+    "zoom": "pull",
+    "stickers": "sparkles, arrows",
+    "music": {
+      "mood": [
+        "uplifting"
+      ],
+      "genre": [
+        "house"
+      ],
+      "energy": "drop"
+    }
+  },
+  "product-launch": {
+    "name": "New Product Drop",
+    "category": "Business",
+    "format": "faceless",
+    "length": "12-25s",
+    "why": "Countdown + reveal + price badge = urgency. Stamps and 3D stickers feel premium.",
+    "film": [
+      "Close-ups of the product (3-4 angles)",
+      "Hands using it",
+      "Packaging / logo"
+    ],
+    "script": "Tease \u2192 reveal \u2192 one key benefit \u2192 price/date \u2192 where to buy.",
+    "title": {
+      "template": "sparkle",
+      "title": "New Drop",
+      "tag": "{date}"
+    },
+    "beats": [
+      "title",
+      "zoom:focus",
+      "reveal",
+      "takeover:{benefit}",
+      "stamp:new drop",
+      "badge:{price}",
+      "cta:Link in bio"
+    ],
+    "captions": "off",
+    "grade": "cinematic",
+    "transition": "zoom-blur",
+    "zoom": "focus",
+    "stickers": "stamps, 3D emoji, badges",
+    "music": {
+      "mood": [
+        "confident"
+      ],
+      "genre": [
+        "house"
+      ],
+      "energy": "drop"
+    }
+  },
+  "packing-orders": {
+    "name": "Packing Orders (small business)",
+    "category": "Business",
+    "format": "voiceover",
+    "length": "15-40s",
+    "why": "Satisfying process + supporting a small business. Customers love seeing their order made.",
+    "film": [
+      "Printing the label",
+      "Wrapping",
+      "Adding a note / sticker",
+      "Sealing the box",
+      "The stack of parcels"
+    ],
+    "script": "Optional voiceover: 'Pack an order with me for ___'.",
+    "title": {
+      "template": "episode",
+      "title": "pack an order",
+      "kicker": "small business",
+      "tag": "No. {n}"
+    },
+    "beats": [
+      "title",
+      "zoom:push",
+      "label:{step}",
+      "label:{step}",
+      "sticker:auto",
+      "cta:Shop the link"
+    ],
+    "captions": "shadow",
+    "grade": "latte",
+    "transition": "blur",
+    "zoom": "push",
+    "stickers": "icon chips (box, heart, tag)",
+    "music": {
+      "mood": [
+        "cosy"
+      ],
+      "genre": [
+        "lo-fi"
+      ]
+    }
+  },
+  "client-testimonial": {
+    "name": "Client Love / Testimonial",
+    "category": "Business",
+    "format": "faceless",
+    "length": "10-20s",
+    "why": "Social proof in their words. Stars + the result in big numbers.",
+    "film": [
+      "Screenshot of the review/message",
+      "Photo of the result or the client (with permission)"
+    ],
+    "script": "The result in one line + the quote.",
+    "title": {
+      "template": "slice",
+      "title": "client love"
+    },
+    "beats": [
+      "title",
+      "takeover:{result}",
+      "icon:star",
+      "takeover:\"{quote}\"",
+      "cta:{cta}"
+    ],
+    "captions": "off",
+    "grade": "clean-bright",
+    "transition": "dip-white",
+    "zoom": "push",
+    "stickers": "stars, hearts (puffy)",
+    "music": {
+      "mood": [
+        "uplifting"
+      ],
+      "genre": [
+        "acoustic"
+      ]
+    }
+  },
+  "behind-the-scenes": {
+    "name": "Behind The Scenes",
+    "category": "Business",
+    "format": "talking-head",
+    "length": "20-45s",
+    "why": "People buy from people. Show the messy real process with honest notes.",
+    "film": [
+      "You at work explaining what you're doing",
+      "Close-ups of the work"
+    ],
+    "script": "'What running a ___ actually looks like' \u2192 3 honest moments.",
+    "title": {
+      "template": "typed",
+      "title": "what it actually looks like"
+    },
+    "beats": [
+      "title",
+      "note:{aside}",
+      "zoom:push",
+      "emoji:eyes",
+      "cta:{cta}"
+    ],
+    "captions": "build",
+    "grade": "portrait-film",
+    "transition": "whip",
+    "zoom": "push",
+    "stickers": "notes + arrows, emoji",
+    "music": {
+      "mood": [
+        "playful"
+      ],
+      "genre": [
+        "funk"
+      ]
+    }
+  },
+  "travel-diary": {
+    "name": "Travel Diary",
+    "category": "Travel",
+    "format": "voiceover",
+    "length": "15-40s",
+    "why": "Location lower-thirds and a chapter feel turn clips into a mini film.",
+    "film": [
+      "Arrival / view",
+      "Food",
+      "Walking shot",
+      "Detail shots",
+      "Golden hour"
+    ],
+    "script": "Place + one feeling per clip.",
+    "title": {
+      "template": "location",
+      "title": "{place}",
+      "sub": "{date}"
+    },
+    "beats": [
+      "title",
+      "zoom:drift",
+      "label:{moment}",
+      "label:{moment}",
+      "zoom:pull"
+    ],
+    "captions": "elegant",
+    "grade": "golden-hour",
+    "transition": "light-leak",
+    "zoom": "drift",
+    "stickers": "few (sun, heart)",
+    "music": {
+      "mood": [
+        "dreamy"
+      ],
+      "genre": [
+        "bossa nova"
+      ]
+    }
+  },
+  "recipe": {
+    "name": "Quick Recipe",
+    "category": "Food",
+    "format": "voiceover",
+    "length": "15-35s",
+    "why": "Numbered steps + close-ups + satisfying sounds. Gets saved.",
+    "film": [
+      "Ingredients laid out",
+      "Each step close-up",
+      "The final plate + first bite"
+    ],
+    "script": "Name \u2192 steps (one line each) \u2192 'save for later'.",
+    "title": {
+      "template": "diary",
+      "title": "5 minute pasta",
+      "kicker": "recipe"
+    },
+    "beats": [
+      "title",
+      "label:Step 1",
+      "label:Step 2",
+      "label:Step 3",
+      "reveal",
+      "cta:Save this"
+    ],
+    "captions": "stacked",
+    "grade": "summer",
+    "transition": "whip",
+    "zoom": "push",
+    "stickers": "icon chips (fork-knife, fire, clock)",
+    "music": {
+      "mood": [
+        "sunny"
+      ],
+      "genre": [
+        "bossa nova"
+      ]
+    }
+  },
+  "outfit-check": {
+    "name": "Outfit Check",
+    "category": "Fashion",
+    "format": "faceless",
+    "length": "8-15s",
+    "why": "Beat-cut outfit changes with labels. Short and rewatchable.",
+    "film": [
+      "3-5 outfits, same spot, same framing, 2 seconds each"
+    ],
+    "script": "Label each look ('work', 'weekend', 'date night').",
+    "title": {
+      "template": "headline",
+      "title": "fits",
+      "script": "this week"
+    },
+    "beats": [
+      "title",
+      "label:{look}",
+      "label:{look}",
+      "label:{look}",
+      "label:{look}"
+    ],
+    "captions": "off",
+    "grade": "clean-girl",
+    "transition": "flash",
+    "zoom": "pulse",
+    "beat_seconds": 1.2,
+    "stickers": "sparkles, hearts",
+    "music": {
+      "mood": [
+        "chic"
+      ],
+      "genre": [
+        "house"
+      ],
+      "tempo": "fast"
+    }
+  },
+  "this-or-that": {
+    "name": "This or That",
+    "category": "Engagement",
+    "format": "faceless",
+    "length": "10-20s",
+    "why": "Asks the viewer to choose \u2014 drives comments.",
+    "film": [
+      "Pairs of photos/clips (optional)"
+    ],
+    "script": "'Coffee or tea?' \u2014 4-6 pairs, ask them to comment their answers.",
+    "title": {
+      "template": "sparkle",
+      "title": "this or that",
+      "tag": "comment yours"
+    },
+    "beats": [
+      "title",
+      "takeover:{a} or {b}?",
+      "takeover:{a} or {b}?",
+      "takeover:{a} or {b}?",
+      "cta:Comment your answers"
+    ],
+    "captions": "off",
+    "grade": "vivid",
+    "transition": "shape-wipe",
+    "zoom": "pulse",
+    "stickers": "3D emoji per option",
+    "music": {
+      "mood": [
+        "playful"
+      ],
+      "genre": [
+        "synth-pop"
+      ],
+      "tempo": "fast"
+    }
+  },
+  "quote": {
+    "name": "Quote / Affirmation",
+    "category": "Motivation",
+    "format": "faceless",
+    "length": "6-12s",
+    "why": "Simple, beautiful, shareable. Let the typography do the work.",
+    "film": [
+      "One slow, calm clip (sky, window, coffee steam) \u2014 or none"
+    ],
+    "script": "One sentence that someone would send to a friend.",
+    "title": {
+      "template": "with-me",
+      "title": "{quote}",
+      "kicker": "reminder"
+    },
+    "beats": [
+      "title"
+    ],
+    "captions": "off",
+    "grade": "soft-glow",
+    "transition": "dip-white",
+    "zoom": "push",
+    "stickers": "none",
+    "music": {
+      "mood": [
+        "calm"
+      ],
+      "genre": [
+        "soft piano"
+      ],
+      "tempo": "slow"
+    }
+  },
+  "morning-routine": {
+    "name": "Morning Routine",
+    "category": "Lifestyle",
+    "format": "voiceover",
+    "length": "20-40s",
+    "why": "Chapters + time stamps + calm b-roll. Aspirational and saveable.",
+    "film": [
+      "Alarm/phone",
+      "Water/coffee",
+      "Movement/stretch",
+      "Getting ready",
+      "Out the door"
+    ],
+    "script": "Time + action per clip.",
+    "title": {
+      "template": "chapter",
+      "title": "morning routine",
+      "kicker": "5am club",
+      "number": "05"
+    },
+    "beats": [
+      "title",
+      "label:5:00",
+      "label:5:15",
+      "label:5:40",
+      "label:6:10"
+    ],
+    "captions": "elegant",
+    "grade": "creamy-pastel",
+    "transition": "light-leak",
+    "zoom": "push",
+    "stickers": "sun, coffee (3D)",
+    "music": {
+      "mood": [
+        "calm"
+      ],
+      "genre": [
+        "lo-fi"
+      ],
+      "tempo": "slow"
+    }
+  },
+  "launch-countdown": {
+    "name": "Launch Countdown",
+    "category": "Business",
+    "format": "faceless",
+    "length": "8-15s",
+    "why": "Builds anticipation for a launch date; big numbers + stamp.",
+    "film": [
+      "Teaser clips/photos of what's coming"
+    ],
+    "script": "'3 days until\u2026' + one hint.",
+    "title": {
+      "template": "chapter",
+      "title": "days to go",
+      "kicker": "launching soon",
+      "number": "03"
+    },
+    "beats": [
+      "title",
+      "takeover:{hint}",
+      "stamp:coming soon",
+      "cta:Turn on notifications"
+    ],
+    "captions": "off",
+    "grade": "night-neon",
+    "transition": "glitch",
+    "zoom": "whip",
+    "stickers": "stamps, neon icons",
+    "music": {
+      "mood": [
+        "energetic"
+      ],
+      "genre": [
+        "synth-pop"
+      ],
+      "energy": "build"
+    }
+  },
+  "year-recap": {
+    "name": "Year / Month Recap",
+    "category": "Lifestyle",
+    "format": "faceless",
+    "length": "15-30s",
+    "why": "Nostalgia + big moments. One of the most-used template types every December.",
+    "film": [
+      "One photo/clip per month or per highlight"
+    ],
+    "script": "Month or moment labels.",
+    "title": {
+      "template": "headline",
+      "title": "2026",
+      "script": "recap"
+    },
+    "beats": [
+      "title",
+      "label:January",
+      "label:March",
+      "label:June",
+      "label:September",
+      "label:December",
+      "cta:Here's to next year"
+    ],
+    "captions": "off",
+    "grade": "sepia-memory",
+    "transition": "film-burn",
+    "zoom": "push",
+    "beat_seconds": 1.4,
+    "stickers": "stamps, stars",
+    "music": {
+      "mood": [
+        "nostalgic"
+      ],
+      "genre": [
+        "cinematic"
+      ],
+      "energy": "build"
+    }
+  },
+  "brand-story": {
+    "name": "Brand Story",
+    "category": "Business",
+    "format": "faceless",
+    "length": "20-40s",
+    "why": "Documentary-style brand story: bold colour fields, one giant word at a time, a boxed year, the founder's photo with a name tag and a logo reveal. Feels like an ad, no filming needed.",
+    "film": [
+      "A photo of you or the founder (any photo)",
+      "2-4 product or process photos",
+      "Your logo file"
+    ],
+    "script": "6-10 short beats: where it started (year), the struggle (one word), the turning point, what makes you different, the result. One idea per beat.",
+    "title": {
+      "template": "headline",
+      "title": "Our story",
+      "script": "since {year}"
+    },
+    "beats": [
+      "story:year:{year}|It started in",
+      "story:word:Nobody.",
+      "story:person:{photo}|{founder}|Founder",
+      "story:word:Differently.",
+      "story:word:Everywhere",
+      "story:logo"
+    ],
+    "captions": "off",
+    "grade": "latte",
+    "transition": "shape-wipe",
+    "zoom": "push",
+    "music": {
+      "mood": [
+        "confident",
+        "uplifting"
+      ],
+      "genre": [
+        "cinematic"
+      ],
+      "tempo": "medium"
+    },
+    "beat_seconds": 2.2
+  }
+}

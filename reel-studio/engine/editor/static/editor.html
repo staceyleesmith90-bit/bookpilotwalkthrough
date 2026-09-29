@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reel Studio Editor</title>
+<style>
+  :root {
+    --bg: #f6f4f0; --panel: #ffffff; --ink: #1d1b19; --muted: #6f6a64; --line: #e4dfd8;
+    --accent: #2f6bff; --accent-ink: #ffffff; --sel: #ff5fa2;
+    --t-text: #2f6bff; --t-sticker: #ff9f1c; --t-overlay: #2ec4b6; --t-broll: #8e7dff; --t-zoom: #e4572e; --t-sfx: #6f6a64;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151413; --panel: #1f1d1b; --ink: #f2efe9; --muted: #a39d95; --line: #34302c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  header { display: flex; gap: 10px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+  header h1 { font-size: 16px; margin: 0 12px 0 0; }
+  button, select, input, textarea { font: inherit; color: inherit; }
+  button { border: 1px solid var(--line); background: var(--panel); padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  select, input, textarea { border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 5px 8px; }
+  .spacer { flex: 1; }
+  .status { color: var(--muted); font-size: 13px; }
+  main { display: grid; grid-template-columns: auto 1fr; gap: 16px; padding: 16px; }
+  #stageWrap { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  #stage { position: relative; width: 360px; height: 640px; background: #000; border-radius: 12px; overflow: hidden; touch-action: none; }
+  #stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #stage .it { position: absolute; transform-origin: center; cursor: grab; user-select: none; -webkit-user-drag: none; }
+  #stage .it.sel { outline: 2px dashed var(--sel); outline-offset: 2px; }
+  #stage .handle { position: absolute; width: 14px; height: 14px; background: var(--sel); border-radius: 50%; cursor: nwse-resize; }
+  #stage .safe { position: absolute; border: 1px dashed rgba(128,128,128,.7); pointer-events: none; }
+  #stage .cap { position: absolute; left: 0; right: 0; text-align: center; color: #fff; font-weight: 800; font-size: 20px; text-shadow: 0 0 4px #000, 0 0 4px #000; pointer-events: none; }
+  .transport { display: flex; gap: 8px; align-items: center; }
+  #side { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; min-width: 280px; }
+  #side h2 { font-size: 14px; margin: 0 0 10px; }
+  .row { display: grid; grid-template-columns: 90px 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .row label { color: var(--muted); font-size: 13px; }
+  .row textarea { min-height: 60px; resize: vertical; }
+  .btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 10px; }
+  #timelineBox { grid-column: 1 / -1; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; overflow-x: auto; }
+  #timeline { position: relative; min-width: 100%; }
+  .ruler { position: relative; height: 22px; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .tick { position: absolute; top: 4px; font-size: 11px; color: var(--muted); }
+  .track { position: relative; height: 32px; border-bottom: 1px solid var(--line); }
+  .track .name { position: sticky; left: 0; z-index: 2; display: inline-block; width: 92px; height: 100%; font-size: 12px; color: var(--muted); background: var(--panel); padding: 8px 4px; }
+  .bar { position: absolute; top: 4px; height: 24px; border-radius: 6px; color: #fff; font-size: 11px; padding: 4px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: grab; }
+  .bar.sel { box-shadow: 0 0 0 2px var(--sel); }
+  .bar .edge { position: absolute; top: 0; bottom: 0; width: 7px; cursor: ew-resize; }
+  .bar .edge.l { left: 0; } .bar .edge.r { right: 0; }
+  .cue { position: absolute; top: 9px; width: 12px; height: 12px; transform: rotate(45deg); background: var(--t-sfx); cursor: grab; }
+  #playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--sel); pointer-events: none; z-index: 3; }
+  dialog { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); max-width: 92vw; }
+  dialog video { max-height: 70vh; border-radius: 8px; }
+  .lib { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; max-height: 50vh; overflow: auto; }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; } #stage { width: 300px; height: 533px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎬 Reel Studio</h1>
+  <select id="projSel" aria-label="Project"></select>
+  <select id="packSel" aria-label="Style pack" title="Style pack"></select>
+  <button id="addBtn">＋ Add</button>
+  <button id="undoBtn" title="Undo (Ctrl+Z)">↶ Undo</button>
+  <span class="spacer"></span>
+  <span class="status" id="status">Loading…</span>
+  <button id="previewBtn">Quick preview</button>
+  <button id="renderBtn" class="primary">Render final</button>
+</header>
+<main>
+  <div id="stageWrap">
+    <div id="stage"><video id="vid" playsinline preload="auto"></video><div class="safe" id="safe"></div><div class="cap" id="cap"></div></div>
+    <div class="transport">
+      <button id="playBtn">▶︎ Play</button>
+      <span id="time" class="status">0.0s</span>
+      <label class="status"><input type="checkbox" id="safeChk" checked> safe zone</label>
+    </div>
+  </div>
+  <aside id="side"><h2>Select something</h2><p class="hint">Click an item on the video or a bar on the timeline. Drag to move, drag the pink dot to resize. Drag bars to change when things appear.</p></aside>
+  <section id="timelineBox"><div id="timeline"></div></section>
+</main>
+
+<dialog id="addDlg">
+  <h2 style="margin-top:0">Add to the reel</h2>
+  <div class="btns">
+    <button data-add="text">Text</button>
+    <button data-add="badge">Badge</button>
+    <button data-add="bubble">Thought bubble</button>
+  </div>
+  <h3>Stickers</h3>
+  <input id="stickerSearch" placeholder="Search stickers, or type emoji:coffee / emoji:🔥" style="width:100%;margin-bottom:6px">
+  <div class="lib" id="stickerLib"></div>
+  <h3>Your files (inbox)</h3>
+  <div class="lib" id="inboxLib"></div>
+  <p class="hint">Drag logos, photos and extras into the <b>inbox</b> folder, then reopen this menu.</p>
+  <div class="btns"><button id="addClose">Close</button></div>
+</dialog>
+
+<dialog id="outDlg"><h2 style="margin-top:0" id="outTitle">Rendering…</h2><div id="outBody"></div><div class="btns"><button onclick="outDlg.close()">Close</button></div></dialog>
+
+<script>
+const K = 360 / 1080;                       // stage scale
+const $ = (s) => document.querySelector(s);
+let slug = new URLSearchParams(location.search).get("p");
+let tl = null, sel = null, lib = null, undo = [], ver = Date.now(), saveTimer = null;
+const vid = $("#vid");
+
+function status(t) { $("#status").textContent = t; }
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+function snapshot() { undo.push(JSON.stringify(tl)); if (undo.length > 60) undo.shift(); }
+function save(refreshImages) {
+  clearTimeout(saveTimer);
+  status("Saving…");
+  saveTimer = setTimeout(async () => {
+    await api(`/api/p/${slug}/timeline`, tl);
+    if (refreshImages) { ver = Date.now(); drawStage(true); }
+    status("Saved ✓");
+  }, 250);
+}
+function typeTrack(it) { return it.type === "sticker" || it.type === "badge" ? "sticker" : it.type === "overlay" ? "overlay" : "text"; }
+
+// ---------------------------------------------------------------- load
+async function init() {
+  const projects = await api("/api/projects");
+  if (!slug) slug = projects[projects.length - 1];
+  $("#projSel").innerHTML = projects.map(p => `<option ${p === slug ? "selected" : ""}>${p}</option>`).join("");
+  $("#projSel").onchange = e => location.search = "?p=" + e.target.value;
+  if (!slug) { status("No projects yet — ask Claude to start one."); return; }
+  lib = await api("/api/library");
+  tl = await api(`/api/p/${slug}/timeline`);
+  if (!tl.items) { status("This project has no timeline yet — ask Claude to build the style plan."); return; }
+  $("#packSel").innerHTML = lib.packs.map(p => `<option ${p === tl.pack ? "selected" : ""}>${p}</option>`).join("");
+  $("#packSel").onchange = e => { snapshot(); tl.pack = e.target.value; save(true); status("Pack changed — images updated. Rebuild preview for the new colour grade."); };
+  if (tl.background) $("#stage").style.background = tl.background;
+  vid.src = `/api/p/${slug}/proxy.mp4`;
+  status("Loading video…");
+  vid.onloadeddata = () => status("Ready");
+  drawSafe(); drawStage(true); drawTimeline();
+}
+
+function drawSafe() {
+  const s = $("#safe");
+  s.style.left = 60 * K + "px"; s.style.top = 220 * K + "px";
+  s.style.width = (1080 - 60 - 150) * K + "px"; s.style.height = (1920 - 220 - 440) * K + "px";
+  s.style.display = $("#safeChk").checked ? "block" : "none";
+}
+$("#safeChk").onchange = drawSafe;
+
+// ---------------------------------------------------------------- stage
+const imgs = {};
+function drawStage(reload) {
+  const t = vid.currentTime || 0;
+  const stage = $("#stage");
+  const items = [...tl.items].sort((a, b) => (a.z || 0) - (b.z || 0));
+  for (const it of items) {
+    let el = imgs[it.id];
+    if (!el) {
+      el = document.createElement("img");
+      el.className = "it"; el.draggable = false; el.dataset.id = it.id;
+      el.onload = () => place(it, el);
+      el.addEventListener("pointerdown", startDrag);
+      stage.appendChild(el); imgs[it.id] = el;
+      reload = true;
+    }
+    if (reload || !el.src) el.src = `/api/p/${slug}/item/${it.id}.png?v=${ver}`;
+    el.style.zIndex = 10 + (it.z || 0);
+    el.style.display = (t >= it.start && t < it.end) ? "block" : "none";
+    el.classList.toggle("sel", sel === it.id);
+    if (el.complete) place(it, el);
+  }
+  for (const id of Object.keys(imgs)) if (!tl.items.find(i => i.id === id)) { imgs[id].remove(); delete imgs[id]; }
+  drawHandle(); drawCaption(t);
+}
+function place(it, el) {
+  const w = el.naturalWidth * K * (it.scale || 1), h = el.naturalHeight * K * (it.scale || 1);
+  el.style.width = w + "px"; el.style.height = h + "px";
+  el.style.left = (it.x * K - w / 2) + "px"; el.style.top = (it.y * K - h / 2) + "px";
+  el.style.transform = it.rotate ? `rotate(${it.rotate}deg)` : "";
+  if (sel === it.id) drawHandle();
+}
+function drawHandle() {
+  document.querySelectorAll("#stage .handle").forEach(h => h.remove());
+  const it = tl.items.find(i => i.id === sel), el = it && imgs[it.id];
+  if (!el || el.style.display === "none") return;
+  const h = document.createElement("div");
+  h.className = "handle";
+  h.style.left = (parseFloat(el.style.left) + parseFloat(el.style.width) - 7) + "px";
+  h.style.top = (parseFloat(el.style.top) + parseFloat(el.style.height) - 7) + "px";
+  h.addEventListener("pointerdown", startResize);
+  h.style.zIndex = 999;
+  $("#stage").appendChild(h);
+}
+function drawCaption(t) {
+  const cap = tl.captions || {}, c = $("#cap");
+  if (!cap.words || cap.style === "off") { c.textContent = ""; return; }
+  const hidden = tl.items.some(i => i.hide_captions && t >= i.start && t < i.end);
+  const n = cap.style === "single-word" ? 1 : (cap.words_per_line || 3);
+  let idx = cap.words.findIndex(w => w.start <= t && t < w.end + 0.3);
+  if (idx < 0 || hidden) { c.textContent = ""; return; }
+  const g0 = Math.floor(idx / n) * n;
+  c.textContent = cap.words.slice(g0, g0 + n).map(w => w.w).join(" ");
+  c.style.top = ((cap.y || 1245) * K - 14) + "px";
+}
+
+let drag = null;
+function stagePoint(e) { const r = $("#stage").getBoundingClientRect(); return [(e.clientX - r.left) / (r.width / 360), (e.clientY - r.top) / (r.height / 640)]; }
+function startDrag(e) {
+  const it = tl.items.find(i => i.id === e.target.dataset.id);
+  select(it.id); snapshot();
+  const [px, py] = stagePoint(e);
+  drag = { it, mode: "move", ox: it.x - px / K, oy: it.y - py / K };
+  e.target.setPointerCapture(e.pointerId);
+  e.preventDefault();
+}
+function startResize(e) {
+  const it = tl.items.find(i => i.id === sel); snapshot();
+  const [px, py] = stagePoint(e);
+  drag = { it, mode: "resize", d0: Math.hypot(px / K - it.x, py / K - it.y), s0: it.scale || 1 };
+  e.target.setPointerCapture(e.pointerId);
+  e.preventDefault(); e.stopPropagation();
+}
+window.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const [px, py] = stagePoint(e);
+  if (drag.mode === "move") { drag.it.x = Math.round(px / K + drag.ox); drag.it.y = Math.round(py / K + drag.oy); }
+  if (drag.mode === "resize") { drag.it.scale = Math.max(0.15, +(drag.s0 * Math.hypot(px / K - drag.it.x, py / K - drag.it.y) / drag.d0).toFixed(3)); }
+  place(drag.it, imgs[drag.it.id]); drawSide();
+});
+window.addEventListener("pointerup", () => { if (drag) { drag = null; save(false); } });
+
+// ---------------------------------------------------------------- side panel
+function select(id) { sel = id; drawStage(false); drawTimeline(); drawSide(); }
+function field(label, html) { return `<div class="row"><label>${label}</label>${html}</div>`; }
+function drawSide() {
+  const it = tl.items.find(i => i.id === sel), side = $("#side");
+  if (!it) { side.innerHTML = `<h2>Select something</h2><p class="hint">Click an item on the video or a bar on the timeline. Drag to move, drag the pink dot to resize, drag bars to change timing.</p>`; return; }
+  const hasText = ["text", "bubble", "badge", "card"].includes(it.type);
+  const anims = ["pop", "fade", "slide", "type", "drop", "none"].map(a => `<option ${it.anim === a ? "selected" : ""}>${a}</option>`).join("");
+  const styles = ["", "doodle", "flat", "retro", "neon", "emoji"].map(a => `<option value="${a}" ${ (it.style || "") === a ? "selected" : ""}>${a || "pack default"}</option>`).join("");
+  const colours = ["pop", "accent", "ink", "paper"].map(a => `<option ${it.colour === a ? "selected" : ""}>${a}</option>`).join("");
+  side.innerHTML = `<h2>${it.role === "logo" ? "Logo" : it.type[0].toUpperCase() + it.type.slice(1)} <span class="status">${it.id}</span></h2>`
+    + (hasText ? field("Text", `<textarea id="fText">${it.text || ""}</textarea>`) : "")
+    + (it.type === "sticker" ? field("Sticker", `<input id="fName" value="${it.name}">`) + field("Style", `<select id="fStyle">${styles}</select>`) : "")
+    + (["sticker", "badge"].includes(it.type) ? field("Colour", `<select id="fColour">${colours}</select>`) : "")
+    + field("Starts (s)", `<input id="fStart" type="number" step="0.05" value="${it.start}">`)
+    + field("Ends (s)", `<input id="fEnd" type="number" step="0.05" value="${it.end}">`)
+    + field("Position", `<span>x <input id="fX" type="number" style="width:70px" value="${Math.round(it.x)}"> y <input id="fY" type="number" style="width:70px" value="${Math.round(it.y)}"></span>`)
+    + field("Size", `<input id="fScale" type="range" min="0.15" max="3" step="0.01" value="${it.scale || 1}">`)
+    + field("Rotate", `<input id="fRot" type="range" min="-45" max="45" step="1" value="${it.rotate || 0}">`)
+    + field("Animation", `<select id="fAnim">${anims}</select>`)
+    + `<div class="btns"><button id="dupBtn">Duplicate</button><button id="upBtn">Bring forward</button><button id="delBtn">Delete</button></div>`
+    + `<p class="hint">Tip: arrow keys nudge, Delete removes, Space plays.</p>`;
+  const on = (id, ev, fn) => { const el = $("#" + id); if (el) el.addEventListener(ev, fn); };
+  on("fText", "change", e => { snapshot(); it.text = e.target.value; save(true); });
+  on("fName", "change", e => { snapshot(); it.name = e.target.value; save(true); });
+  on("fStyle", "change", e => { snapshot(); it.style = e.target.value || undefined; save(true); });
+  on("fColour", "change", e => { snapshot(); it.colour = e.target.value; save(true); });
+  on("fStart", "change", e => { snapshot(); it.start = +e.target.value; save(false); drawTimeline(); drawStage(false); });
+  on("fEnd", "change", e => { snapshot(); it.end = +e.target.value; save(false); drawTimeline(); drawStage(false); });
+  on("fX", "change", e => { snapshot(); it.x = +e.target.value; save(false); drawStage(false); });
+  on("fY", "change", e => { snapshot(); it.y = +e.target.value; save(false); drawStage(false); });
+  on("fScale", "input", e => { it.scale = +e.target.value; place(it, imgs[it.id]); });
+  on("fScale", "change", () => { snapshot(); save(false); });
+  on("fRot", "input", e => { it.rotate = +e.target.value; place(it, imgs[it.id]); });
+  on("fRot", "change", () => { snapshot(); save(false); });
+  on("fAnim", "change", e => { snapshot(); it.anim = e.target.value; save(false); });
+  on("delBtn", "click", () => { snapshot(); tl.items = tl.items.filter(i => i !== it); sel = null; save(false); drawStage(false); drawTimeline(); drawSide(); });
+  on("dupBtn", "click", () => { snapshot(); const c = JSON.parse(JSON.stringify(it)); c.id = it.id.replace(/\d*$/, "") + Date.now() % 100000; c.x += 40; c.y += 40; tl.items.push(c); save(true); select(c.id); });
+  on("upBtn", "click", () => { snapshot(); it.z = (it.z || 0) + 5; save(false); drawStage(false); });
+}
+
+// ---------------------------------------------------------------- timeline
+let pps = 40; // pixels per second
+function drawTimeline() {
+  const box = $("#timelineBox"), dur = tl.duration;
+  pps = Math.max(24, (box.clientWidth - 120) / dur);
+  const W = 92 + dur * pps;
+  const tracks = [
+    ["Text", tl.items.filter(i => typeTrack(i) === "text"), "--t-text"],
+    ["Stickers", tl.items.filter(i => typeTrack(i) === "sticker"), "--t-sticker"],
+    ["Images", tl.items.filter(i => typeTrack(i) === "overlay"), "--t-overlay"],
+    ["B-roll", (tl.broll || []).map((b, k) => ({ id: "broll" + k, start: b.start, end: b.start + b.dur, label: b.file.split("/").pop(), ref: b, kind: "broll" })), "--t-broll"],
+    ["Zoom", (tl.zooms || []).map((z, k) => ({ id: "zoom" + k, start: z.start, end: z.end, label: "punch-in", ref: z, kind: "zoom" })), "--t-zoom"],
+  ];
+  let html = `<div class="ruler" id="ruler" style="width:${W}px">`;
+  for (let s = 0; s <= dur; s += dur > 40 ? 5 : 1) html += `<span class="tick" style="left:${92 + s * pps}px">${s}s</span>`;
+  html += `</div>`;
+  for (const [name, list, col] of tracks) {
+    html += `<div class="track" style="width:${W}px"><span class="name">${name}</span>`;
+    for (const it of list) {
+      const label = it.label || it.text || (it.name || "").replace("emoji:", "") || it.role || it.type;
+      html += `<div class="bar ${sel === it.id ? "sel" : ""}" data-id="${it.id}" data-kind="${it.kind || "item"}" style="left:${92 + it.start * pps}px;width:${Math.max(8, (it.end - it.start) * pps)}px;background:var(${col})"><span class="edge l"></span>${label}<span class="edge r"></span></div>`;
+    }
+    html += `</div>`;
+  }
+  html += `<div class="track" style="width:${W}px"><span class="name">Sound FX</span>`;
+  (tl.audio?.sfx || []).forEach((c, k) => html += `<div class="cue" title="${c.name} @ ${c.t}s" data-cue="${k}" style="left:${92 + c.t * pps - 6}px"></div>`);
+  html += `</div><div id="playhead"></div>`;
+  $("#timeline").innerHTML = html;
+  $("#timeline").style.width = W + "px";
+  $("#ruler").onclick = e => { vid.currentTime = Math.max(0, (e.offsetX - 92) / pps); tick(); };
+  document.querySelectorAll(".bar").forEach(b => b.addEventListener("pointerdown", barDown));
+  document.querySelectorAll(".cue").forEach(c => c.addEventListener("pointerdown", cueDown));
+  movePlayhead();
+}
+function findBarRef(el) {
+  if (el.dataset.kind === "broll") { const b = tl.broll[+el.dataset.id.replace("broll", "")]; return { get start() { return b.start; }, set start(v) { b.start = v; }, get end() { return b.start + b.dur; }, set end(v) { b.dur = Math.max(0.2, v - b.start); } }; }
+  if (el.dataset.kind === "zoom") return tl.zooms[+el.dataset.id.replace("zoom", "")];
+  return tl.items.find(i => i.id === el.dataset.id);
+}
+let bdrag = null;
+function barDown(e) {
+  const bar = e.currentTarget, ref = findBarRef(bar);
+  if (bar.dataset.kind === "item") select(bar.dataset.id);
+  snapshot();
+  const mode = e.target.classList.contains("l") ? "l" : e.target.classList.contains("r") ? "r" : "move";
+  bdrag = { ref, mode, x0: e.clientX, s0: ref.start, e0: ref.end };
+  e.preventDefault();
+}
+function cueDown(e) { snapshot(); const c = tl.audio.sfx[+e.target.dataset.cue]; bdrag = { cue: c, x0: e.clientX, t0: c.t }; e.preventDefault(); }
+window.addEventListener("pointermove", e => {
+  if (!bdrag) return;
+  const dt = (e.clientX - bdrag.x0) / pps, dur = tl.duration;
+  if (bdrag.cue) { bdrag.cue.t = +Math.min(dur, Math.max(0, bdrag.t0 + dt)).toFixed(2); }
+  else if (bdrag.mode === "move") { const len = bdrag.e0 - bdrag.s0; const s = Math.min(dur - len, Math.max(0, bdrag.s0 + dt)); bdrag.ref.start = +s.toFixed(2); bdrag.ref.end = +(s + len).toFixed(2); }
+  else if (bdrag.mode === "l") bdrag.ref.start = +Math.min(bdrag.e0 - 0.1, Math.max(0, bdrag.s0 + dt)).toFixed(2);
+  else bdrag.ref.end = +Math.max(bdrag.s0 + 0.1, Math.min(dur, bdrag.e0 + dt)).toFixed(2);
+  drawTimeline(); drawStage(false);
+});
+window.addEventListener("pointerup", () => { if (bdrag) { bdrag = null; save(false); drawSide(); } });
+
+// ---------------------------------------------------------------- transport
+function movePlayhead() { const p = $("#playhead"); if (p) p.style.left = (92 + (vid.currentTime || 0) * pps) + "px"; }
+function tick() { $("#time").textContent = (vid.currentTime || 0).toFixed(1) + "s / " + (tl?.duration || 0).toFixed(1) + "s"; movePlayhead(); drawStage(false); }
+vid.addEventListener("timeupdate", tick);
+(function loop() { if (!vid.paused) tick(); requestAnimationFrame(loop); })();
+$("#playBtn").onclick = () => { if (vid.paused) { vid.play(); $("#playBtn").textContent = "❚❚ Pause"; } else { vid.pause(); $("#playBtn").textContent = "▶︎ Play"; } };
+window.addEventListener("keydown", e => {
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
+  const it = tl?.items.find(i => i.id === sel);
+  if (e.code === "Space") { $("#playBtn").click(); e.preventDefault(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === "z") { if (undo.length) { tl = JSON.parse(undo.pop()); save(true); drawTimeline(); drawSide(); } e.preventDefault(); }
+  if (!it) return;
+  const step = e.shiftKey ? 20 : 4;
+  if (e.key === "ArrowLeft") it.x -= step; if (e.key === "ArrowRight") it.x += step;
+  if (e.key === "ArrowUp") it.y -= step; if (e.key === "ArrowDown") it.y += step;
+  if (e.key.startsWith("Arrow")) { place(it, imgs[it.id]); drawSide(); save(false); e.preventDefault(); }
+  if (e.key === "Delete" || e.key === "Backspace") { $("#delBtn")?.click(); e.preventDefault(); }
+});
+$("#undoBtn").onclick = () => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true }));
+
+// ---------------------------------------------------------------- add
+function newItem(extra) {
+  const t = vid.currentTime || 0;
+  const it = Object.assign({ id: extra.type.slice(0, 3) + Date.now() % 100000, start: +t.toFixed(2), end: +Math.min(tl.duration, t + 2.5).toFixed(2), x: 540, y: 700, anim: "pop", z: 30 }, extra);
+  snapshot(); tl.items.push(it); save(true); select(it.id); $("#addDlg").close();
+}
+$("#addBtn").onclick = async () => { lib = await api("/api/library"); drawLib(""); $("#addDlg").showModal(); };
+$("#addClose").onclick = () => $("#addDlg").close();
+document.querySelectorAll("[data-add]").forEach(b => b.onclick = () => {
+  const k = b.dataset.add;
+  if (k === "text") newItem({ type: "text", text: "Your text", w: 900, h: 400, max_px: 140, on_video: !!tl.source });
+  if (k === "badge") newItem({ type: "badge", text: "NEW", shape: "burst", size: 300, colour: "pop" });
+  if (k === "bubble") newItem({ type: "bubble", text: "wait… what?!", width: 600 });
+});
+function drawLib(q) {
+  const names = lib.stickers.filter(n => n.includes(q.toLowerCase()));
+  if (q.startsWith("emoji:")) names.unshift(q);
+  $("#stickerLib").innerHTML = names.map(n => `<button data-st="${n}">${n}</button>`).join("");
+  document.querySelectorAll("[data-st]").forEach(b => b.onclick = () => newItem({ type: "sticker", name: b.dataset.st, size: 300, colour: "accent", float: true }));
+  $("#inboxLib").innerHTML = lib.inbox.length ? lib.inbox.map(f => `<button data-f="${f}">${f.split("/").pop()}</button>`).join("") : `<span class="hint">Inbox is empty.</span>`;
+  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => newItem({ type: "overlay", file: b.dataset.f, width: 300, knock_out_white: true, anim: "fade", start: 0, end: tl.duration }));
+}
+$("#stickerSearch").oninput = e => drawLib(e.target.value);
+
+// ---------------------------------------------------------------- render
+async function doRender(preview) {
+  await api(`/api/p/${slug}/timeline`, tl);
+  await api(`/api/p/${slug}/render`, { preview });
+  $("#outTitle").textContent = preview ? "Quick preview rendering…" : "Rendering your reel…";
+  $("#outBody").innerHTML = `<p class="hint">This runs on your computer and doesn't use Claude credits.</p>`;
+  $("#outDlg").showModal();
+  const poll = setInterval(async () => {
+    const j = await api(`/api/p/${slug}/job`);
+    if (j.state === "done") {
+      clearInterval(poll);
+      $("#outTitle").textContent = "Done ✓";
+      $("#outBody").innerHTML = `<video controls autoplay src="/api/p/${slug}/render/${j.file}?v=${Date.now()}"></video><p class="hint">Saved in projects/${slug}/renders/${j.file}</p>`;
+    } else if (j.state === "error") { clearInterval(poll); $("#outTitle").textContent = "Something went wrong"; $("#outBody").textContent = j.error + " — tell Claude \"the render failed\" and it will fix it."; }
+  }, 1500);
+}
+$("#previewBtn").onclick = () => doRender(true);
+$("#renderBtn").onclick = () => doRender(false);
+window.addEventListener("resize", () => tl && drawTimeline());
+init().catch(e => status("Error: " + e.message));
+</script>
+</body>
+</html>

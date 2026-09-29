@@ -1,0 +1,7 @@
+pillow>=10
+resvg-py>=0.5
+numpy>=1.24
+faster-whisper>=1.0
+yt-dlp>=2024.1
+pytest>=8
+mediapipe>=0.10
