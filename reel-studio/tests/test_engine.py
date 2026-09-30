@@ -349,3 +349,13 @@ def test_soft_foley_sounds_and_no_repeats():
     assert files[0] != files[1] and files[1] != files[2]
     t = sd.typewriter(0, "a much longer sentence", 1.0, "soft")
     assert sum(1 for _, n, _ in t if ":typing:" in n) == 1 and not any(":type_key:" in n for _, n, _ in t)
+
+
+def test_agents_md_lists_every_skill():
+    import os, subprocess, sys
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    subprocess.run([sys.executable, os.path.join(root, "scripts", "make_agents_md.py")], check=True, capture_output=True)
+    text = open(os.path.join(root, "AGENTS.md"), encoding="utf-8").read()
+    for name in os.listdir(os.path.join(root, ".claude", "skills")):
+        if os.path.exists(os.path.join(root, ".claude", "skills", name, "SKILL.md")):
+            assert f".claude/skills/{name}/SKILL.md" in text

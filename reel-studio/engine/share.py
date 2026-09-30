@@ -20,6 +20,24 @@ def _dur(path):
     return float(out or 0)
 
 
+def script_lines(project_dir):
+    """The kept lines with where they start in the finished reel (for the line-by-line review)."""
+    try:
+        rc = json.load(open(os.path.join(project_dir, "roughcut.json")))
+        tl = json.load(open(os.path.join(project_dir, "timeline.json")))
+    except Exception:
+        return []
+    words = (tl.get("captions") or {}).get("words") or []
+    out, wi = [], 0
+    for n, l in enumerate([l for l in rc.get("lines", []) if l.get("keep", True)], 1):
+        k = len(l.get("words") or l["text"].split())
+        t = words[wi]["start"] if wi < len(words) else None
+        wi += k
+        out.append({"n": n, "text": l["text"], "t": t,
+                    "secs": round(l.get("duration", l.get("end", 0) - l.get("start", 0)), 1)})
+    return out
+
+
 def build(project_dir, title=None, version="v1", did=None):
     final = os.path.join(project_dir, "renders", "final.mp4")
     out = os.path.join(project_dir, "renders", "review")
@@ -35,7 +53,7 @@ def build(project_dir, title=None, version="v1", did=None):
     d = _dur(final)
     title = title or os.path.basename(project_dir.rstrip("/")).replace("-", " ").title()
     html = open(os.path.join(HERE, "review_page.html")).read()
-    data = json.dumps({"title": title, "version": version, "did": did or []}).replace("</", "<\\/")
+    data = json.dumps({"title": title, "version": version, "did": did or [], "lines": script_lines(project_dir)}).replace("</", "<\\/")
     html = (html.replace("__TITLE__", title).replace("__VERSION__", version)
             .replace("__DURATION__", f"{int(d // 60)}:{int(d % 60):02d}").replace("__DATA__", data))
     open(os.path.join(out, "index.html"), "w").write(html)

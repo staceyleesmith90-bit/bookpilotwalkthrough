@@ -36,3 +36,19 @@ Three models, from least to most control:
 - A small cloud API: `/templates`, `/packs`, `/trends`, `/inspire`, `/review`, `/update`, auth by
   licence key; plus an MCP server wrapper so Claude can call it directly.
 - A licence check in `setup-check` and a friendly "subscription ended" message.
+
+## What the competitor actually does (seen on her checkout, Sept 2026)
+- The engine: $97 one-off ($67 early), "lifetime" access, **Mac-first** (Windows "more hands-on").
+- Straight after checkout, a one-click upsell: **"The Startup Moms Community" — $37/month**
+  (normally $47, "yours stays $37 as long as you're a member"). Members get: every engine update
+  first, "ask for it, I'll build it", a live hour each month, a walkthrough library, the community.
+- So her real recurring income is the membership; the engine is the door opener.
+
+## Our version (same proven shape, better product)
+- **Reel Studio (one-off or first month)** + **Reel Studio Club (monthly)**: updates the moment
+  they ship, new templates/sounds/effects each month, request-a-feature board, monthly live
+  session, tutorials, community. Founding-member price locked while subscribed.
+- Our edges to lead with: works on **Windows AND Mac**, works with **Claude AND ChatGPT Codex**,
+  editable **CapCut export**, brand-agnostic (white-label for agencies), review page for clients.
+- Keep the valuable, always-fresh parts (templates, sound packs, effects, trend lists, updates)
+  flowing from the Club so the subscription keeps its value even though the engine runs locally.

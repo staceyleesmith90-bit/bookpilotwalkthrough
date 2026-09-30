@@ -92,6 +92,32 @@ def ease_out(p):
     return 1 - (1 - p) ** 3
 
 
+_WIN = {}
+
+
+def _window_frames(it, pack):
+    """[(RGBA frame, seconds)] for an animation window, cropped to what's drawn (engine/animwin.py)."""
+    key = (it.get("window"), round(it["end"] - it["start"], 2), pack.get("label"), pack["colors"].get("pop"))
+    if key not in _WIN:
+        from .animwin import frames, FPS
+        try:
+            paths = frames(it, pack)
+        except Exception as e:
+            print(f"[reel] animation window skipped ({e})")
+            _WIN[key] = []
+            return []
+        ims = [Image.open(p_).convert("RGBA") for p_ in paths]
+        box = None
+        for im in ims[::5]:
+            b = im.getbbox()
+            if b:
+                box = b if box is None else (min(box[0], b[0]), min(box[1], b[1]), max(box[2], b[2]), max(box[3], b[3]))
+        if box:
+            ims = [im.crop(box) for im in ims]
+        _WIN[key] = [(im, 1 / FPS) for im in ims]
+    return _WIN[key]
+
+
 def item_image(it, pack):
     """The RGBA image for one timeline item at full (1080-wide) scale. Also used by the editor."""
     t = it["type"]
@@ -121,6 +147,9 @@ def item_image(it, pack):
     if t == "story":
         from .story import story_card
         return story_card(it, pack)
+    if t == "window":                            # animation window: its settled frame (editor, cover, CapCut)
+        fr = _window_frames(it, pack)
+        return fr[int(len(fr) * 0.8)][0] if fr else None
     if t == "photo":
         from .premium import photo_card
         if it.get("file"):
@@ -303,6 +332,8 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
         if it.get("type") == "sticker" and str(it.get("name", "")).startswith("anim:"):
             from .iconstickers import animated
             anim[it["id"]] = animated(it["name"][5:], it.get("size", 300))
+        elif it.get("type") == "window":
+            anim[it["id"]] = _window_frames(it, pack)
     cap = tl.get("captions") or {}
     groups = caption_groups(cap) if cap.get("style", "off") != "off" else []
     # which words get the highlight colour: the plan's picks (words or indexes) or automatic
@@ -377,7 +408,7 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
                 elif it["id"] in anim and anim[it["id"]]:
                     frs = anim[it["id"]]
                     total = sum(d for _, d in frs)
-                    lt = (t - it["start"]) % total
+                    lt = (t - it["start"]) % total if it["type"] != "window" else min(t - it["start"], total - 1e-6)
                     for img_f, dd in frs:
                         if lt < dd:
                             break

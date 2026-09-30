@@ -42,6 +42,13 @@ button:focus-visible, textarea:focus-visible { outline: 3px solid var(--blue); o
 .note.done p { color: var(--muted); text-decoration: line-through; }
 .note.done .st { color: var(--ok); }
 .empty, .hint { color: var(--muted); font-size: .9rem; margin: 0; }
+.lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 420px; overflow: auto; }
+.ln { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: start; padding: 8px; border: 1px solid var(--line); border-radius: 10px; }
+.ln p { margin: 0; font-size: .92rem; }
+.ln .secs { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.ln .acts { display: flex; gap: 6px; }
+.ln .acts button { background: var(--chip); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font: 500 12px var(--body); cursor: pointer; }
+.ln.cut p { text-decoration: line-through; color: var(--muted); }
 .did { margin: 0; padding-left: 18px; color: var(--muted); font-size: .9rem; display: grid; gap: 3px; }
 details summary { cursor: pointer; font-weight: 600; }
 details audio { width: 100%; margin-top: 10px; }
@@ -89,6 +96,12 @@ details audio { width: 100%; margin-top: 10px; }
       <p class="hint" id="status" role="status"></p>
     </div>
 
+    <div class="card" id="scriptCard" hidden>
+      <h2>The script, line by line</h2>
+      <p class="hint">Tap a time to jump there. <b>Note</b> adds a note for that line; <b>Cut</b> asks Claude to remove it.</p>
+      <ul class="lines" id="lines"></ul>
+    </div>
+
     <div class="card">
       <h2>Notes so far</h2>
       <ul class="notes" id="notes"><li class="empty">No notes yet. Your notes show up here with the moment they belong to.</li></ul>
@@ -116,7 +129,35 @@ document.getElementById("quick").addEventListener("click", e => {
   box.focus();
 });
 
+let addNote = null;           // set once the notes database is ready
+const cutLines = new Set();
+function renderLines() {
+  const lines = DATA.lines || [];
+  if (!lines.length) return;
+  document.getElementById("scriptCard").hidden = false;
+  const ul = document.getElementById("lines"); ul.replaceChildren();
+  lines.forEach(l => {
+    const li = document.createElement("li"); li.className = "ln" + (cutLines.has(l.n) ? " cut" : "");
+    const t = document.createElement("button"); t.type = "button"; t.className = "t"; t.textContent = l.t == null ? "–" : fmt(l.t);
+    t.style.cssText = "font:600 12px var(--body);color:var(--blue);background:var(--chip);border:0;border-radius:7px;padding:3px 8px;cursor:pointer";
+    t.addEventListener("click", () => { if (l.t != null) { video.currentTime = l.t; video.play(); } });
+    const mid = document.createElement("div");
+    const p = document.createElement("p"); p.textContent = l.text;
+    const secs = document.createElement("span"); secs.className = "secs"; secs.textContent = l.secs + "s" + (l.secs > 6 ? " · long, may lose viewers" : "");
+    mid.append(p, secs);
+    const acts = document.createElement("div"); acts.className = "acts";
+    const note = document.createElement("button"); note.type = "button"; note.textContent = "Note";
+    note.addEventListener("click", () => { const box = document.getElementById("noteText"); box.value = `Line ${l.n} (“${l.text.slice(0, 40)}…”): `; if (l.t != null) video.currentTime = l.t; box.focus(); });
+    const cut = document.createElement("button"); cut.type = "button"; cut.textContent = cutLines.has(l.n) ? "Cut ✓" : "Cut";
+    cut.addEventListener("click", async () => { if (!addNote || cutLines.has(l.n)) return; await addNote(`Cut line ${l.n}: “${l.text}”`, l.t ?? 0, { line: l.n, action: "cut" }); });
+    acts.append(note, cut);
+    li.append(t, mid, acts); ul.appendChild(li);
+  });
+}
+renderLines();
+
 function renderNotes(list) {
+  cutLines.clear(); list.forEach(n => { if (n.action === "cut" && n.line) cutLines.add(n.line); }); renderLines();
   const ul = document.getElementById("notes");
   ul.replaceChildren();
   if (!list.length) {
@@ -144,6 +185,13 @@ function renderNotes(list) {
     add.disabled = true; return;
   }
   const col = db.collection("feedback");
+  addNote = async (note, t, extra) => {
+    try {
+      await col.add(Object.assign({ t: Math.round(t * 10) / 10, note, status: "open", version: DATA.version,
+                                    created: new Date().toISOString() }, extra || {}));
+      status.textContent = "Added. Claude will see it.";
+    } catch (e) { status.textContent = "That didn't save. Try again in a moment."; }
+  };
   col.onSnapshot(snap => renderNotes(snap.docs.map(d => d.data())),
                  () => { status.textContent = "Notes couldn't load. Refresh the page to try again."; });
   add.addEventListener("click", async () => {

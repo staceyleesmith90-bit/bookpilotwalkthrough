@@ -343,6 +343,26 @@ def design(tl, cues, kit="clean"):
     for i, it in enumerate(items):
         if it.get("type") == "callout":
             out.append(cue("slide", it["start"], 200 + i, kit, 0.25))
+        elif it.get("type") == "window":        # the window arrives, and its actions make real sounds
+            from .animwin import parse
+            wk, wargs = parse(it.get("window", "app"))
+            d = it["end"] - it["start"]
+            out.append(cue("swish", it["start"], 200 + i, kit, 0.22))
+            if wk == "chat" and wargs:
+                n = len(wargs[0])
+                out.append(cue("typing", it["start"] + 0.4, 200 + i, kit, 0.3, n / 24))
+                out.append(cue("select", it["start"] + 0.4 + n / 24 + 0.3, 210 + i, kit, 0.3))
+            elif wk == "checklist" and wargs:
+                k = len([x for x in wargs[0].split(";") if x])
+                step = max((d - 1.2) / max(k, 1), 0.35)
+                for j in range(k):
+                    out.append(cue("select", it["start"] + 0.6 + step * (j + 0.6), 220 + i * 10 + j, kit, 0.28))
+            elif wk == "app":
+                out.append(cue("cta", it["start"] + 0.5 + max(d - 1.6, 0.8), 230 + i, kit, 0.25))
+            elif wk == "doc":
+                out.append(cue("highlight", it["start"] + 0.7, 240 + i, kit, 0.25))
+            elif wk == "stat":
+                out.append(cue("reveal", it["start"] + max(d - 1.0, 1.0), 250 + i, kit, 0.22))
         elif it.get("type") == "photo":
             out.append(cue("shutter", it["start"] - 0.05, 200 + i, kit, 0.3))    # a snapshot pops up
         elif it.get("type") == "story":

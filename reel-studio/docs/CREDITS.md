@@ -18,6 +18,8 @@ Third-party material it uses:
 | Fonts: Great Vibes, Pinyon Script, Allura, Parisienne, Mrs Saint Delafield, Kaushan Script, Bodoni Moda, Cinzel, Montserrat, Abril Fatface, Courier Prime | SIL OFL 1.1 | `library/fonts/` |
 | Fonts: Yellowtail, Satisfy | Apache 2.0 | `library/fonts/` |
 | Kenney sound packs (Interface, UI, Impact, Digital, Casino audio) — kenney.nl | CC0 | `library/sfx/kenney/` (licence included) |
+| Real recorded sound effects (clicks, key taps, pops, whooshes, shutters, sparkles, paper) — freesound.org, per-sound authors in `library/sfx/foley/credits.json` | CC0 | `library/sfx/foley/` |
+| pycapcut (CapCut project writer) — github.com/GuanYixuan/pyCapCut | Apache-2.0 | installed via requirements.txt |
 | DeepFilterNet (Hendrik Schröter) speech enhancer | MIT / Apache 2.0 | downloaded on first use to `library/models/` |
 | RNNoise model "somnolent-hogwash" (GregorR/rnnoise-models) | not subject to copyright (per authors) | downloaded on first use |
 | MediaPipe BlazeFace face detector | Apache 2.0 | downloaded on first use |

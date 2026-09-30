@@ -535,6 +535,14 @@ def to_timeline(plan, rc=None, source=None):
                     it["file"] = what.strip()
                 it["x"], it["y"] = (820, 380) if it["rotate"] > 0 else (260, 1180)
                 items.append(it)                    # its camera-shutter sound comes from sound design
+            elif kind == "window":                # window:<app|chat|checklist|stat|doc|product>|<text>|...
+                from .animwin import parse
+                wk, wargs = parse(arg)
+                need = {"chat": 1.8 + len((wargs or [""])[0]) / 24, "checklist": 1.4 + 0.6 * len((wargs or [""])[0].split(";"))}.get(wk, 2.8)
+                it = {"id": _id("win"), "type": "window", "window": arg, "start": a + 0.1,
+                      "end": a + 0.1 + min(max(b_end - a, need, 2.4), 5.0), "x": 540, "y": 1180,
+                      "scale": 0.92, "z": 36, "anim": "none", "hide_captions": True}
+                items.append(it)
             elif kind == "reveal":
                 cues.append((max(a - 1.2, 0), "riser", 0.5))
                 cues.append((a, "hit", 0.8))

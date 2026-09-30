@@ -123,6 +123,29 @@ def export(project_dir, tl, name=None, captions=True, dest=None):
     if p["graphics"]:
         script.add_track(cc.TrackType.video, "Graphics", relative_index=1)
         for i, it in enumerate(sorted(p["graphics"], key=lambda x: x["start"])):
+            if it["type"] == "window":            # animation window: a real moving clip (transparent)
+                from .render import _window_frames
+                frs = _window_frames(it, pack)
+                if not frs:
+                    continue
+                fdir = tempfile.mkdtemp()
+                for k, (im, _) in enumerate(frs):
+                    im.save(os.path.join(fdir, f"{k:04d}.png"))
+                clip = os.path.join(media, f"g{i:02d}-window.mov")
+                import subprocess
+                subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", "30", "-i", os.path.join(fdir, "%04d.png"),
+                                "-c:v", "prores_ks", "-profile:v", "4444", "-pix_fmt", "yuva444p10le", clip], check=True)
+                k = it.get("scale", 1.0)
+                w0, h0 = frs[0][0].size
+                pl = place(it["x"], it["y"], w0 * k, h0 * k)
+                vm = cc.VideoMaterial(clip)
+                cs = cc.ClipSettings(scale_x=pl["scale"], scale_y=pl["scale"], transform_x=pl["tx"], transform_y=pl["ty"])
+                seg = cc.VideoSegment(vm, cc.trange(int(it["start"] * SEC), min(vm.duration, int((min(it["end"], dur) - it["start"]) * SEC))),
+                                      clip_settings=cs)
+                track = f"Window {i + 1}"
+                script.add_track(cc.TrackType.video, track, relative_index=20 + i)
+                script.add_segment(seg, track)
+                continue
             try:
                 if it["type"] == "title":
                     from . import titles

@@ -49,14 +49,27 @@ their key). Or their own track. Set `"music": {"file": ..., "gain": 0.18}` in th
    read `projects/<p>/roughcut.json` notes and act on them (tighten gaps, etc.).
 4. **Style plan.** Choose the reel's **recipe** (`reel-recipes` skill) from what they said and
    what the video is. Write `projects/<p>/plan.json` (format below) — a few lines, not a
-   frame-by-frame spec. Then `python -m engine timeline <project>` and show the table it
-   prints, in plain words. Ask one question: "Build it?"
+   frame-by-frame spec. Default look is **clean**: plain footage most of the time, quiet
+   single-word captions, soft real sounds, and ONE special treatment per moment (a takeover,
+   a pop-up, an animation window) — never several at once. Then
+   `python -m engine styleplan <project>` and show that table as it is (beat → line → what
+   happens). Ask: "Build it, or change anything?" Apply changes in plain words ("beat 1:
+   full-screen takeover") to plan.json, then build. Never build before a "go".
+   Named effects: `python -m engine effects` lists them; use `fx:<name>` in a beat. When the
+   user likes something ("save that as my 'spotlight'"), save it:
+   `python -m engine effect-save spotlight --options "punch-in;label:{text}" --name "what it does"`.
 5. **Build.** `python -m engine render <project>` → `renders/final.mp4` + `renders/cover.jpg`.
    Use `--preview` for a fast half-size check when making several changes.
 6. **Tweak.** Small changes ("bigger", "move my logo", "less stickers", "later") — either edit
    `timeline.json` directly or open the manual editor: `python -m engine editor <project>`
    (drag anything, trim on the timeline, render from there). Big changes → edit plan.json and
    rebuild the timeline (this resets manual moves — say so first).
+7. **Deliver — two versions, their choice.** The postable MP4 (review page, `finish-check`), and
+   on request (or if they use CapCut) an editable **CapCut project**:
+   `python -m engine capcut <project> [--no-captions]`. Every graphic is its own clip, takeovers
+   and captions are real CapCut text, voice/music/each sound effect sit on their own tracks.
+   With CapCut installed it appears on CapCut's home screen; otherwise copy the printed folder
+   into CapCut's projects folder. `--no-captions` when they add captions in CapCut themselves.
 
 ## plan.json
 

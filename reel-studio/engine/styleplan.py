@@ -39,7 +39,7 @@ PLAIN = {
     "comment": "comment bubble",
     "comments": "comment collage",
     "story": "brand-story card",
-    "anim": "animation window",
+    "window": "animation window",
     "keep-footage": "plain footage",
     "sfx": "sound",
 }
