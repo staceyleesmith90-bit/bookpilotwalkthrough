@@ -309,3 +309,43 @@ def test_vlog_tag_title_and_vlog_inspiration():
     assert s["format"] == "vlog" and s["captions"] == "off" and s["title_template"] == "tag"
     t = plan_settings({"pacing": {"feel": "fast"}, "speech": {"words_per_sec": 3.4}, "sound": {}, "look": {}})
     assert t["captions"] == "kinetic"
+
+
+def test_named_effects_and_style_plan():
+    from engine.styleplan import expand, summary
+    assert expand(["fx:spotlight", "badge:Hi"], "so good") == ["punch-in", "label:so good", "badge:Hi"]
+    assert expand(["fx:nope"]) == ["fx:nope"]
+    rc = {"lines": [{"id": 1, "text": "I have zero time", "duration": 1.2, "keep": True},
+                    {"id": 2, "text": "cut me", "duration": 1.0, "keep": False}]}
+    s = summary({"beats": [{"line": 1, "do": ["fx:full-screen takeover"]}]}, rc)
+    assert "full-screen" in s and "cut me" not in s and "look: clean" in s
+
+
+def test_capcut_plan_keeps_everything_editable():
+    from engine.capcut import plan, place
+    pack = __import__("engine.packs", fromlist=["load"]).load("brand")
+    tl = {"duration": 10, "items": [
+        {"type": "text", "role": "takeover", "text": "ZERO TIME", "start": 0, "end": 2, "x": 540, "y": 800},
+        {"type": "badge", "text": "Hi", "start": 1, "end": 3, "x": 300, "y": 400}],
+        "captions": {"style": "single-word", "words_per_line": 1,
+                     "words": [{"w": "hello", "start": 0, "end": 0.4}, {"w": "there", "start": 0.3, "end": 0.9}]},
+        "audio": {"sfx": [{"t": 1.0, "name": "sd:soft:type_key:1"}, {"t": 1.1, "name": "sd:soft:type_key:2"},
+                          {"t": 5.0, "name": "sd:soft:word_pop:3"}]}}
+    p = plan(tl, pack)
+    assert [t["text"] for t in p["texts"]] == ["ZERO TIME"] and len(p["graphics"]) == 1
+    assert all(a["end"] <= b["start"] + 1e-9 for a, b in zip(p["captions"], p["captions"][1:]))  # one clean track
+    assert len(p["sounds"]) == 2 and p["sounds"][0]["label"] == "typing"   # typing = one clip
+    c = place(540, 960, 540, 960)
+    assert abs(c["tx"]) < 1e-9 and abs(c["ty"]) < 1e-9 and abs(c["scale"] - 0.5) < 1e-9
+
+
+def test_soft_foley_sounds_and_no_repeats():
+    from engine import sounddesign as sd
+    x = sd.render("sd:soft:type_key:3")
+    assert len(x) > 100 and abs(x).max() <= 1.01
+    assert sd.source_file("sd:soft:type_key:3")[0].endswith(".wav") and "foley" in sd.source_file("sd:soft:type_key:3")[0]
+    cues = sd.no_repeats([(0, "sd:soft:word_pop:1", .2), (1, "sd:soft:word_pop:1", .2), (2, "sd:soft:word_pop:1", .2)])
+    files = [sd.source_file(n)[0] for _, n, _ in cues]
+    assert files[0] != files[1] and files[1] != files[2]
+    t = sd.typewriter(0, "a much longer sentence", 1.0, "soft")
+    assert sum(1 for _, n, _ in t if ":typing:" in n) == 1 and not any(":type_key:" in n for _, n, _ in t)

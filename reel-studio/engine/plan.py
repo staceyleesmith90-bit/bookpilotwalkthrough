@@ -201,7 +201,10 @@ def to_timeline(plan, rc=None, source=None):
                 continue
             b = by_line.get(lid, {"line": lid, "do": []})
             windows.append((ws[0]["start"], ws[-1]["end"] + 0.12, b, l["text"], ws))
-        cap_style = plan.get("captions", pack["captions"]["style"])
+        # the "clean" look (default): quiet single words, small — the footage and ONE treatment
+        # per moment do the talking. Any caption style the user/plan names wins.
+        clean = plan.get("look", "clean") == "clean"
+        cap_style = plan.get("captions") or ("single-word" if clean else pack["captions"]["style"])
         wpl = pack["captions"].get("words_per_line", 3)
         if cap_style == "single-word":
             wpl = 1
@@ -209,6 +212,8 @@ def to_timeline(plan, rc=None, source=None):
             wpl = 3                                # e.g. a one-word pack switched to karaoke
         tl["captions"] = {"style": cap_style, "words_per_line": wpl,
                           "words": all_words, "y": 1245}
+        if clean and not plan.get("captions"):
+            tl["captions"].update(size=62, case="lower")
     else:
         t = 0.0
         for b in beats:
@@ -224,18 +229,19 @@ def to_timeline(plan, rc=None, source=None):
     logo = _logo_item(plan, pack, dur)
     fixed = [logo["_box"]] if logo else []
     base_on_video = rc is not None
-    auto = plan.get("auto_stickers", True)
+    auto = plan.get("auto_stickers", plan.get("look", "clean") != "clean")   # clean: no filler stickers
     sticker_budget = max(2, int(dur / 6))          # ~1 sticker per 6s by default
     used_stickers = set()
     # premium by default: frosted-glass stickers, serif words, glass badges. A playful brand can
     # opt out with "look": "playful" (uses the brand's own sticker style) or set "sticker_style".
-    look = plan.get("look", "premium")
-    sticker_style = plan.get("sticker_style") or ("glass" if look == "premium" else None)
+    look = plan.get("look", "clean")
+    sticker_style = plan.get("sticker_style") or ("glass" if look in ("premium", "clean") else None)
     style = sticker_style or pack.get("sticker", {}).get("style", "doodle")
     badge_shape = plan.get("badge_shape") or ("glass" if style == "glass" else "chip")
 
     for bi, (a, b_end, beat, text, ws) in enumerate(windows):
-        do = list(beat.get("do", []))
+        from .styleplan import expand
+        do = expand(list(beat.get("do", [])), text)       # named effects (fx:<name>) -> treatments
         on_video = base_on_video or any(d.startswith("broll:") for d in do)
         taken = list(fixed) + ([FACE, CAPTION_BOX] if on_video else [])
         if base_on_video and source and not beat.get("broll"):
@@ -521,13 +527,14 @@ def to_timeline(plan, rc=None, source=None):
                 it = {"id": _id("pop"), "type": "photo", "label": label.strip() or None, "size": 360,
                       "start": a + 0.3, "end": min(b_end, a + 3.2), "anim": "pop", "z": 34,
                       "rotate": [5, -4][len(items) % 2]}
-                if re.match(r"^[\d.]+$", what.strip()) and source:
+                if what.strip() in ("", "auto") and source:     # a still from this very moment
+                    it.update(grab_from=source, grab_t=_source_time(tl["cuts"], (a + b_end) / 2))
+                elif re.match(r"^[\d.]+$", what.strip()) and source:
                     it.update(grab_from=source, grab_t=_source_time(tl["cuts"], float(what)))
                 else:
                     it["file"] = what.strip()
                 it["x"], it["y"] = (820, 380) if it["rotate"] > 0 else (260, 1180)
-                items.append(it)
-                cues.append((it["start"], "whoosh", 0.3))
+                items.append(it)                    # its camera-shutter sound comes from sound design
             elif kind == "reveal":
                 cues.append((max(a - 1.2, 0), "riser", 0.5))
                 cues.append((a, "hit", 0.8))
@@ -598,7 +605,7 @@ def to_timeline(plan, rc=None, source=None):
         tl["speed"] = float(plan["speed"])
     # sound design: one coherent kit per reel, a sound for every move, variety every time
     from . import sounddesign
-    kit = plan.get("sound_kit") or sounddesign.KIT_FOR_LOOK.get(look, "clean")
+    kit = plan.get("sound_kit") or sounddesign.KIT_FOR_LOOK.get(look, sounddesign.DEFAULT_KIT)
     sounddesign.vary_entrances(tl["items"])
     cues = sounddesign.design(tl, cues, kit)
     tl["sound_kit"] = kit

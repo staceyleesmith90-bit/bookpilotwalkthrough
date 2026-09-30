@@ -22,6 +22,10 @@
   python -m engine sounds-add "Song — Artist" [--mood a,b] [--tempo T] [--business] [--link URL]
   python -m engine sounds-suggest <project> [--business]  best trending sound for this reel + how to add it
   python -m engine share <project> [--name T] [--options v2]  branded review page with feedback notes
+  python -m engine styleplan <project>          the plan in plain words — show it, get a "go", then build
+  python -m engine effects                      named effects (built-in + the user's own)
+  python -m engine effect-save <name> --options "punch-in;label:{text}" [--name "what it does"]
+  python -m engine capcut <project> [--name N] [--no-captions]   editable CapCut project (every piece its own clip)
   python -m engine layers <project>             editable layers (video · graphics · captions · audio) for any editor
   python -m engine chop <file|folder> [--options SECONDS]  long clips -> best short b-roll clips
   python -m engine trial <trial.json>           hook-on-b-roll trial reels + captions map
@@ -75,6 +79,7 @@ def main(argv=None):
     ap.add_argument("--preview", action="store_true")
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--no-browser", action="store_true")
+    ap.add_argument("--no-captions", action="store_true", help="capcut: leave captions out (use CapCut auto-captions)")
     ap.add_argument("--language")
     ap.add_argument("--options")
     ap.add_argument("--clips")
@@ -229,6 +234,23 @@ def main(argv=None):
         from .render import export_layers
         out = export_layers(project.path(a.arg, "timeline.json"), project.path(a.arg, "renders", "layers"))
         print("layers:", os.path.relpath(out, ROOT))
+    elif c == "styleplan":
+        from .styleplan import summary
+        print(summary(project.load(a.arg, "plan.json") or {}, project.load(a.arg, "roughcut.json") or {}))
+    elif c == "effects":
+        from .styleplan import effects
+        for k, v in effects().items():
+            print(f"  {k:24s} {v.get('about', '')}  [{' + '.join(v['do'])}]")
+    elif c == "effect-save":
+        from .styleplan import save_effect
+        e = save_effect(a.arg, [x.strip() for x in (a.options or "").split(";") if x.strip()], a.name or "")
+        print("saved:", a.arg, "=", " + ".join(e["do"]))
+    elif c == "capcut":
+        from .capcut import export
+        tl = project.load(a.arg, "timeline.json")
+        folder, inside = export(project.path(a.arg), tl, a.name, captions=not a.no_captions)
+        print(("Open CapCut: the project is on your home screen as" if inside else
+               "CapCut project folder (copy it into CapCut's projects folder):"), folder)
     elif c == "chop":
         from .chop import chop
         made = chop([a.arg], float(a.options or 6))

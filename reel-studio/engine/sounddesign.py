@@ -20,38 +20,45 @@ import numpy as np
 SR = 44100
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KEN = os.path.join(ROOT, "library", "sfx", "kenney")
+FOLEY = os.path.join(ROOT, "library", "sfx", "foley")
 
 # event -> kit -> candidate sources ("k:<glob>" = Kenney sample glob, "s:<synth>" = synth)
 KITS = {
-    "text_in":   {"clean": ["k:interface-click_*", "k:ui-click*"], "luxe": ["k:interface-glass_*", "s:shimmer"],
-                  "playful": ["k:interface-drop_*", "k:interface-pluck_*"], "digital": ["k:interface-select_*", "k:digital-pepSound*"]},
-    "word_pop":  {"clean": ["k:interface-tick_*"], "luxe": ["k:interface-tick_*"],
-                  "playful": ["k:interface-toggle_*", "k:interface-drop_*"], "digital": ["k:ui-rollover*"]},
-    "type_key":  {"*": ["k:ui-switch*"]},
-    "type_end":  {"clean": ["k:interface-confirmation_*"], "luxe": ["s:shimmer"],
-                  "playful": ["k:interface-bong_*", "k:interface-confirmation_*"], "digital": ["k:digital-twoTone*"]},
-    "slide":     {"*": ["k:casino-card-slide-*"]},
-    "highlight": {"*": ["k:casino-card-slide-*"]},
-    "glass":     {"*": ["k:interface-glass_*", "k:impact-impactGlass_light_*"]},
-    "select":    {"clean": ["k:interface-select_*"], "luxe": ["k:interface-glass_*"],
-                  "playful": ["k:interface-pluck_*"], "digital": ["k:interface-select_*"]},
-    "sticker_in": {"clean": ["k:interface-drop_*"], "luxe": ["k:interface-glass_*"],
-                   "playful": ["k:interface-drop_*", "k:interface-pluck_*", "s:boing"], "digital": ["k:digital-pepSound*"]},
-    "whoosh":    {"*": ["s:whoosh"]},
-    "swish":     {"*": ["s:swish"]},
+    # "f:<kind>" = real recorded foley (library/sfx/foley, CC0 from Freesound — sounds like the
+    # sounds in CapCut's library because they are real recordings, not synths or game blips)
+    "text_in":   {"soft": ["f:softpop", "f:tap"], "clean": ["f:tap", "f:click"], "luxe": ["f:tap", "k:interface-glass_*"],
+                  "playful": ["f:pop", "f:softpop"], "digital": ["f:click", "k:interface-select_*"]},
+    "word_pop":  {"soft": ["f:softpop"], "clean": ["f:tick", "f:softpop"], "luxe": ["f:tick"],
+                  "playful": ["f:pop"], "digital": ["f:click"]},
+    "type_key":  {"*": ["f:key"]},
+    "typing":    {"*": ["f:typing"]},
+    "type_end":  {"soft": ["f:tick"], "clean": ["f:tick"], "luxe": ["f:ding"],
+                  "playful": ["f:softpop"], "digital": ["k:digital-twoTone*"]},
+    "slide":     {"*": ["f:swipe", "f:paper"]},
+    "highlight": {"*": ["f:marker", "f:swipe"]},
+    "glass":     {"*": ["k:interface-glass_*", "f:tap"]},
+    "select":    {"soft": ["f:click"], "clean": ["f:click"], "luxe": ["f:tap"], "playful": ["f:pop"],
+                  "digital": ["f:click", "k:interface-select_*"]},
+    "sticker_in": {"soft": ["f:softpop"], "clean": ["f:softpop", "f:tap"], "luxe": ["f:tap", "k:interface-glass_*"],
+                   "playful": ["f:pop", "s:boing"], "digital": ["f:click", "k:digital-pepSound*"]},
+    "shutter":   {"*": ["f:shutter"]},
+    "page":      {"*": ["f:pageflip"]},
+    "whoosh":    {"*": ["f:whoosh", "f:swoosh"]},
+    "swish":     {"*": ["f:swoosh", "f:swipe"]},
     "zoom_in":   {"*": ["s:zoom"]},
-    "impact":    {"clean": ["s:hit_soft"], "luxe": ["s:hit_lux"], "playful": ["k:impact-impactSoft_heavy_*"],
+    "impact":    {"soft": ["f:tap"], "clean": ["s:hit_soft"], "luxe": ["s:hit_lux"], "playful": ["k:impact-impactSoft_heavy_*"],
                   "digital": ["s:hit_soft", "k:interface-glitch_*"]},
     "riser":     {"*": ["s:riser"]},
-    "reveal":    {"clean": ["k:interface-confirmation_*"], "luxe": ["s:shimmer"],
-                  "playful": ["k:digital-powerUp*"], "digital": ["k:digital-powerUp*", "k:digital-phaserUp*"]},
-    "cta":       {"clean": ["k:interface-confirmation_*"], "luxe": ["k:impact-impactBell_heavy_*"],
-                  "playful": ["k:interface-bong_*"], "digital": ["k:digital-threeTone*"]},
-    "transition": {"*": ["s:whoosh"]},
+    "reveal":    {"soft": ["f:sparkle"], "clean": ["f:sparkle"], "luxe": ["f:sparkle", "s:shimmer"],
+                  "playful": ["f:sparkle", "k:digital-powerUp*"], "digital": ["k:digital-powerUp*", "k:digital-phaserUp*"]},
+    "cta":       {"soft": ["f:ding"], "clean": ["f:ding"], "luxe": ["f:ding", "k:impact-impactBell_heavy_*"],
+                  "playful": ["f:ding", "k:interface-bong_*"], "digital": ["k:digital-threeTone*"]},
+    "transition": {"*": ["f:whoosh", "f:swoosh"]},
     "glitch":    {"*": ["k:interface-glitch_*"]},
 }
-KIT_FOR_LOOK = {"premium": "luxe", "playful": "playful", "bold": "digital"}
-KIT_GAIN = {"luxe": 0.8, "clean": 0.85, "playful": 1.0, "digital": 0.9}
+KIT_FOR_LOOK = {"premium": "luxe", "playful": "playful", "bold": "digital", "clean": "soft"}
+DEFAULT_KIT = "soft"                    # soft real foley: few sounds, each tied to something on screen
+KIT_GAIN = {"soft": 0.7, "luxe": 0.8, "clean": 0.85, "playful": 1.0, "digital": 0.9}
 
 
 def cue(event, t, seed=0, kit="clean", gain=0.6, dur=None):
@@ -202,14 +209,29 @@ SYNTH = {"whoosh": whoosh, "swish": swish, "zoom": zoom, "hit_soft": hit_soft, "
 
 
 # ---------------------------------------------------------------- render a cue
+def source_file(name):
+    """Which sample file (or synth) a cue name resolves to — used to avoid back-to-back repeats."""
+    _, kit, event, seed, *rest = name.split(":")
+    seed = int(seed)
+    table = KITS.get(event, KITS["text_in"])
+    cands = table.get(kit) or table.get("*") or next(iter(table.values()))
+    src, h = _pick(cands, seed, event)
+    if src.startswith("s:"):
+        return src, h, None
+    folder, pat = (FOLEY, src[2:] + "-*.wav") if src.startswith("f:") else (KEN, src[2:] + ".wav")
+    files = sorted(glob.glob(os.path.join(folder, pat)))
+    if not files:
+        return "s:swish", h, None
+    f, h2 = _pick(files, seed, src)
+    return f, h, h2
+
+
 def render(name):
     """name = sd:<kit>:<event>:<seed>[:<dur>] -> mono float32 at SR."""
     _, kit, event, seed, *rest = name.split(":")
     seed = int(seed)
     dur = float(rest[0]) if rest else None
-    table = KITS.get(event, KITS["text_in"])
-    cands = table.get(kit) or table.get("*") or next(iter(table.values()))
-    src, h = _pick(cands, seed, event)
+    src, h, h2 = source_file(name)
     if src.startswith("s:"):
         fn = SYNTH[src[2:]]
         if src[2:] in ("whoosh", "riser", "zoom") and dur:
@@ -217,26 +239,41 @@ def render(name):
         else:
             x = fn(seed=seed)
     else:
-        files = sorted(glob.glob(os.path.join(KEN, src[2:] + ".wav")))
-        if not files:
-            x = SYNTH["swish"](seed)
-        else:
-            f, h2 = _pick(files, seed, src)
-            x = _pitch(_wav(f), ((h2 >> 8) % 7 - 3) * 0.4)          # ±1.2 semitone variation
+        x = _wav(src)
+        foley = src.startswith(FOLEY)
+        x = _pitch(x, ((h2 >> 8) % 5 - 2) * (0.25 if foley else 0.4))   # tiny pitch variation
+        if dur and len(x) > dur * SR * 1.15 and event in ("typing", "whoosh", "swish", "transition", "slide"):
+            x = x[: int(dur * SR)].copy()                                # fit the move / the typing
+            f = min(len(x) // 3, int(0.04 * SR))
+            x[-f:] *= np.linspace(1, 0, f)
+        if foley and kit in ("soft", "clean", "luxe"):
+            x = _soften(x)                                               # no harsh top end
     level = 0.85 + ((h >> 16) % 30) / 100                             # ±15% level variation
     return (x / (np.abs(x).max() + 1e-9) * level).astype(np.float32)
 
 
+def _soften(x, cutoff=7500):
+    """Gentle high cut so clicks sound soft and expensive, not piercing."""
+    n = len(x)
+    if n < 64:
+        return x
+    X = np.fft.rfft(x)
+    f = np.fft.rfftfreq(n, 1 / SR)
+    X *= 1 / np.sqrt(1 + (f / cutoff) ** 4)
+    return np.fft.irfft(X, n).astype(np.float32)
+
+
 def typewriter(t0, text, dur, kit="clean", seed=0, gain=0.35):
-    """One key click per character across `dur` seconds (spaces quieter), a soft end sound."""
-    chars = [c for c in text]
-    n = max(len(chars), 1)
-    cues = []
-    for i, c in enumerate(chars):
-        if c == " ":
-            continue
-        cues.append(cue("type_key", t0 + dur * i / n, seed * 97 + i, kit, gain * (0.8 + 0.4 * ((i * 7) % 5) / 5)))
-    cues.append(cue("type_end", t0 + dur + 0.05, seed, kit, gain * 0.9))
+    """Typing sound while text types on: short words get a few real key taps; longer text gets
+    one real typing burst fitted to the typing time (not a machine-gun of identical clicks)."""
+    chars = [c for c in text if c != " "]
+    if len(chars) > 8:
+        cues = [cue("typing", t0, seed, kit, gain * 1.1, max(dur, 0.3))]
+    else:
+        n = max(len(text), 1)
+        cues = [cue("type_key", t0 + dur * i / n, seed * 97 + i, kit, gain * (0.8 + 0.4 * ((i * 7) % 5) / 5))
+                for i, c in enumerate(text) if c != " "]
+    cues.append(cue("type_end", t0 + dur + 0.05, seed, kit, gain * 0.7))
     return cues
 
 
@@ -306,6 +343,10 @@ def design(tl, cues, kit="clean"):
     for i, it in enumerate(items):
         if it.get("type") == "callout":
             out.append(cue("slide", it["start"], 200 + i, kit, 0.25))
+        elif it.get("type") == "photo":
+            out.append(cue("shutter", it["start"] - 0.05, 200 + i, kit, 0.3))    # a snapshot pops up
+        elif it.get("type") == "story":
+            out.append(cue("page", it["start"] - 0.05, 200 + i, kit, 0.28))
         elif it.get("style") == "glass" and it.get("type") == "sticker" and it.get("anim") != "type":
             out.append(cue("glass", it["start"], 200 + i, kit, 0.4))
         elif it.get("type") == "sticker" and it.get("anim") == "slide":
@@ -318,10 +359,29 @@ def design(tl, cues, kit="clean"):
         idx = auto_keywords(cap["words"]) if kws is None else [
             i for i, w in enumerate(cap["words"]) if i in kws or w["w"].lower().strip(".,!?") in {str(k).lower() for k in kws}]
         busy = sorted(t for t, _, g in out if g >= 0.3)
+        gap = 3.0 if kit in ("soft", "clean", "luxe") else 1.5     # restraint: a few ticks, not every word
         last = -9.0
         for i in idx:
             t = cap["words"][i]["start"]
-            if t - last >= 1.5 and not any(abs(t - b) < 0.4 for b in busy):
-                out.append(cue("word_pop", t, 300 + i, kit, 0.2))
+            if t - last >= gap and not any(abs(t - b) < 0.5 for b in busy):
+                out.append(cue("word_pop", t, 300 + i, kit, 0.16 if kit == "soft" else 0.2))
                 last = t
-    return sorted(out)
+    return no_repeats(sorted(out))
+
+
+def no_repeats(cues):
+    """Never the same sample twice in a row (rotate the seed until the file changes)."""
+    out, last_file = [], {}
+    for t, name, g in cues:
+        if name.startswith("sd:"):
+            parts = name.split(":")
+            ev = parts[2]
+            for k in range(12):
+                f = source_file(name)[0]
+                if f != last_file.get(ev):
+                    break
+                parts[3] = str(int(parts[3]) + 1000)
+                name = ":".join(parts)
+            last_file[ev] = f
+        out.append((t, name, g))
+    return out

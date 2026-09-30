@@ -1,0 +1,35 @@
+{
+  "full-screen takeover": {
+    "do": [
+      "takeover"
+    ],
+    "about": "the words fill the whole screen, top to bottom"
+  },
+  "spotlight": {
+    "do": [
+      "punch-in",
+      "label:{text}"
+    ],
+    "about": "quick push in on your face with a small label"
+  },
+  "product moment": {
+    "do": [
+      "popup:auto|{text}",
+      "callout:{text}"
+    ],
+    "about": "a snapshot of the product pops up with a pointer"
+  },
+  "big reveal": {
+    "do": [
+      "reveal",
+      "takeover"
+    ],
+    "about": "a sparkle, then the words take over"
+  },
+  "quiet": {
+    "do": [
+      "keep-footage"
+    ],
+    "about": "just you talking, nothing on top"
+  }
+}
