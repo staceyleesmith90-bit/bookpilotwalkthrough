@@ -54,6 +54,12 @@ font once in CapCut so CapCut knows it.
 from their video: `python -m engine look-from-video <project>` → show `brand/previews/looks.jpg`
 → they tap 1, 2 or 3 → `python -m engine look-use N --name "<brand name>"`. Offer the full setup later.
 
+**I. "I love this reel's look"** (TikTok / Reel / Short links) → `python -m engine brand-setup inspire
+"<link> <link2>" --name "<brand>"` → three looks in the reels' shared colours, with the reel's filter, pace
+and sound energy saved into the brand (`reel_style`) so every reel for it follows that style → `look-use N`.
+Then look at `brand/inspiration/<name>.jpg` once and tell them in two lines what you borrowed (text style,
+energy). Never copy their words, footage, music or graphics.
+
 **H. "Show me some designs"** → 13 ready-made professional designs (HyperFrames frame presets, open
 source, bundled): `python -m engine designs` lists them. Offer 3–4 that fit what they told you as tap
 answers, then `python -m engine brand-setup design "<name>" --name "<brand>"` → show `looks.jpg` → `look-use N`.
@@ -63,7 +69,7 @@ FRAME.md (or DESIGN.md) → drop it in the inbox → `brand-setup file inbox/<fi
 
 **The easiest way for most people is the Studio app**: Brands → *Add a brand* walks through every route
 above with buttons (name → how to make the look → see the looks on a reel → tap one). Point them there.
-Same routes from the chat: `python -m engine brand-setup <design|file|website|image|video|vibe> "<value>"`.
+Same routes from the chat: `python -m engine brand-setup <design|inspire|file|website|image|video|vibe> "<value>"`.
 
 **Several brands** (content creators, agencies, influencers with brand deals): each brand is set up once
 (`brand-new "<name>"`, then any route above). `brands` lists them; `brand-use "<name>"` switches (also the

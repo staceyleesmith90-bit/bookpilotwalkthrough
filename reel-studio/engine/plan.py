@@ -212,6 +212,8 @@ def to_timeline(plan, rc=None, source=None):
     beats = plan.get("beats", [])
     items, cues, zooms, broll, transitions = [], [], [], [], []
     layouts = []
+    if pack.get("reel_style"):                    # the brand was styled from reels they love: its pace/filter/sounds
+        plan = dict({k: v for k, v in pack["reel_style"].items() if k != "from_reels"}, **plan)
     if plan.get("inspiration"):                   # "make it feel like this reel": its settings fill the gaps
         import json as _json
         pth = os.path.join(ROOT_DIR, "brand", "inspiration", f"{plan['inspiration']}.json")

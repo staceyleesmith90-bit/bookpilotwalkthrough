@@ -40,7 +40,7 @@
   python -m engine font-use <font|auto> --role R  e.g. font-use "Satisfy" --role sticker (auto = brand match)
   python -m engine brands                       the brands you make content for (one is in use)
   python -m engine brand-new "<name>" | brand-use "<name>" | brand-delete "<name>"
-  python -m engine brand-setup <route> "<value>" [--name "<brand>"]  route: design|file|website|image|video|vibe
+  python -m engine brand-setup <route> "<value>" [--name "<brand>"]  route: design|inspire|file|website|image|video|vibe
   python -m engine designs                      the ready-made designs (HyperFrames presets) to pick from
   python -m engine look-from-video <project|video>  3 looks made from the colours in the video
   python -m engine look-use <1|2|3> [--name "<brand>"]  use one of those looks as the brand

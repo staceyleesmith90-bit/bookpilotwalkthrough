@@ -426,7 +426,7 @@ async function useBrand(slug) { await api("/api/brands/use", { slug }); toast("S
 
 function openSetup(isNew) { BS = { isNew, step: isNew ? "name" : "route" }; $("#bs").showModal(); drawSetup(); }
 $("#bsClose").onclick = () => { $("#bs").close(); clearInterval(bsPoll); load(); };
-const ROUTE_IC = { design: "🎨", video: "🎬", website: "🌐", image: "🖼️", file: "📄", vibe: "✨" };
+const ROUTE_IC = { inspire: "💖", design: "🎨", video: "🎬", website: "🌐", image: "🖼️", file: "📄", vibe: "✨" };
 async function drawSetup() {
   const body = $("#bsBody"), next = $("#bsNext"), back = $("#bsBack");
   back.style.visibility = ["route", "name", "working"].includes(BS.step) ? "hidden" : "visible";
@@ -454,6 +454,8 @@ async function drawSetup() {
       h = `<h3>Pick a design</h3>${guide}<div class="designs">${DESIGNS.map(d => `<button class="design ${BS.value === d.name ? "on" : ""}" data-v="${d.name}"><img loading="lazy" src="${d.preview}" alt="" onerror="this.style.display='none'"><div class="dd"><b>${esc(d.title)}</b><span>${esc(d.about)}</span><div class="sw2">${["accent", "background", "text"].map(k => `<i style="background:${d.colors[k]}"></i>`).join("")}</div></div></button>`).join("")}</div>
         <label class="f">Your own accent colour (optional)</label><input type="color" id="bsAcc" value="${BS.acc || "#E4572E"}"> <label><input type="checkbox" id="bsAccOn" ${BS.accOn ? "checked" : ""}> use my colour instead</label>
         <p class="note">Designs from HyperFrames by HeyGen (open source). <a href="https://www.hyperframes.dev" target="_blank" rel="noopener">See them all on hyperframes.dev ↗</a></p>`;
+    } else if (BS.route === "inspire") {
+      h = `<h3>Paste the reel you love</h3>${guide}<textarea id="bsVal" rows="3" placeholder="https://www.tiktok.com/@someone/video/…&#10;(one link per line)">${esc(BS.value || "")}</textarea>`;
     } else if (BS.route === "website") {
       h = `<h3>Your website</h3>${guide}<input type="text" id="bsVal" placeholder="www.yourbusiness.co.za" value="${esc(BS.value || "")}">`;
     } else if (BS.route === "vibe") {

@@ -22,6 +22,8 @@ GALLERY = "https://www.hyperframes.dev/design/{name}"
 ROUTES = [
     {"id": "design", "title": "Pick a ready-made design", "time": "1 minute",
      "about": "13 professional looks (from HyperFrames, open source). Pick one, change the colours if you like."},
+    {"id": "inspire", "title": "From a reel I love", "time": "2 minutes",
+     "about": "Paste a TikTok, Reel or YouTube Short link (or a few). We take its colours, filter, pace and energy."},
     {"id": "video", "title": "From my video", "time": "no prep",
      "about": "Colours taken from the product, outfit or place in your video."},
     {"id": "website", "title": "From my website", "time": "1 minute",
@@ -45,6 +47,10 @@ GUIDES = {
              "Canva to Claude (Settings → Connectors → Canva) and say \"I styled my Canva\".",
              "Figma or a brand guide: export the page with your colours and fonts as PNG or PDF and drop it here.",
              "We read your colours and fonts and show your look before anything is saved."],
+    "inspire": ["Open the TikTok, Instagram Reel or YouTube Short you love and tap Share → Copy link.",
+                "Paste it below. Got a few you love? Paste them all, one per line: we take what they share.",
+                "We study its colours, filter, pace and sound energy (never its words, footage or music).",
+                "Tap the look you like. Every reel for this brand then follows that style."],
     "website": ["Paste your website address.", "We read its colours, fonts and logo.",
                 "Check the three looks and tap the one you like."],
     "image": ["Upload your logo (PNG is best), a product photo or a mood board.",
@@ -122,6 +128,8 @@ def run(route, value=None, name="My brand", frame=None, overrides=None):
                 raise ValueError("I couldn't read colours from that PDF — export the page as PNG instead.")
             return from_spec(spec, name, frame, {"file": os.path.basename(value)}, overrides)
         return from_spec(stylesheet.read(value), name, frame, {"file": os.path.basename(value)}, overrides)
+    if route == "inspire":
+        return from_reels(value, name, frame)
     if route == "website":
         site = brand.from_website(value)
         cols = [c for c in site["colors"] if not brand.is_neutral(c)]
@@ -141,6 +149,39 @@ def run(route, value=None, name="My brand", frame=None, overrides=None):
         looks = [{"feel": d["name"], "pack": dict(brand.direction_pack(d), label=name)} for d in dirs]
         return autolook.save_looks(looks, _frame_or_sample(frame), {"vibe": value})
     raise ValueError(f"Unknown route '{route}'.")
+
+
+def from_reels(links, name, frame=None):
+    """Brand looks from reels they love: the shared colours + the reel's style (filter, pace, sound
+    energy, caption feel) saved into the brand so every reel for it follows that style."""
+    from . import inspire
+    urls = [u.strip() for u in re.split(r"[\s,]+", links or "") if u.strip()]
+    if not urls:
+        raise ValueError("Paste at least one link.")
+    profs, errs = [], []
+    for u in urls[:4]:
+        try:
+            profs.append(inspire.analyse(u, transcribe_audio=False))
+        except Exception:
+            errs.append(u)
+    if not profs:
+        raise ValueError("I couldn't open that link. Check it's public, or download the video and use "
+                         "'From my video' instead.")
+    cols = []
+    for p in profs:
+        cols += [c for c in p.get("palette", []) if not brand.is_neutral(c, 0.22) and not autolook._is_skin(c)]
+    style = inspire.plan_settings(profs[0])
+    style = {k: v for k, v in style.items() if v and k not in ("captions",)}   # captions: their brand's own style
+    sheet, looks = autolook.looks_from_colours(cols, name, _frame_or_sample(frame),
+                                               {"inspire": urls, "names": [p["name"] for p in profs]})
+    for lk in looks:
+        lk["pack"]["reel_style"] = dict(style, from_reels=[p["name"] for p in profs])
+        if style.get("grade"):
+            lk["pack"]["grade"] = style["grade"]
+        if errs:
+            lk["notes"] = [f"Couldn't open: {', '.join(errs)}"]
+    autolook.save_looks(looks, _frame_or_sample(frame), {"inspire": urls})
+    return sheet, looks
 
 
 def _pdf_text(path):
