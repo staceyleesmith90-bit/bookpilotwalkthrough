@@ -87,9 +87,11 @@ def has_brand():
 
 def load(name=None):
     """name=None -> the user's brand if set up, else the 'bold' preset."""
+    # a fresh install must never crash before onboarding: "brand" without a brand -> 'bold'
     if name in (None, "brand") and has_brand():
-        return _resolve(json.load(open(BRAND)))
-    return _resolve(presets()[name or "bold"])
+        return _resolve(json.load(open(BRAND, encoding="utf-8")))
+    p = presets()
+    return _resolve(p.get(name) or p["bold"])
 
 
 def save_brand(pack):
