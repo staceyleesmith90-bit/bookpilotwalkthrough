@@ -144,12 +144,53 @@ function attachMic(btn, box, hint, onText) {
 }
 const DATA = JSON.parse(document.getElementById("reel-data").textContent);
 const video = document.getElementById("reel");
-// if every source fails (or nothing loads in 8 s), show direct links instead of a dead player
-{ const help = () => { document.getElementById("playHelp").hidden = false; };
+// Some viewers (e.g. the Claude iPhone app) can't let the media player fetch the files directly,
+// though the page itself can. Rescue: the page downloads the file and hands it to the player.
+const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+async function viaBlob(el, files) {
+  for (const [url, type] of files) {
+    if (type && !el.canPlayType(type.split(";")[0])) continue;
+    try {
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) continue;
+      const blob = new Blob([await res.blob()], { type: type.split(";")[0] });
+      el.src = URL.createObjectURL(blob);
+      el.load();
+      const ok = await new Promise(r => {
+        const t = setTimeout(() => r(false), 8000);
+        el.addEventListener("loadedmetadata", () => { clearTimeout(t); r(true); }, { once: true });
+        el.addEventListener("error", () => { clearTimeout(t); r(false); }, { once: true });
+      });
+      if (ok) return url;
+    } catch (e) { /* try the next file */ }
+  }
+  return null;
+}
+{ const help = document.getElementById("playHelp");
+  let rescuing = false;
+  const rescue = async () => {
+    if (rescuing || video.readyState > 0) return;
+    rescuing = true;
+    help.hidden = false; help.textContent = "Loading the video…";
+    const order = IOS ? [["reel.mp4", "video/mp4"], ["reel-opus.mp4", "video/mp4"]]
+                      : [["reel-opus.mp4", "video/mp4"], ["reel.webm", "video/webm"], ["reel.mp4", "video/mp4"]];
+    const got = await viaBlob(video, order);
+    if (got) { help.hidden = true; return; }
+    help.textContent = "The video won't play in this view. Open this page in your browser (Share → Open in browser), or ask Claude to send the file.";
+  };
+  if (IOS) rescue();                                   // don't wait for the player to fail on iPhone
   const srcs = video.querySelectorAll("source");
-  srcs[srcs.length - 1].addEventListener("error", help);
-  video.addEventListener("error", help);
-  setTimeout(() => { if (video.readyState === 0 && !video.played.length) help(); }, 8000); }
+  if (srcs.length) srcs[srcs.length - 1].addEventListener("error", rescue);
+  video.addEventListener("error", rescue);
+  setTimeout(() => { if (video.readyState === 0 && !video.played.length) rescue(); }, 6000);
+  const audio = document.querySelector("audio");
+  if (audio) {
+    let tried = false;
+    const fix = async () => { if (tried) return; tried = true; await viaBlob(audio, [["soundtrack.mp3", "audio/mpeg"]]); };
+    audio.addEventListener("error", fix);
+    if (IOS) audio.closest("details")?.addEventListener("toggle", fix, { once: true });
+  }
+}
 const fmt = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
 const did = document.getElementById("did");
 (DATA.did || []).forEach(line => { const li = document.createElement("li"); li.textContent = line; did.appendChild(li); });
