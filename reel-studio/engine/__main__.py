@@ -22,6 +22,7 @@
   python -m engine sounds-add "Song — Artist" [--mood a,b] [--tempo T] [--business] [--link URL]
   python -m engine sounds-suggest <project> [--business]  best trending sound for this reel + how to add it
   python -m engine share <project> [--name T] [--options v2]  branded review page with feedback notes
+  python -m engine hf-captions                  premium animated caption styles (HyperFrames)
   python -m engine styleplan <project>          the plan in plain words — show it, get a "go", then build
   python -m engine effects                      named effects (built-in + the user's own)
   python -m engine effect-save <name> --options "punch-in;label:{text}" [--name "what it does"]
@@ -242,6 +243,11 @@ def main(argv=None):
         from .render import export_layers
         out = export_layers(project.path(a.arg, "timeline.json"), project.path(a.arg, "renders", "layers"))
         print("layers:", os.path.relpath(out, ROOT))
+    elif c == "hf-captions":
+        from .hyperframes import caption_styles
+        print("HyperFrames caption styles (HeyGen, Apache-2.0) — use as \"captions\": \"hf:<name>\":")
+        for k, v in caption_styles().items():
+            print(f"  hf:{k:22s} {v}")
     elif c == "styleplan":
         from .styleplan import summary
         print(summary(project.load(a.arg, "plan.json") or {}, project.load(a.arg, "roughcut.json") or {}))

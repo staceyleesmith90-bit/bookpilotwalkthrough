@@ -305,6 +305,26 @@ def caption_groups(cap):
     return groups
 
 
+def hf_captions(tl, scale=1.0):
+    """Frames + placement for a HyperFrames caption style ("hf:<name>"). Captions yield to full-screen
+    moments: words under a takeover/title are left out so the two never fight for the same pixels."""
+    from . import hyperframes
+    cap = tl["captions"]
+    hide = [(it["start"] - 0.1, it["end"] + 0.1) for it in tl.get("items", []) if it.get("hide_captions")]
+    words = [w for w in cap["words"] if not any(a <= w["start"] < b for a, b in hide)]
+    if not words:
+        return None
+    res = hyperframes.caption_frames(cap["style"], words, float(tl["duration"]))
+    box = res["box"]
+    if not box:
+        return None
+    bw, bh = box[2] - box[0], box[3] - box[1]
+    k = min(1.0, 980 / max(bw, 1), 520 / max(bh, 1)) * scale
+    cy = (box[1] + box[3]) / 2
+    y = cap.get("y", 1245) if cy > 700 else 1060                # bottom styles low; big centre styles a bit higher
+    return {"frames": res["frames"], "box": box, "k": k, "x": 540 * scale, "y": y * scale}
+
+
 def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
     """layer=None: the finished picture. For the layers export: "video" (footage + camera moves
     only), "graphics" (titles/stickers on transparent), "captions" (captions on transparent)."""
@@ -339,6 +359,10 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
             anim[it["id"]] = _window_frames(it, pack)
     cap = tl.get("captions") or {}
     groups = caption_groups(cap) if cap.get("style", "off") != "off" else []
+    hfcap = None
+    if str(cap.get("style", "")).startswith("hf:") and cap.get("words") and layer != "graphics":
+        hfcap = hf_captions(tl, scale)              # HyperFrames caption style, drawn as one layer
+        groups = []
     # which words get the highlight colour: the plan's picks (words or indexes) or automatic
     kw_src = cap.get("keywords")
     if kw_src is None:
@@ -419,6 +443,13 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
                     _place(frame, img_f, it, t, scale)
                 else:
                     _place(frame, cache[it["id"]], it, t, scale)
+        if hfcap and hfcap["frames"] and fi < len(hfcap["frames"]):
+            im = Image.open(hfcap["frames"][fi]).convert("RGBA")
+            if hfcap["box"]:
+                im = im.crop(tuple(hfcap["box"]))
+            if hfcap["k"] != 1:
+                im = im.resize((max(1, int(im.width * hfcap["k"])), max(1, int(im.height * hfcap["k"]))), Image.LANCZOS)
+            frame.alpha_composite(im, (int(hfcap["x"] - im.width / 2), int(hfcap["y"] - im.height / 2)))
         if groups and layer != "graphics" and not any(a <= t < b for a, b in hide_caps):
             for gi, g in enumerate(groups):
                 if g[0]["start"] <= t < (groups[gi + 1][0]["start"] if gi + 1 < len(groups) else g[-1]["end"] + 0.3):

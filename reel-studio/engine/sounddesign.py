@@ -21,37 +21,47 @@ SR = 44100
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KEN = os.path.join(ROOT, "library", "sfx", "kenney")
 FOLEY = os.path.join(ROOT, "library", "sfx", "foley")
+UISFX = os.path.join(ROOT, "library", "sfx", "uisfx")      # CC0 interface sounds (uisfx.com), 10 "feels"
+CC0PACK = os.path.join(ROOT, "library", "sfx", "cc0pack")  # CC0 "100 SFX #2" by rubberduck: air, glass, taps
+# which uisfx feels each kit uses (one is picked per sound, so a reel stays coherent but never repetitive)
+KIT_FEEL = {"soft": ["soft", "minimal"], "clean": ["studio", "minimal"], "luxe": ["glass", "dreamy"],
+            "playful": ["rubber", "organic"], "digital": ["scifi", "mechanical"]}
+# one place decides how loud each kind of sound sits under the voice (relative; cue gains multiply this)
+EVENT_LEVEL = {"type_key": 0.55, "typing": 0.8, "type_end": 0.6, "word_pop": 0.5, "text_in": 0.75,
+               "sticker_in": 0.75, "select": 0.7, "slide": 0.7, "highlight": 0.7, "glass": 0.7,
+               "whoosh": 0.65, "swish": 0.6, "transition": 0.7, "shutter": 0.75, "page": 0.7,
+               "reveal": 0.8, "cta": 0.85, "impact": 0.9, "riser": 0.7, "zoom_in": 0.6}
 
 # event -> kit -> candidate sources ("k:<glob>" = Kenney sample glob, "s:<synth>" = synth)
 KITS = {
     # "f:<kind>" = real recorded foley (library/sfx/foley, CC0 from Freesound — sounds like the
     # sounds in CapCut's library because they are real recordings, not synths or game blips)
-    "text_in":   {"soft": ["f:softpop", "f:tap"], "clean": ["f:tap", "f:click"], "luxe": ["f:tap", "k:interface-glass_*"],
+    "text_in":   {"soft": ["u:select", "u:press", "f:softpop"], "clean": ["f:tap", "f:click"], "luxe": ["f:tap", "k:interface-glass_*"],
                   "playful": ["f:pop", "f:softpop"], "digital": ["f:click", "k:interface-select_*"]},
-    "word_pop":  {"soft": ["f:softpop"], "clean": ["f:tick", "f:softpop"], "luxe": ["f:tick"],
+    "word_pop":  {"soft": ["u:hover", "f:softpop"], "clean": ["u:hover", "f:tick"], "luxe": ["u:hover", "f:tick"],
                   "playful": ["f:pop"], "digital": ["f:click"]},
-    "type_key":  {"*": ["f:key"]},
+    "type_key":  {"*": ["u:typing", "f:key"]},
     "typing":    {"*": ["f:typing"]},
-    "type_end":  {"soft": ["f:tick"], "clean": ["f:tick"], "luxe": ["f:ding"],
+    "type_end":  {"soft": ["u:check"], "clean": ["u:check"], "luxe": ["u:check", "f:ding"],
                   "playful": ["f:softpop"], "digital": ["k:digital-twoTone*"]},
-    "slide":     {"*": ["f:swipe", "f:paper"]},
+    "slide":     {"*": ["u:swipe", "f:swipe", "f:paper"]},
     "highlight": {"*": ["f:marker", "f:swipe"]},
-    "glass":     {"*": ["k:interface-glass_*", "f:tap"]},
-    "select":    {"soft": ["f:click"], "clean": ["f:click"], "luxe": ["f:tap"], "playful": ["f:pop"],
+    "glass":     {"*": ["o:glass_*", "u:press"]},
+    "select":    {"soft": ["u:select", "f:click"], "clean": ["u:select", "f:click"], "luxe": ["u:select", "f:tap"], "playful": ["f:pop"],
                   "digital": ["f:click", "k:interface-select_*"]},
-    "sticker_in": {"soft": ["f:softpop"], "clean": ["f:softpop", "f:tap"], "luxe": ["f:tap", "k:interface-glass_*"],
+    "sticker_in": {"soft": ["u:drop", "u:snap", "f:softpop"], "clean": ["u:snap", "f:softpop"], "luxe": ["f:tap", "k:interface-glass_*"],
                    "playful": ["f:pop", "s:boing"], "digital": ["f:click", "k:digital-pepSound*"]},
     "shutter":   {"*": ["f:shutter"]},
     "page":      {"*": ["f:pageflip"]},
-    "whoosh":    {"*": ["f:whoosh", "f:swoosh"]},
+    "whoosh":    {"*": ["f:whoosh", "o:air_*", "f:swoosh"]},
     "swish":     {"*": ["f:swoosh", "f:swipe"]},
     "zoom_in":   {"*": ["s:zoom"]},
-    "impact":    {"soft": ["f:tap"], "clean": ["s:hit_soft"], "luxe": ["s:hit_lux"], "playful": ["k:impact-impactSoft_heavy_*"],
+    "impact":    {"soft": ["o:wood_hit_*", "f:tap"], "clean": ["s:hit_soft"], "luxe": ["s:hit_lux"], "playful": ["k:impact-impactSoft_heavy_*"],
                   "digital": ["s:hit_soft", "k:interface-glitch_*"]},
     "riser":     {"*": ["s:riser"]},
-    "reveal":    {"soft": ["f:sparkle"], "clean": ["f:sparkle"], "luxe": ["f:sparkle", "s:shimmer"],
+    "reveal":    {"soft": ["u:success", "f:sparkle"], "clean": ["u:success", "f:sparkle"], "luxe": ["f:sparkle", "s:shimmer"],
                   "playful": ["f:sparkle", "k:digital-powerUp*"], "digital": ["k:digital-powerUp*", "k:digital-phaserUp*"]},
-    "cta":       {"soft": ["f:ding"], "clean": ["f:ding"], "luxe": ["f:ding", "k:impact-impactBell_heavy_*"],
+    "cta":       {"soft": ["u:notification", "f:ding"], "clean": ["u:notification", "f:ding"], "luxe": ["f:ding", "k:impact-impactBell_heavy_*"],
                   "playful": ["f:ding", "k:interface-bong_*"], "digital": ["k:digital-threeTone*"]},
     "transition": {"*": ["f:whoosh", "f:swoosh"]},
     "glitch":    {"*": ["k:interface-glitch_*"]},
@@ -218,8 +228,14 @@ def source_file(name):
     src, h = _pick(cands, seed, event)
     if src.startswith("s:"):
         return src, h, None
-    folder, pat = (FOLEY, src[2:] + "-*.wav") if src.startswith("f:") else (KEN, src[2:] + ".wav")
-    files = sorted(glob.glob(os.path.join(folder, pat)))
+    if src.startswith("u:"):                          # uisfx: the kit's feels, one event
+        feels = KIT_FEEL.get(kit, ["soft"])
+        files = [f for fe in feels for f in glob.glob(os.path.join(UISFX, fe, src[2:] + ".wav"))]
+    else:
+        folder, pat = {"f:": (FOLEY, src[2:] + "-*.wav"), "o:": (CC0PACK, src[2:] + ".wav")}.get(
+            src[:2], (KEN, src[2:] + ".wav"))
+        files = glob.glob(os.path.join(folder, pat))
+    files = sorted(files)
     if not files:
         return "s:swish", h, None
     f, h2 = _pick(files, seed, src)
@@ -240,7 +256,7 @@ def render(name):
             x = fn(seed=seed)
     else:
         x = _wav(src)
-        foley = src.startswith(FOLEY)
+        foley = src.startswith((FOLEY, UISFX, CC0PACK))
         x = _pitch(x, ((h2 >> 8) % 5 - 2) * (0.25 if foley else 0.4))   # tiny pitch variation
         if dur and len(x) > dur * SR * 1.15 and event in ("typing", "whoosh", "swish", "transition", "slide"):
             x = x[: int(dur * SR)].copy()                                # fit the move / the typing
@@ -248,7 +264,7 @@ def render(name):
             x[-f:] *= np.linspace(1, 0, f)
         if foley and kit in ("soft", "clean", "luxe"):
             x = _soften(x)                                               # no harsh top end
-    level = 0.85 + ((h >> 16) % 30) / 100                             # ±15% level variation
+    level = (0.85 + ((h >> 16) % 30) / 100) * EVENT_LEVEL.get(event, 0.75)   # balanced per kind, ±15% variation
     return (x / (np.abs(x).max() + 1e-9) * level).astype(np.float32)
 
 

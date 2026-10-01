@@ -19,6 +19,10 @@ Third-party material it uses:
 | Fonts: Yellowtail, Satisfy | Apache 2.0 | `library/fonts/` |
 | Kenney sound packs (Interface, UI, Impact, Digital, Casino audio) — kenney.nl | CC0 | `library/sfx/kenney/` (licence included) |
 | Real recorded sound effects (clicks, key taps, pops, whooshes, shutters, sparkles, paper) — freesound.org, per-sound authors in `library/sfx/foley/credits.json` | CC0 | `library/sfx/foley/` |
+| Interface sounds from uisfx by Romain Simon (uisfx.com, github.com/romainsimon/uisfx) — 10 feels | CC0 (audio) | `library/sfx/uisfx/` (licence included) |
+| "100 CC0 SFX #2" by rubberduck (opengameart.org/content/100-cc0-sfx-2) — air, glass, switches, taps | CC0 | `library/sfx/cc0pack/` |
+| HyperFrames caption components by HeyGen (github.com/heygen-com/hyperframes) | Apache-2.0 | `library/hyperframes/` (LICENSE + NOTICE) |
+| GSAP 3.14.2 by GreenSock (gsap.com) | GreenSock standard no-charge licence | `library/hyperframes/gsap.min.js` |
 | pycapcut (CapCut project writer) — github.com/GuanYixuan/pyCapCut | Apache-2.0 | installed via requirements.txt |
 | DeepFilterNet (Hendrik Schröter) speech enhancer | MIT / Apache 2.0 | downloaded on first use to `library/models/` |
 | RNNoise model "somnolent-hogwash" (GregorR/rnnoise-models) | not subject to copyright (per authors) | downloaded on first use |

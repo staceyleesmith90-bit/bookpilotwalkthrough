@@ -343,7 +343,8 @@ def test_soft_foley_sounds_and_no_repeats():
     from engine import sounddesign as sd
     x = sd.render("sd:soft:type_key:3")
     assert len(x) > 100 and abs(x).max() <= 1.01
-    assert sd.source_file("sd:soft:type_key:3")[0].endswith(".wav") and "foley" in sd.source_file("sd:soft:type_key:3")[0]
+    src = sd.source_file("sd:soft:type_key:3")[0]
+    assert src.endswith(".wav") and ("foley" in src or "uisfx" in src)   # real recorded / CC0 interface sounds
     cues = sd.no_repeats([(0, "sd:soft:word_pop:1", .2), (1, "sd:soft:word_pop:1", .2), (2, "sd:soft:word_pop:1", .2)])
     files = [sd.source_file(n)[0] for _, n, _ in cues]
     assert files[0] != files[1] and files[1] != files[2]
