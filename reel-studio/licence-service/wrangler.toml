@@ -1,0 +1,17 @@
+# Reel Studio licence service — Cloudflare Worker (free plan is enough).
+# Deploy: npx wrangler deploy   (after: npx wrangler kv namespace create LICENCES → paste the id below)
+name = "reel-studio-licence"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+[[kv_namespaces]]
+binding = "LICENCES"
+id = "PASTE_KV_NAMESPACE_ID"
+
+[vars]
+PRICE_ZAR = "449.00"                 # monthly price in rand (PayFast)
+PRODUCT = "Reel Studio monthly"
+PAYFAST_HOST = "www.payfast.co.za"   # sandbox: sandbox.payfast.co.za
+PUBLIC_URL = "https://reelstudio.systemspilot.co.za"
+MAX_MACHINES = "2"
+# secrets (npx wrangler secret put NAME): PAYFAST_MERCHANT_ID, PAYFAST_MERCHANT_KEY, PAYFAST_PASSPHRASE, ADMIN_TOKEN

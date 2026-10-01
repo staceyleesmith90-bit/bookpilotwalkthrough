@@ -36,3 +36,13 @@ jobs:
         run: python -m engine setup-check
       - name: Tests
         run: python -m pytest tests -q
+      - name: Licence service tests
+        run: node licence-service/test.mjs
+      - uses: astral-sh/setup-uv@v6
+      - name: One-click extension (build, install like Claude does, call its tools)
+        shell: bash
+        run: |
+          python scripts/build_extension.py
+          mkdir -p "$RUNNER_TEMP/ext/ext"
+          (cd "$RUNNER_TEMP/ext/ext" && unzip -q "$GITHUB_WORKSPACE"/reel-studio/dist/reel-studio-*.mcpb)
+          uv --directory "$RUNNER_TEMP/ext/ext" run python "$GITHUB_WORKSPACE/reel-studio/extension/tests/smoke.py" "$RUNNER_TEMP/ext" DEV

@@ -1,0 +1,53 @@
+{
+  "manifest_version": "0.4",
+  "name": "reel-studio",
+  "display_name": "Reel Studio by Systems Pilot",
+  "version": "1.8.0",
+  "description": "Your reel editor inside Claude. Drop in a video and say what you want — rough cut, captions, sounds, stickers, CapCut export. Everything runs on your own computer.",
+  "long_description": "Reel Studio edits short-form videos on your own computer: rough cut, brand captions, real sound effects, CapCut-style text, animation windows, CapCut project export and a review page with voice notes. Your videos never leave your computer. Uses your own Claude plan for the thinking. Needs an active Reel Studio subscription (licence key from your Systems Pilot account).",
+  "author": { "name": "Systems Pilot", "url": "https://systemspilot.co.za" },
+  "homepage": "https://systemspilot.co.za",
+  "icon": "icon.png",
+  "server": {
+    "type": "uv",
+    "entry_point": "src/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["--directory", "${__dirname}", "run", "src/server.py"],
+      "env": {
+        "REEL_LICENSE_KEY": "${user_config.licence_key}",
+        "REEL_HOME": "${user_config.workspace}",
+        "PYTHONUTF8": "1"
+      }
+    }
+  },
+  "user_config": {
+    "licence_key": {
+      "type": "string",
+      "title": "Licence key",
+      "description": "From your Reel Studio account (Systems Pilot). Active subscription required.",
+      "sensitive": true,
+      "required": true
+    },
+    "workspace": {
+      "type": "directory",
+      "title": "Reel Studio folder",
+      "description": "Where your brand, projects and finished reels are kept (on this computer).",
+      "default": "${DOCUMENTS}/Reel Studio",
+      "required": false
+    }
+  },
+  "compatibility": {
+    "platforms": ["win32", "darwin"]
+  },
+  "tools": [
+    { "name": "reel_guide", "description": "How Reel Studio works: the playbooks for every task." },
+    { "name": "reel_command", "description": "Run a Reel Studio step (rough cut, style plan, render, CapCut export, …)." },
+    { "name": "reel_job", "description": "Check on a long step that is running." },
+    { "name": "reel_read", "description": "Read a file in the Reel Studio folder." },
+    { "name": "reel_write", "description": "Write a plan or setting file in the Reel Studio folder." },
+    { "name": "reel_inbox", "description": "List videos ready to edit and open the Inbox folder." },
+    { "name": "reel_open", "description": "Open the Studio app, review page or a finished reel." },
+    { "name": "reel_licence", "description": "Check the Reel Studio subscription." }
+  ]
+}
