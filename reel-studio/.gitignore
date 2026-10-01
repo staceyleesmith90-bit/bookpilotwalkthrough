@@ -20,3 +20,6 @@ brand/voice.md
 library/models/deep-filter*
 library/cache/
 dist/
+brand/sounds/
+brand/rules.json
+brand/effects.json

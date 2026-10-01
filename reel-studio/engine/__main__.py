@@ -23,10 +23,13 @@
   python -m engine sounds-suggest <project> [--business]  best trending sound for this reel + how to add it
   python -m engine share <project> [--name T] [--options v2]  branded review page with feedback notes
   python -m engine hf-captions                  premium animated caption styles (HyperFrames)
+  python -m engine hf-find <words>              search ~400 HyperFrames effects (lower thirds, follow cards, charts…)
+  python -m engine hf-add <project> --name <effect>  fetch one into the project to adapt its words
   python -m engine styleplan <project>          the plan in plain words — show it, get a "go", then build
   python -m engine effects                      named effects (built-in + the user's own)
   python -m engine effect-save <name> --options "punch-in;label:{text}" [--name "what it does"]
-  python -m engine capcut <project> [--name N] [--no-captions]   editable CapCut project (every piece its own clip)
+  python -m engine capcut <project> [--name N] [--no-captions] [--options animated]
+                                                CapCut project: editable (default) or animated layers
   python -m engine layers <project>             editable layers (video · graphics · captions · audio) for any editor
   python -m engine chop <file|folder> [--options SECONDS]  long clips -> best short b-roll clips
   python -m engine trial <trial.json>           hook-on-b-roll trial reels + captions map
@@ -35,6 +38,13 @@
   python -m engine fonts                        list fonts (yours + library) and the sticker fonts in use
   python -m engine font-add <file.ttf|otf> [--role R]  use your own font (not on Google), e.g. --role sticker
   python -m engine font-use <font|auto> --role R  e.g. font-use "Satisfy" --role sticker (auto = brand match)
+  python -m engine library                      the effects library page (see, hear, copy what to say)
+  python -m engine sounds-learn [<folder>] [--options capcut --name "<CapCut project>"] [--role EVENT]
+                                                learn the user's own sounds (inbox/sound-effects by default)
+  python -m engine my-sounds | sounds-forget [<name>|all]
+  python -m engine remember "<rule>" [--name "<phrase>"] | rules | forget-rule <number|words>
+  python -m engine style-from <design file> [--preview]  brand look from DESIGN.md/CSS/JSON/Canva values
+  python -m engine report                       a private problem report (no footage, no keys)
   python -m engine sticker-requests             stickers made on the fly (Claude can draw illustrated versions)
 """
 import argparse, json, os, shutil, subprocess, sys
@@ -248,6 +258,18 @@ def main(argv=None):
         print("HyperFrames caption styles (HeyGen, Apache-2.0) — use as \"captions\": \"hf:<name>\":")
         for k, v in caption_styles().items():
             print(f"  hf:{k:22s} {v}")
+    elif c == "hf-find":
+        from .hyperframes import catalog
+        items = catalog(" ".join(x for x in [a.arg, a.options] if x))
+        for i in items[:60]:
+            d = i.get("dimensions") or {}
+            print(f"  {i['name']:30s} {i['title'] or ''} — {i['description'][:90]}"
+                  + (f"  [{d.get('width')}x{d.get('height')}, {i.get('duration')}s]" if d else ""))
+        print(f"{len(items)} effect(s). Use in a beat: \"hf:<name>\" (Claude adapts its words: hf-add first).")
+    elif c == "hf-add":
+        from .hyperframes import fetch
+        path = fetch(a.options or a.name, project.path(a.arg))
+        print("Added:", os.path.relpath(path, ROOT), "— edit its demo words to the reel's, then use \"hf:" + (a.options or a.name) + "\" in a beat.")
     elif c == "styleplan":
         from .styleplan import summary
         print(summary(project.load(a.arg, "plan.json") or {}, project.load(a.arg, "roughcut.json") or {}))
@@ -262,7 +284,8 @@ def main(argv=None):
     elif c == "capcut":
         from .capcut import export
         tl = project.load(a.arg, "timeline.json")
-        folder, inside = export(project.path(a.arg), tl, a.name, captions=not a.no_captions)
+        folder, inside = export(project.path(a.arg), tl, a.name, captions=not a.no_captions,
+                                mode="animated" if (a.options or "").startswith("anim") else "editable")
         print(("Open CapCut: the project is on your home screen as" if inside else
                "CapCut project folder (copy it into CapCut's projects folder):"), folder)
     elif c == "chop":
@@ -285,6 +308,66 @@ def main(argv=None):
     elif c == "update":
         from .update import update
         print(update())
+    elif c == "library":
+        from .library_page import build
+        print("Effects library:", build(open_it=not a.no_browser))
+    elif c == "sounds-learn":
+        from . import mysounds
+        if (a.options or "").lower() == "capcut":
+            r = mysounds.learn_capcut(a.name or a.arg or "my favorites")
+            if not r["ok"]:
+                print("Couldn't read it:", r["why"])
+                if r.get("projects"):
+                    print("CapCut projects on this computer:", ", ".join(r["projects"]))
+            else:
+                print(f"From CapCut project '{r['project']}':")
+                for n, ev in r["learned"]:
+                    print(f"  ✓ {n} → {', '.join(ev)}")
+                if r["not_downloaded"]:
+                    print("  not on this computer yet (play each once in CapCut, close CapCut, run again):",
+                          ", ".join(r["not_downloaded"]))
+                for p_ in r["pairs"]:
+                    print(f"  ✓ text '{p_['animation']}' gets '{p_['sound']}'")
+        elif a.arg and os.path.isfile(a.arg):
+            print("learned:", ", ".join(mysounds.learn(a.arg, as_event=a.role)))
+        else:
+            folder = a.arg or os.path.join(ROOT, "inbox", "sound-effects")
+            if not os.path.isdir(folder):
+                os.makedirs(folder, exist_ok=True)
+                print("Put sound files in", folder, "(sub-folders like 'typing', 'pop', 'whoosh' name their use), then run again.")
+            for n, ev in mysounds.learn_folder(folder):
+                print(f"  ✓ {n} → {', '.join(ev)}")
+        print(mysounds.summary())
+    elif c == "my-sounds":
+        from . import mysounds
+        print(mysounds.summary())
+    elif c == "sounds-forget":
+        from . import mysounds
+        print(mysounds.forget(None if (a.arg or "all") == "all" else a.arg))
+    elif c == "remember":
+        from . import rules
+        n = rules.remember(a.arg or "", name=a.name)
+        print(f"Saved as rule {n}. I'll apply it to every reel from now on.")
+        print(rules.listing())
+    elif c == "rules":
+        from . import rules
+        print(rules.listing())
+    elif c == "forget-rule":
+        from . import rules
+        gone = rules.forget(a.arg)
+        print(("Forgot: " + gone["rule"]) if gone else "No rule like that.")
+    elif c == "style-from":
+        from . import stylesheet
+        spec = stylesheet.read(a.arg)
+        pack, notes = stylesheet.make_pack(spec, a.name or "My style", save=not a.preview)
+        out = stylesheet.overview(pack, os.path.join(ROOT, "brand", "previews", "style-overview.jpg"))
+        print("Colours:", spec["colors"], "\nFonts:", spec["fonts"])
+        for n_ in notes:
+            print("•", n_)
+        print(("Preview only (not saved): " if a.preview else "Saved as your brand. Overview: ") + out)
+    elif c == "report":
+        from .report import write
+        print("Report:", write())
     elif c == "batch":
         from .plan import to_timeline
         from .render import render

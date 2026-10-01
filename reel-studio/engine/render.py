@@ -6,7 +6,7 @@ Pass 3 (ffmpeg): audio — voice + sound effects + music (ducked under the voice
 
 All of this runs locally. Claude never has to look at frames to render.
 """
-import re, json, os, subprocess, tempfile
+import hashlib, re, json, os, subprocess, tempfile
 import numpy as np
 from PIL import Image, ImageChops, ImageFilter
 from . import captions, fx, grades, layout, packs, sfx, stickers, textfit, titles
@@ -93,6 +93,7 @@ def ease_out(p):
 
 
 _WIN = {}
+SAFE_TOP, SAFE_BOTTOM = 270, 1620        # platform UI bands (top bar, bottom buttons/caption) — keep clear
 
 
 def _window_frames(it, pack):
@@ -115,6 +116,42 @@ def _window_frames(it, pack):
         if box:
             ims = [im.crop(box) for im in ims]
         _WIN[key] = [(im, 1 / FPS) for im in ims]
+    return _WIN[key]
+
+
+def _hf_frames(it):
+    """[(RGBA frame, seconds)] for a HyperFrames catalog effect, fitted to the 1080×1920 reel."""
+    key = ("hf", it.get("src"), round(it["end"] - it["start"], 2))
+    if key not in _WIN:
+        from .hyperframes import component_frames
+        try:
+            res = component_frames(_abs(it["src"]))
+        except Exception as e:
+            print(f"[reel] HyperFrames effect skipped ({e})")
+            _WIN[key] = []
+            return []
+        ims = []
+        w, h = res["size"]
+        box = res["box"]
+        if h > w and box:                                   # vertical effects: keep their spot, but out of the app's UI
+            sx, sy = 1080 / w, 1920 / h
+            cx, cy = (box[0] + box[2]) / 2 * sx, (box[1] + box[3]) / 2 * sy
+            lift = max(0, box[3] * sy - SAFE_BOTTOM) - min(0, box[1] * sy - SAFE_TOP)
+            it["x"], it["y"] = cx, cy - lift
+            if (w, h) != (1080, 1920) and not res.get("cropped"):
+                box = None                                  # rare: rescale the whole frame instead
+        k = 1.0 if h > w else min(1.0, 980 / max((box[2] - box[0]) if box else w, 1), 900 / max((box[3] - box[1]) if box else h, 1))
+        for fp in res["frames"]:
+            im = Image.open(fp).convert("RGBA")
+            if box and not res.get("cropped"):
+                im = im.crop(tuple(box))
+            if h > w and (w, h) != (1080, 1920):
+                im = im.resize((1080, 1920), Image.LANCZOS)
+                it["x"], it["y"] = 540, 960
+            elif k != 1:
+                im = im.resize((max(1, int(im.width * k)), max(1, int(im.height * k))), Image.LANCZOS)
+            ims.append((im, 1 / res["fps"]))
+        _WIN[key] = ims
     return _WIN[key]
 
 
@@ -147,6 +184,9 @@ def item_image(it, pack):
     if t == "story":
         from .story import story_card
         return story_card(it, pack)
+    if t == "hf":                                # HyperFrames effect: its settled frame
+        fr = _hf_frames(it)
+        return fr[int(len(fr) * 0.6)][0] if fr else None
     if t == "window":                            # animation window: its settled frame (editor, cover, CapCut)
         fr = _window_frames(it, pack)
         return fr[int(len(fr) * 0.8)][0] if fr else None
@@ -322,11 +362,12 @@ def hf_captions(tl, scale=1.0):
     k = min(1.0, 980 / max(bw, 1), 520 / max(bh, 1)) * scale
     cy = (box[1] + box[3]) / 2
     y = cap.get("y", 1245) if cy > 700 else 1060                # bottom styles low; big centre styles a bit higher
-    return {"frames": res["frames"], "box": box, "k": k, "x": 540 * scale, "y": y * scale}
+    return {"frames": res["frames"], "box": box, "k": k, "x": 540 * scale, "y": y * scale, "cropped": res.get("cropped")}
 
 
-def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
-    """layer=None: the finished picture. For the layers export: "video" (footage + camera moves
+def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
+    """frames=(first, last) renders only that piece (fast re-renders, see build_graphics_cached).
+    layer=None: the finished picture. For the layers export: "video" (footage + camera moves
     only), "graphics" (titles/stickers on transparent), "captions" (captions on transparent)."""
     W, H = [int(v * scale) // 2 * 2 for v in tl["size"]]
     fps = tl.get("fps", 30)
@@ -357,6 +398,8 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
             anim[it["id"]] = animated(it["name"][5:], it.get("size", 300))
         elif it.get("type") == "window":
             anim[it["id"]] = _window_frames(it, pack)
+        elif it.get("type") == "hf":
+            anim[it["id"]] = _hf_frames(it)
     cap = tl.get("captions") or {}
     groups = caption_groups(cap) if cap.get("style", "off") != "off" else []
     hfcap = None
@@ -377,7 +420,9 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
     cap_cache = {}
     hide_caps = [(it["start"], it["end"]) for it in items if it.get("hide_captions")]
 
-    dec = subprocess.Popen(["ffmpeg", "-loglevel", "quiet", "-i", base, "-f", "rawvideo", "-pix_fmt", "rgba", "-"],
+    f0, f1 = frames or (0, n_frames)
+    seek = ["-ss", f"{f0 / fps:.4f}"] if f0 else []
+    dec = subprocess.Popen(["ffmpeg", "-loglevel", "quiet"] + seek + ["-i", base, "-f", "rawvideo", "-pix_fmt", "rgba", "-"],
                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     if layer in ("graphics", "captions"):   # transparent layers: ProRes 4444 with alpha (CapCut/Premiere/Resolve/FCP)
         vcodec = ["-c:v", "prores_ks", "-profile:v", "4444", "-pix_fmt", "yuva444p10le"]
@@ -391,7 +436,7 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
         items, groups = [], []
     fsize = W * H * 4
     last = None
-    for fi in range(n_frames):
+    for fi in range(f0, f1):
         buf = dec.stdout.read(fsize)
         if len(buf) == fsize:
             last = buf
@@ -435,7 +480,7 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
                 elif it["id"] in anim and anim[it["id"]]:
                     frs = anim[it["id"]]
                     total = sum(d for _, d in frs)
-                    lt = (t - it["start"]) % total if it["type"] != "window" else min(t - it["start"], total - 1e-6)
+                    lt = (t - it["start"]) % total if it["type"] not in ("window", "hf") else min(t - it["start"], total - 1e-6)
                     for img_f, dd in frs:
                         if lt < dd:
                             break
@@ -445,7 +490,7 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None):
                     _place(frame, cache[it["id"]], it, t, scale)
         if hfcap and hfcap["frames"] and fi < len(hfcap["frames"]):
             im = Image.open(hfcap["frames"][fi]).convert("RGBA")
-            if hfcap["box"]:
+            if hfcap["box"] and not hfcap.get("cropped"):
                 im = im.crop(tuple(hfcap["box"]))
             if hfcap["k"] != 1:
                 im = im.resize((max(1, int(im.width * hfcap["k"])), max(1, int(im.height * hfcap["k"]))), Image.LANCZOS)
@@ -521,9 +566,15 @@ def build_audio(tl, base_has_voice, base, out_wav):
             cleaned = None
             if a.get("denoise") == "elevenlabs":         # paid studio tier (user's own key)
                 cleaned = elevenlabs_isolate(base, os.path.join(tmp, "voice-clean.wav"))
+            keep = base + f".voice-{noise['level']}.wav"   # cached beside a cached base: re-renders skip this
+            if not cleaned and os.path.exists(keep):
+                cleaned = keep
             if not cleaned:                              # default: neural speech cleaner (offline, free)
                 cleaned = deepfilter(base, os.path.join(tmp, "voice-clean.wav"),
                                      strength=None if noise["level"] == "noisy" else 30)
+                if cleaned and os.sep + "cache" + os.sep in base:
+                    import shutil as _sh
+                    _sh.copy(cleaned, keep)
             if cleaned:
                 voice_src, deep = cleaned, True
         inputs += ["-i", voice_src]
@@ -557,6 +608,79 @@ def build_audio(tl, base_has_voice, base, out_wav):
                                                           "-map", "[aout]", "-ar", "48000", "-ac", "2", out_wav])
 
 
+CHUNK = 60          # frames per cached graphics piece (2 s at 30 fps)
+ENGINE_SALT = "gfx-v1"
+
+
+def _sig(obj):
+    return hashlib.md5(json.dumps(obj, sort_keys=True, default=str).encode()).hexdigest()[:16]
+
+
+def _file_sig(path):
+    try:
+        st = os.stat(path)
+        return f"{st.st_size}-{int(st.st_mtime)}"
+    except OSError:
+        return "none"
+
+
+def build_base_cached(tl, pack, out_dir, scale):
+    """The cut, colour-corrected footage — reused whenever the cut, b-roll and look are unchanged."""
+    keys = {k: tl.get(k) for k in ("cuts", "broll", "finish", "fps", "grade", "picture", "source", "duration",
+                                    "size", "background")}
+    keys["src"] = _file_sig(_abs(tl["source"])) if tl.get("source") else None
+    keys["pack_bg"] = pack["colors"].get("bg")
+    keys["scale"] = scale
+    path = os.path.join(out_dir, f"base-{_sig(keys)}.mp4")
+    flag = path + ".voice"
+    if os.path.exists(path) and os.path.exists(flag):
+        return path, open(flag).read() == "1"
+    has_voice = build_base(tl, pack, path, scale)
+    open(flag, "w").write("1" if has_voice else "0")
+    return path, has_voice
+
+
+def _piece_sig(tl, pack, base, scale, f0, f1, fps):
+    t0, t1 = f0 / fps, f1 / fps
+    near = lambda a, b: a < t1 + 0.6 and b > t0 - 0.6
+    cap = dict(tl.get("captions") or {})
+    words = cap.pop("words", []) or []
+    return _sig({
+        "salt": ENGINE_SALT, "base": _file_sig(base), "scale": scale, "f": [f0, f1],
+        "pack": {"colors": pack.get("colors"), "fonts": pack.get("fonts")},
+        "items": [i for i in tl.get("items", []) if near(i["start"], i["end"])],
+        "zooms": [z for z in tl.get("zooms", []) if near(z["start"], z["end"])],
+        "trans": [t for t in tl.get("transitions", []) if near(t["t"] - 1, t["t"] + 1)],
+        "layouts": [l for l in tl.get("layouts", []) if near(l["start"], l["end"])],
+        "cap": cap, "words": [w for w in words if t0 - 4 < w["start"] < t1 + 4] if not str(cap.get("style", "")).startswith("hf:")
+        else words,                          # animated caption styles depend on the whole transcript
+        "dur": tl["duration"],
+    })
+
+
+def build_graphics_cached(tl, pack, base, out, scale, cache_dir):
+    """Graphics in 2-second pieces; a piece is redrawn only if something in it changed. A text or sticker
+    tweak re-renders seconds, not the whole reel. Returns (pieces redrawn, total pieces)."""
+    fps = tl.get("fps", 30)
+    n = int(tl["duration"] * fps)
+    os.makedirs(cache_dir, exist_ok=True)
+    pieces, redrawn = [], 0
+    for f0 in range(0, n, CHUNK):
+        f1 = min(n, f0 + CHUNK)
+        path = os.path.join(cache_dir, f"gfx-{_piece_sig(tl, pack, base, scale, f0, f1, fps)}.mp4")
+        if not os.path.exists(path):
+            build_graphics(json.loads(json.dumps(tl)), pack, base, path + ".part.mp4", scale, frames=(f0, f1))
+            os.replace(path + ".part.mp4", path)
+            redrawn += 1
+        pieces.append(path)
+    lst = out + ".txt"
+    with open(lst, "w", encoding="utf-8") as f:
+        for pth in pieces:
+            f.write("file '" + pth.replace("\\", "/").replace("'", "'\\''") + "'\n")
+    _run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", out])
+    return redrawn, len(pieces)
+
+
 def render(timeline, out, preview=False, no_music_out=None):
     """no_music_out: also write a copy with voice + sound effects only (no background music),
     so a trending sound can be added inside TikTok/Instagram. Costs one extra audio mix only."""
@@ -564,10 +688,18 @@ def render(timeline, out, preview=False, no_music_out=None):
     pack = packs.load(tl.get("pack"))
     scale = 0.5 if preview else 1.0
     tmp = tempfile.mkdtemp()
-    base = os.path.join(tmp, "base.mp4")
-    has_voice = build_base(tl, pack, base, scale)
+    cache_dir = (os.path.join(os.path.dirname(os.path.abspath(timeline)), "renders", "cache")
+                 if isinstance(timeline, str) else None)
     gfx = os.path.join(tmp, "gfx.mp4")
-    build_graphics(tl, pack, base, gfx, scale)
+    if cache_dir:                                        # fast re-renders: reuse what didn't change
+        os.makedirs(cache_dir, exist_ok=True)
+        base, has_voice = build_base_cached(tl, pack, cache_dir, scale)
+        redrawn, total = build_graphics_cached(tl, pack, base, gfx, scale, cache_dir)
+        print(f"[reel] graphics: redrew {redrawn} of {total} pieces")
+    else:
+        base = os.path.join(tmp, "base.mp4")
+        has_voice = build_base(tl, pack, base, scale)
+        build_graphics(tl, pack, base, gfx, scale)
     wav = os.path.join(tmp, "mix.wav")
     build_audio(tl, has_voice, base, wav)
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)

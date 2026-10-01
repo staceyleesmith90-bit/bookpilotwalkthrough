@@ -83,7 +83,10 @@ def plan(tl, pack, captions=True):
     return out
 
 
-def export(project_dir, tl, name=None, captions=True, dest=None):
+def export(project_dir, tl, name=None, captions=True, dest=None, mode="editable"):
+    """mode="editable": every graphic its own clip, text as real CapCut text (retype anything).
+    mode="animated": the designed text + graphics arrive as two moving transparent layers (exactly as
+    rendered, animations included) — move, resize or switch them off, but not retype."""
     import pycapcut as cc
     from PIL import Image
     pack = packs.load(tl.get("pack"))
@@ -118,87 +121,129 @@ def export(project_dir, tl, name=None, captions=True, dest=None):
                          kit=tl.get("sound_kit", "clean"))
         script.add_segment(cc.VideoSegment(card, cc.trange(int(dur * SEC), int(2.6 * SEC))), "Video")
 
-    p = plan(tl, pack, captions)
-    # 2) graphics: each one its own clip, in the right place, easy to move or delete
-    if p["graphics"]:
-        script.add_track(cc.TrackType.video, "Graphics", relative_index=1)
-        for i, it in enumerate(sorted(p["graphics"], key=lambda x: x["start"])):
-            if it["type"] == "window":            # animation window: a real moving clip (transparent)
-                from .render import _window_frames
-                frs = _window_frames(it, pack)
-                if not frs:
+    if mode == "animated":
+        import subprocess
+        p = plan(tl, pack, captions)
+        g = os.path.join(media, "graphics-animated.mov")
+        build_graphics(json.loads(json.dumps(tl)), pack, base, g, layer="graphics")
+        layers = [("Graphics (animated)", g)]
+        if captions and (tl.get("captions") or {}).get("style", "off") != "off":
+            c = os.path.join(media, "captions-animated.mov")
+            build_graphics(json.loads(json.dumps(tl)), pack, base, c, layer="captions")
+            layers.append(("Captions (animated)", c))
+        for n_, (track, f) in enumerate(layers):
+            vm2 = cc.VideoMaterial(f)
+            script.add_track(cc.TrackType.video, track, relative_index=10 + n_)
+            script.add_segment(cc.VideoSegment(vm2, cc.trange(0, min(vm2.duration, int(dur * SEC)))), track)
+    else:
+        p = plan(tl, pack, captions)
+        # 2) graphics: each one its own clip, in the right place, easy to move or delete
+        if p["graphics"]:
+            script.add_track(cc.TrackType.video, "Graphics", relative_index=1)
+            for i, it in enumerate(sorted(p["graphics"], key=lambda x: x["start"])):
+                if it["type"] in ("window", "hf"):    # animation window / HyperFrames effect: a real moving clip
+                    from .render import _window_frames, _hf_frames
+                    frs = _window_frames(it, pack) if it["type"] == "window" else _hf_frames(it)
+                    if not frs:
+                        continue
+                    fdir = tempfile.mkdtemp()
+                    for k, (im, _) in enumerate(frs):
+                        im.save(os.path.join(fdir, f"{k:04d}.png"))
+                    clip = os.path.join(media, f"g{i:02d}-window.mov")
+                    import subprocess
+                    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", "30", "-i", os.path.join(fdir, "%04d.png"),
+                                    "-c:v", "prores_ks", "-profile:v", "4444", "-pix_fmt", "yuva444p10le", clip], check=True)
+                    k = it.get("scale", 1.0)
+                    w0, h0 = frs[0][0].size
+                    pl = place(it["x"], it["y"], w0 * k, h0 * k)
+                    vm = cc.VideoMaterial(clip)
+                    cs = cc.ClipSettings(scale_x=pl["scale"], scale_y=pl["scale"], transform_x=pl["tx"], transform_y=pl["ty"])
+                    seg = cc.VideoSegment(vm, cc.trange(int(it["start"] * SEC), min(vm.duration, int((min(it["end"], dur) - it["start"]) * SEC))),
+                                          clip_settings=cs)
+                    track = f"Window {i + 1}"
+                    script.add_track(cc.TrackType.video, track, relative_index=20 + i)
+                    script.add_segment(seg, track)
                     continue
-                fdir = tempfile.mkdtemp()
-                for k, (im, _) in enumerate(frs):
-                    im.save(os.path.join(fdir, f"{k:04d}.png"))
-                clip = os.path.join(media, f"g{i:02d}-window.mov")
-                import subprocess
-                subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", "30", "-i", os.path.join(fdir, "%04d.png"),
-                                "-c:v", "prores_ks", "-profile:v", "4444", "-pix_fmt", "yuva444p10le", clip], check=True)
+                try:
+                    if it["type"] == "title":
+                        from . import titles
+                        img, off = titles.composite(titles.build(it["spec"], pack))
+                        cx, cy = it["x"] + off[0], it["y"] + off[1]
+                    else:
+                        img = item_image(it, pack)
+                        cx, cy = it["x"], it["y"]
+                except Exception:
+                    continue
+                if img is None:
+                    continue
                 k = it.get("scale", 1.0)
-                w0, h0 = frs[0][0].size
-                pl = place(it["x"], it["y"], w0 * k, h0 * k)
+                if k != 1.0:
+                    img = img.resize((max(1, int(img.width * k)), max(1, int(img.height * k))))
+                png = os.path.join(media, f"g{i:02d}-{it['type']}.png")
+                img.save(png)
+                pl = place(cx, cy, img.width, img.height)
+                cs = cc.ClipSettings(scale_x=pl["scale"], scale_y=pl["scale"], transform_x=pl["tx"],
+                                     transform_y=pl["ty"], rotation=float(it.get("rotate", 0)))
+                track = "Graphics"
+                try:
+                    script.add_segment(cc.VideoSegment(png, tr(it["start"], it["end"]), clip_settings=cs), track)
+                except Exception:                      # overlapping graphics: give it its own track
+                    track = f"Graphics {i + 2}"
+                    script.add_track(cc.TrackType.video, track, relative_index=i + 2)
+                    script.add_segment(cc.VideoSegment(png, tr(it["start"], it["end"]), clip_settings=cs), track)
+
+        # 3) text you can retype in CapCut
+        def add_texts(rows, track, style_fn):
+            if not rows:
+                return
+            script.add_track(cc.TrackType.text, track)
+            n = 0
+            for r in sorted(rows, key=lambda x: x["start"]):
+                st, cs = style_fn(r)
+                t = cc.TextSegment(r["text"], tr(r["start"], r["end"]), style=st, clip_settings=cs,
+                                   border=cc.TextBorder(color=(0, 0, 0), alpha=0.35, width=25))
+                try:
+                    script.add_segment(t, track)
+                except Exception:
+                    n += 1
+                    script.add_track(cc.TrackType.text, f"{track} {n + 1}")
+                    script.add_segment(t, f"{track} {n + 1}")
+
+        add_texts(p["texts"], "Text", lambda r: (
+            cc.TextStyle(size=r["size"], bold=True, color=_rgb(r["colour"]), align=1, auto_wrapping=True,
+                         max_line_width=0.8),
+            cc.ClipSettings(transform_x=(r["x"] - W / 2) / (W / 2), transform_y=-(r["y"] - H / 2) / (H / 2))))
+        capd = tl.get("captions") or {}
+        if captions and str(capd.get("style", "")).startswith("hf:") and capd.get("words"):
+            # animated HyperFrames captions: one transparent clip on its own track (move / switch off in CapCut)
+            from .render import hf_captions
+            import subprocess
+            hc = hf_captions(tl)
+            if hc:
+                from PIL import Image
+                fdir = tempfile.mkdtemp()
+                for k, fp in enumerate(hc["frames"]):
+                    im = Image.open(fp).convert("RGBA")
+                    if not hc.get("cropped"):
+                        im = im.crop(tuple(hc["box"]))
+                    if hc["k"] != 1:
+                        im = im.resize((max(1, int(im.width * hc["k"])), max(1, int(im.height * hc["k"]))))
+                    im.save(os.path.join(fdir, f"{k:05d}.png"))
+                clip = os.path.join(media, "captions-animated.mov")
+                subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", "30", "-i", os.path.join(fdir, "%05d.png"),
+                                "-c:v", "prores_ks", "-profile:v", "4444", "-pix_fmt", "yuva444p10le", clip], check=True)
                 vm = cc.VideoMaterial(clip)
-                cs = cc.ClipSettings(scale_x=pl["scale"], scale_y=pl["scale"], transform_x=pl["tx"], transform_y=pl["ty"])
-                seg = cc.VideoSegment(vm, cc.trange(int(it["start"] * SEC), min(vm.duration, int((min(it["end"], dur) - it["start"]) * SEC))),
-                                      clip_settings=cs)
-                track = f"Window {i + 1}"
-                script.add_track(cc.TrackType.video, track, relative_index=20 + i)
-                script.add_segment(seg, track)
-                continue
-            try:
-                if it["type"] == "title":
-                    from . import titles
-                    img, off = titles.composite(titles.build(it["spec"], pack))
-                    cx, cy = it["x"] + off[0], it["y"] + off[1]
-                else:
-                    img = item_image(it, pack)
-                    cx, cy = it["x"], it["y"]
-            except Exception:
-                continue
-            if img is None:
-                continue
-            k = it.get("scale", 1.0)
-            if k != 1.0:
-                img = img.resize((max(1, int(img.width * k)), max(1, int(img.height * k))))
-            png = os.path.join(media, f"g{i:02d}-{it['type']}.png")
-            img.save(png)
-            pl = place(cx, cy, img.width, img.height)
-            cs = cc.ClipSettings(scale_x=pl["scale"], scale_y=pl["scale"], transform_x=pl["tx"],
-                                 transform_y=pl["ty"], rotation=float(it.get("rotate", 0)))
-            track = "Graphics"
-            try:
-                script.add_segment(cc.VideoSegment(png, tr(it["start"], it["end"]), clip_settings=cs), track)
-            except Exception:                      # overlapping graphics: give it its own track
-                track = f"Graphics {i + 2}"
-                script.add_track(cc.TrackType.video, track, relative_index=i + 2)
-                script.add_segment(cc.VideoSegment(png, tr(it["start"], it["end"]), clip_settings=cs), track)
-
-    # 3) text you can retype in CapCut
-    def add_texts(rows, track, style_fn):
-        if not rows:
-            return
-        script.add_track(cc.TrackType.text, track)
-        n = 0
-        for r in sorted(rows, key=lambda x: x["start"]):
-            st, cs = style_fn(r)
-            t = cc.TextSegment(r["text"], tr(r["start"], r["end"]), style=st, clip_settings=cs,
-                               border=cc.TextBorder(color=(0, 0, 0), alpha=0.35, width=25))
-            try:
-                script.add_segment(t, track)
-            except Exception:
-                n += 1
-                script.add_track(cc.TrackType.text, f"{track} {n + 1}")
-                script.add_segment(t, f"{track} {n + 1}")
-
-    add_texts(p["texts"], "Text", lambda r: (
-        cc.TextStyle(size=r["size"], bold=True, color=_rgb(r["colour"]), align=1, auto_wrapping=True,
-                     max_line_width=0.8),
-        cc.ClipSettings(transform_x=(r["x"] - W / 2) / (W / 2), transform_y=-(r["y"] - H / 2) / (H / 2))))
-    ink = pack["colors"].get("caption", "#FFFFFF")
-    add_texts(p["captions"], "Captions", lambda r: (
-        cc.TextStyle(size=8, bold=True, color=_rgb(ink), align=1, auto_wrapping=True, max_line_width=0.78),
-        cc.ClipSettings(transform_y=-0.42)))
+                pl = place(hc["x"], hc["y"], vm.width, vm.height)
+                script.add_track(cc.TrackType.video, "Captions (animated)", relative_index=40)
+                script.add_segment(cc.VideoSegment(vm, cc.trange(0, min(vm.duration, int(dur * SEC))),
+                                                   clip_settings=cc.ClipSettings(scale_x=pl["scale"], scale_y=pl["scale"],
+                                                                                 transform_x=pl["tx"], transform_y=pl["ty"])),
+                                   "Captions (animated)")
+            p["captions"] = []
+        ink = pack["colors"].get("caption", "#FFFFFF")
+        add_texts(p["captions"], "Captions", lambda r: (
+            cc.TextStyle(size=8, bold=True, color=_rgb(ink), align=1, auto_wrapping=True, max_line_width=0.78),
+            cc.ClipSettings(transform_y=-0.42)))
 
     # 4) sound: voice, music and every sound effect as its own clip
     if has_voice:

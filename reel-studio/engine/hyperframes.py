@@ -113,6 +113,15 @@ def adapt(html, words, duration):
     return html
 
 
+def _crop_all(paths, box):
+    """Store only the part of each frame the effect ever uses (saves ~90% disk)."""
+    from PIL import Image
+    if not box:
+        return
+    for fp in paths:
+        Image.open(fp).crop(tuple(box)).save(fp, optimize=False, compress_level=3)
+
+
 def _browser(p):
     exe = os.environ.get("REEL_CHROMIUM")
     try:
@@ -166,6 +175,99 @@ def caption_frames(style, words, duration, fps=FPS):
         bb = Image.open(fp).getbbox()
         if bb:
             box = bb if box is None else (min(box[0], bb[0]), min(box[1], bb[1]), max(box[2], bb[2]), max(box[3], bb[3]))
-    result = {"frames": paths, "box": box, "fps": fps}
+    _crop_all(paths, box)
+    result = {"frames": paths, "box": box, "fps": fps, "cropped": True}
     json.dump(result, open(done, "w"))
     return result
+
+
+# ---------------------------------------------------------------- the whole catalog (~400 effects), by name
+CATALOG = os.path.join(ROOT, "library", "hyperframes", "catalog.json")
+
+
+def catalog(query=""):
+    """Search the HyperFrames catalog: name, title, description, tags. Empty query = everything."""
+    data = json.load(open(CATALOG, encoding="utf-8"))
+    q = query.lower().split()
+    items = [i for i in data["items"]
+             if all(w in (i["name"] + " " + (i["title"] or "") + " " + i["description"] + " " + " ".join(i["tags"])).lower()
+                    for w in q)]
+    return items
+
+
+def _item(name):
+    data = json.load(open(CATALOG, encoding="utf-8"))
+    for i in data["items"]:
+        if i["name"] == name:
+            return i, data["commit"]
+    raise ValueError(f"No HyperFrames effect called '{name}'. Search with: python -m engine hf-find <words>")
+
+
+def fetch(name, project_dir):
+    """Download one catalog effect (its page + assets) into projects/<p>/hf/<name>/ from HeyGen's GitHub,
+    ready for Claude to swap in the reel's own words. Returns the page path. Already there = kept (edits stay)."""
+    import urllib.request
+    it, commit = _item(name)
+    folder = os.path.join(project_dir, "hf", name)
+    main = os.path.join(folder, it["files"][0])
+    if os.path.exists(main):
+        return main
+    for rel in it["files"]:
+        url = f"https://raw.githubusercontent.com/heygen-com/hyperframes/{commit}/registry/{it['kind']}/{name}/{rel}"
+        dst = os.path.join(folder, rel)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        with urllib.request.urlopen(url, timeout=60) as r:
+            open(dst, "wb").write(r.read())
+    return main
+
+
+def component_frames(html_path, duration=None, fps=FPS):
+    """Render any HyperFrames page (its GSAP timeline) to transparent frames. -> {frames, box, size, fps}"""
+    html = open(html_path, encoding="utf-8").read()
+    w = int((re.search(r'data-width="(\d+)"', html) or [None, 1920])[1])
+    h = int((re.search(r'data-height="(\d+)"', html) or [None, 1080])[1])
+    if duration is None:
+        m = re.search(r'data-duration="([0-9.]+)"', html)
+        duration = float(m.group(1)) if m else 4.0
+    gsap = pathlib.Path(os.path.join(ROOT, "library", "hyperframes", "gsap.min.js")).resolve().as_uri()
+    html2 = re.sub(r'<script src="https://[^"]*gsap[^"]*"></script>', f'<script src="{gsap}"></script>', html)
+    key = hashlib.md5((html2 + str(duration) + str(fps)).encode()).hexdigest()[:16]
+    folder = os.path.join(CACHE, key)
+    done = os.path.join(folder, "frames.json")
+    if os.path.exists(done):
+        return json.load(open(done))
+    os.makedirs(folder, exist_ok=True)
+    page = os.path.join(os.path.dirname(os.path.abspath(html_path)), f".render-{key}.html")   # beside its assets
+    open(page, "w", encoding="utf-8").write(html2)
+    from playwright.sync_api import sync_playwright
+    from PIL import Image
+    paths = []
+    try:
+        with sync_playwright() as p:
+            b = _browser(p)
+            ctx = b.new_context(viewport={"width": w, "height": h}, ignore_https_errors=os.environ.get("REEL_IGNORE_TLS") == "1")
+            pg = ctx.new_page()
+            pg.goto(pathlib.Path(page).resolve().as_uri())
+            pg.wait_for_function("window.__timelines && Object.keys(window.__timelines).length > 0", timeout=30000)
+            pg.evaluate("document.fonts && document.fonts.ready")
+            pg.wait_for_timeout(300)
+            for i in range(int(duration * fps)):
+                pg.evaluate(f"(() => {{ for (const tl of Object.values(window.__timelines)) tl.seek({i / fps}, false); }})()")
+                fp = os.path.join(folder, f"{i:05d}.png")
+                pg.screenshot(path=fp, omit_background=True)
+                paths.append(fp)
+            b.close()
+    finally:
+        try:
+            os.remove(page)
+        except OSError:
+            pass
+    box = None
+    for fp in paths[::3]:
+        bb = Image.open(fp).getbbox()
+        if bb:
+            box = bb if box is None else (min(box[0], bb[0]), min(box[1], bb[1]), max(box[2], bb[2]), max(box[3], bb[3]))
+    _crop_all(paths, box)
+    res = {"frames": paths, "box": box, "size": [w, h], "fps": fps, "duration": duration, "cropped": True}
+    json.dump(res, open(done, "w"))
+    return res

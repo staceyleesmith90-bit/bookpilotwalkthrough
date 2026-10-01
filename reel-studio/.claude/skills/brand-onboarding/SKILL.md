@@ -39,6 +39,17 @@ read the font names, title styles, and sticker/graphic vibe (glass, editorial, p
 fonts → `brand.google_font`; Canva-only/bought fonts → they upload the .ttf/.otf (My brand → Fonts).
 Mirror their design choices in the pack (title fonts, caption style, sticker look, colours).
 
+**F. "I have a design file / brand guide"** (a DESIGN.md, a design-system or brand page from
+HyperFrames, Figma, Stitch, a CSS file, a brand-guide text) → save it in `inbox/`, then
+`python -m engine style-from inbox/<file> --preview` → show `brand/previews/style-overview.jpg`
+(hook · captions · side comment · takeover · name tag · end card in their look). On "yes":
+run it again without `--preview` to save. **Canva link** → if the Canva connector is on, read the
+design (fonts, the three colours: text / accent / background, and each styled page), write those
+values into `inbox/canva-style.md` (lines like `Accent: #C2185B`, `Headline font: Playfair Display`)
+and run style-from on it. No connector → ask for the page exported as PNG/PDF and use route E.
+Fonts not on Google Fonts: ask for the font file (`font-add`). Remind CapCut users to pick each
+font once in CapCut so CapCut knows it.
+
 ## Step 2 — The 6 questions (skip any already answered by the route)
 1. **Vibe** — three words for how your content should feel.
 2. **Colours** — main brand colour(s), plus light or dark background preference.

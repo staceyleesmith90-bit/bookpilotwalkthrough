@@ -601,6 +601,25 @@ def to_timeline(plan, rc=None, source=None):
                     it["file"] = what.strip()
                 it["x"], it["y"] = (820, 380) if it["rotate"] > 0 else (260, 1180)
                 items.append(it)                    # its camera-shutter sound comes from sound design
+            elif kind == "hf":                    # hf:<catalog effect>[|top|center|bottom] — HyperFrames, by name
+                from . import hyperframes
+                name, _, place = arg.partition("|")
+                pdir = os.path.dirname(os.path.join(ROOT_DIR, source)) if source else None
+                proj = os.path.dirname(pdir) if pdir and os.path.basename(pdir) == "source" else pdir
+                try:
+                    it_meta, _ = hyperframes._item(name.strip())
+                    page = hyperframes.fetch(name.strip(), proj or os.path.join(ROOT_DIR, "out"))
+                except Exception as e:
+                    print(f"[reel] HyperFrames effect '{name}' skipped: {e}")
+                    continue
+                dims = it_meta.get("dimensions") or {}
+                vertical = dims.get("height", 0) > dims.get("width", 1)
+                dur = float(it_meta.get("duration") or 4.0)
+                y = {"top": 520, "bottom": 1320, "center": 960}.get(place.strip(), 960 if vertical else 1180)
+                items.append({"id": _id("hf"), "type": "hf", "src": os.path.relpath(page, ROOT_DIR), "start": a + 0.05,
+                              "end": a + 0.05 + dur, "x": 540, "y": 960 if vertical else y, "z": 38, "anim": "none",
+                              "hide_captions": vertical or place.strip() == "full", "full": vertical})
+                cues.append((a + 0.05, "swish", 0.3))
             elif kind == "window":                # window:<app|chat|checklist|stat|doc|product>|<text>|...
                 from .animwin import parse
                 wk, wargs = parse(arg)

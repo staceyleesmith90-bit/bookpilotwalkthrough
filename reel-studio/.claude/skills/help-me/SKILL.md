@@ -13,6 +13,10 @@ description: Answer "how do I…" questions about Reel Studio with short, exact 
   move/delete a sticker (Edit → click it → drag / Delete) · change font (My brand → Fonts) ·
   add a trending sound (Trending sounds tab) · change filter (Looks → Filters) · add my logo
   (My brand, or drop it in the chat) · batch reels (`broll-batch`).
+- **"something's not working"** → fix it yourself first (read the error, setup-check, re-run). Still
+  stuck → `python -m engine report` writes `out/problem-report.txt` (no footage, no keys, no brand);
+  they add one line about what happened and email it to Systems Pilot support.
+- **"show me the effects library"** → `python -m engine library`.
 - **"what can you do"** → 6 bullets max, then "What are we making today?"
 - Never answer "why didn't it zoom/…?" with an excuse: fix it (edit the timeline), re-render,
   and say what changed.

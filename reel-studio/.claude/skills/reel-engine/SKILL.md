@@ -64,12 +64,55 @@ their key). Or their own track. Set `"music": {"file": ..., "gain": 0.18}` in th
    `timeline.json` directly or open the manual editor: `python -m engine editor <project>`
    (drag anything, trim on the timeline, render from there). Big changes → edit plan.json and
    rebuild the timeline (this resets manual moves — say so first).
-7. **Deliver — two versions, their choice.** The postable MP4 (review page, `finish-check`), and
-   on request (or if they use CapCut) an editable **CapCut project**:
-   `python -m engine capcut <project> [--no-captions]`. Every graphic is its own clip, takeovers
-   and captions are real CapCut text, voice/music/each sound effect sit on their own tracks.
-   With CapCut installed it appears on CapCut's home screen; otherwise copy the printed folder
-   into CapCut's projects folder. `--no-captions` when they add captions in CapCut themselves.
+7. **Deliver — ask once, early (at the style plan): "How finished do you want it?"**
+   - **Ready to post** (default): the finished MP4 — review page + `finish-check`.
+   - **Ready to tweak in CapCut, fully editable**: `python -m engine capcut <project>` — every graphic
+     its own clip, takeovers/captions as real CapCut text, voice/music/each sound on its own track.
+     `--no-captions` if they'll run CapCut's Auto Captions themselves.
+   - **Ready to tweak in CapCut, animated**: `python -m engine capcut <project> --options animated` —
+     the designed text and graphics exactly as rendered (animations included) on two moving layers.
+   With CapCut installed the project appears on CapCut's home screen. Ask CapCut users to close CapCut
+   while you write a new version, and never overwrite a version they've opened — export a new name
+   (`--name "<reel> 2"`).
+8. **Hands-off** — if they say "just do it" / "hands-off": after the rough cut, skip the questions,
+   decide the plan yourself (clean look, one treatment per moment) and deliver. Still run finish-check.
+9. **Changes are fast**: re-rendering only redraws the 2-second pieces that changed (footage and the
+   cleaned voice are reused), so a text/sticker tweak takes seconds-to-a-minute, not a full render.
+   Tell them so — invite small changes.
+
+## Premium effects (HyperFrames by HeyGen, open source)
+- **Animated caption styles**: `python -m engine hf-captions` lists them (Kinetic Slam, Highlight, Pill
+  Karaoke, Neon Accent, Weight Shift, Editorial Emphasis, Parallax…). Use `"captions": "hf:<name>"`.
+  Suggest one that fits the brand when they want "CapCut-style captions" or "more premium captions".
+- **~400 effects by name**: `python -m engine hf-find "<words>"` (lower third, follow card, chart,
+  notification, hand-drawn arrow, marker highlight, checklist, star rating, logo outro…). Then
+  `python -m engine hf-add <project> --name <effect>`, open the page it saved and replace ONLY the demo
+  words/handles/numbers/images with the reel's own (keep the design and code), then use the beat treatment
+  `hf:<effect>[|top|center|bottom]`. Vertical effects (follow cards) keep their place, lifted out of the
+  app's UI bands. One effect per moment.
+
+## Teach it once (their taste sticks)
+- **Rules**: before every style plan run `python -m engine rules` and follow them (they beat defaults).
+  When they say "remember that" / "always…" / "never…": `python -m engine remember "<the rule, in
+  plain words>" [--name "<phrase that calls it back>"]`, then read it back in one line so they can
+  correct it. "show me my rules" → `rules`; "forget …" → `forget-rule <number|words>`.
+- **Their own sounds** (used first, before the built-in library, every reel after):
+  - CapCut favourites: they make one CapCut project (e.g. "my favorites") with the sounds they love
+    (play each once so CapCut downloads it), optionally a text clip with an animation over a sound
+    ("Typewriter" over a keyboard sound = that pairing), close CapCut, then
+    `python -m engine sounds-learn --options capcut --name "my favorites"`. Show what it learned.
+  - Downloaded sounds (Pixabay free, their Epidemic Sound account, own recordings): drop in
+    `inbox/sound-effects/` (sub-folders like `typing/`, `pop/`, `whoosh/` name the use) →
+    `python -m engine sounds-learn`. One file for one use: `sounds-learn <file> --role typing`.
+  - Epidemic Sound connector on? You may search it for a sound, have them download it to
+    `inbox/sound-effects/`, then learn it. `my-sounds` lists theirs; `sounds-forget <name|all>`.
+  - Sound rules that always apply: the sound matches the motion (typing for typed text, trimmed to
+    the typing; a whoosh only on real movement; pops for text popping on); never the same sound
+    back to back; "shine/glitter" words sparkle; real money moments ring. Few sounds, each tied to
+    something on screen. Their own sounds stay on their computer.
+- **Effects library page**: "show me the effects library" → `python -m engine library` (opens in
+  their browser: moments, captions, ~400 premium effects that play on click, every sound
+  playable, what to say, their rules). Inside Claude they won't hear sounds — the browser will.
 
 ## plan.json
 

@@ -17,6 +17,8 @@ library/sfx/kenney/ plus sounds synthesised here (whooshes, risers, shimmer, sub
 import glob, hashlib, os, wave
 import numpy as np
 
+from . import mysounds
+
 SR = 44100
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KEN = os.path.join(ROOT, "library", "sfx", "kenney")
@@ -30,7 +32,8 @@ KIT_FEEL = {"soft": ["soft", "minimal"], "clean": ["studio", "minimal"], "luxe":
 EVENT_LEVEL = {"type_key": 0.55, "typing": 0.8, "type_end": 0.6, "word_pop": 0.5, "text_in": 0.75,
                "sticker_in": 0.75, "select": 0.7, "slide": 0.7, "highlight": 0.7, "glass": 0.7,
                "whoosh": 0.65, "swish": 0.6, "transition": 0.7, "shutter": 0.75, "page": 0.7,
-               "reveal": 0.8, "cta": 0.85, "impact": 0.9, "riser": 0.7, "zoom_in": 0.6}
+               "reveal": 0.8, "cta": 0.85, "impact": 0.9, "riser": 0.7, "zoom_in": 0.6,
+               "sparkle": 0.7, "money": 0.8, "writing": 0.65, "wrong": 0.75}
 
 # event -> kit -> candidate sources ("k:<glob>" = Kenney sample glob, "s:<synth>" = synth)
 KITS = {
@@ -65,6 +68,10 @@ KITS = {
                   "playful": ["f:ding", "k:interface-bong_*"], "digital": ["k:digital-threeTone*"]},
     "transition": {"*": ["f:whoosh", "f:swoosh"]},
     "glitch":    {"*": ["k:interface-glitch_*"]},
+    "sparkle":   {"*": ["f:sparkle", "s:shimmer"]},
+    "money":     {"*": ["f:ding", "u:success"]},
+    "writing":   {"*": ["f:marker", "f:paper"]},
+    "wrong":     {"*": ["k:interface-glitch_*", "u:close"]},
 }
 KIT_FOR_LOOK = {"premium": "luxe", "playful": "playful", "bold": "digital", "clean": "soft"}
 DEFAULT_KIT = "soft"                    # soft real foley: few sounds, each tied to something on screen
@@ -223,6 +230,11 @@ def source_file(name):
     """Which sample file (or synth) a cue name resolves to — used to avoid back-to-back repeats."""
     _, kit, event, seed, *rest = name.split(":")
     seed = int(seed)
+    mine = mysounds.files_for(event)               # the user's own sounds (CapCut favourites / inbox) come first
+    if mine:
+        h = int(hashlib.md5(f"{event}{seed}".encode()).hexdigest(), 16)
+        f, h2 = _pick(mine, seed, "mine")
+        return f, h, h2
     table = KITS.get(event, KITS["text_in"])
     cands = table.get(kit) or table.get("*") or next(iter(table.values()))
     src, h = _pick(cands, seed, event)
@@ -256,13 +268,13 @@ def render(name):
             x = fn(seed=seed)
     else:
         x = _wav(src)
-        foley = src.startswith((FOLEY, UISFX, CC0PACK))
+        foley = src.startswith((FOLEY, UISFX, CC0PACK, mysounds.MINE))
         x = _pitch(x, ((h2 >> 8) % 5 - 2) * (0.25 if foley else 0.4))   # tiny pitch variation
         if dur and len(x) > dur * SR * 1.15 and event in ("typing", "whoosh", "swish", "transition", "slide"):
             x = x[: int(dur * SR)].copy()                                # fit the move / the typing
             f = min(len(x) // 3, int(0.04 * SR))
             x[-f:] *= np.linspace(1, 0, f)
-        if foley and kit in ("soft", "clean", "luxe"):
+        if foley and kit in ("soft", "clean", "luxe") and not src.startswith(mysounds.MINE):
             x = _soften(x)                                               # no harsh top end
     level = (0.85 + ((h >> 16) % 30) / 100) * EVENT_LEVEL.get(event, 0.75)   # balanced per kind, ±15% variation
     return (x / (np.abs(x).max() + 1e-9) * level).astype(np.float32)
@@ -283,7 +295,7 @@ def typewriter(t0, text, dur, kit="clean", seed=0, gain=0.35):
     """Typing sound while text types on: short words get a few real key taps; longer text gets
     one real typing burst fitted to the typing time (not a machine-gun of identical clicks)."""
     chars = [c for c in text if c != " "]
-    if len(chars) > 8:
+    if len(chars) > 8 or mysounds.files_for("typing"):     # their own typing sound: one burst, trimmed to fit
         cues = [cue("typing", t0, seed, kit, gain * 1.1, max(dur, 0.3))]
     else:
         n = max(len(text), 1)
@@ -402,7 +414,22 @@ def design(tl, cues, kit="clean"):
             if t - last >= gap and not any(abs(t - b) < 0.5 for b in busy):
                 out.append(cue("word_pop", t, 300 + i, kit, 0.16 if kit == "soft" else 0.2))
                 last = t
+    # spoken moments that have a sound of their own: "shine/glitter" sparkles, real money rings
+    words = cap.get("words") or []
+    busy = sorted(t for t, _, g in out if g >= 0.2)
+    for i, w in enumerate(words):
+        tok = w["w"].lower().strip(".,!?\"'")
+        ev = ("sparkle" if tok in SPARKLE_WORDS else
+              "money" if (tok.startswith(("$", "r", "£", "€")) and any(c.isdigit() for c in tok)) or tok in MONEY_WORDS
+              else None)
+        if ev and not any(abs(w["start"] - b) < 0.6 for b in busy):
+            out.append(cue(ev, w["start"], 500 + i, kit, 0.22))
+            busy.append(w["start"])
     return no_repeats(sorted(out))
+
+
+SPARKLE_WORDS = {"shine", "shiny", "sparkle", "sparkly", "glitter", "glow", "glowing", "magic", "magical"}
+MONEY_WORDS = {"sale", "sales", "paid", "profit", "revenue", "earned", "kaching"}
 
 
 def no_repeats(cues):
