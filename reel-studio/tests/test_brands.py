@@ -68,3 +68,23 @@ def test_look_from_video_picks_the_colourful_thing(tmp_path, monkeypatch):
     monkeypatch.setattr(autolook, "ROOT", str(tmp_path))
     sheet, looks = autolook.make_looks(v, "Pink Co")
     assert len(looks) == 3 and os.path.exists(sheet)
+
+
+def test_ready_made_designs_read_cleanly():
+    from engine import brandsetup
+    ds = brandsetup.designs()
+    assert len(ds) == 13
+    for d in ds:
+        c = d["colors"]
+        assert c["accent"] not in (c["background"], c["text"]), d["name"]
+        assert d["fonts"].get("main"), d["name"]
+    coral = next(d for d in ds if d["name"] == "coral")
+    assert coral["fonts"]["main"] == "Bebas Neue" and coral["colors"]["accent"] == "#E85D5D"
+
+
+def test_vibe_route_makes_three_looks(tmp_path, monkeypatch):
+    from engine import brandsetup
+    monkeypatch.setattr(autolook, "LOOKS", str(tmp_path / "looks.json"))
+    monkeypatch.setattr(autolook, "ROOT", str(tmp_path))
+    sheet, looks = brandsetup.run("vibe", "warm calm", "Bake Co", frame=None)
+    assert len(looks) == 3 and all(l["pack"]["label"] == "Bake Co" for l in looks) and os.path.exists(sheet)

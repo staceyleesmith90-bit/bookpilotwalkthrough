@@ -64,6 +64,10 @@ sounds · Move text off my face · Different colours · Tighter cut · Looks gre
 4. **Have a reel you love the look of?** (optional) *Paste a link · Skip* → inspiration-reels.
 5. Then the script (below), then the style plan, then **How finished?** (step 7).
 
+Answers from the Studio's new-reel wizard are already in `projects/<p>/brief.json` — don't ask again:
+`extras` (just-edit · broll · full), `brollFrom` (inbox · pick · film → give a shot list), `brollLook`
+(→ plan.json `"broll_look"`, "same" = leave it out), plus format, idea, vibe, filter, title, captions, music.
+
 ## The script, line by line
 After the rough cut, show the lines as a numbered list (the review page shows the same: play, remove,
 note, voice-note). Under it offer: *Keep as is · Tighten it · Make the hook stronger · Rewrite line N ·

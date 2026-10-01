@@ -90,8 +90,13 @@ def _complement(h):
 
 def make_looks(video, name="My brand"):
     vivid, frame = palette_from_video(video)
-    pick = (vivid + [_complement(vivid[0]) if vivid else "#E4572E", "#2F6BFF", "#E4572E"])[:3]
-    # three feels, each led by a different colour from the video (soft editorial gets the gentlest)
+    return looks_from_colours(vivid, name, frame=frame, source={"video": video})
+
+
+def looks_from_colours(colours, name="My brand", frame=None, source=None):
+    """Three feels (modern · soft editorial · bold), each led by one of the given colours."""
+    colours = [c for c in colours if c]
+    pick = (colours + [_complement(colours[0]) if colours else "#E4572E", "#2F6BFF", "#E4572E"])[:3]
     accents = [_shift(pick[0], light=0.5, sat=0.75), _shift(pick[1], light=0.45, sat=0.45),
                _shift(pick[2], light=0.55, sat=0.85)]
     looks = []
@@ -103,8 +108,13 @@ def make_looks(video, name="My brand"):
         pack = brand.build_pack(name, roles, brand._font(main), brand._font(acc), brand._font(cap),
                                 prefer="dark" if bgkind == "dark" else "light")
         looks.append({"feel": feel, "pack": pack})
+    return save_looks(looks, frame, source)
+
+
+def save_looks(looks, frame=None, source=None):
+    """Keep the candidate looks (brand/looks.json) and draw each one. -> (sheet of all, looks)"""
     os.makedirs(os.path.dirname(LOOKS), exist_ok=True)
-    json.dump({"video": video, "frame": frame, "looks": looks}, open(LOOKS, "w", encoding="utf-8"), indent=1)
+    json.dump({"source": source or {}, "frame": frame, "looks": looks}, open(LOOKS, "w", encoding="utf-8"), indent=1)
     sheets = []
     for i, lk in enumerate(looks, 1):
         sheets.append(stylesheet.overview(lk["pack"], os.path.join(ROOT, "brand", "previews", f"look-{i}.jpg"),

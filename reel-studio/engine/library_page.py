@@ -15,18 +15,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "out", "effects-library.html")
 CDN = "https://cdn.jsdelivr.net/gh/heygen-com/hyperframes@{commit}/registry/{kind}/{name}/"
 
-SAY = [
-    ("Start", ["Edit my newest video", "Make my voiceover reel", "Make b-roll reels from my b-roll folder",
-               "Just do it — hands-off"]),
-    ("How finished", ["Give me the finished video", "Give me a CapCut version I can tweak",
-                      "Give me the animated layers in CapCut", "Leave captions out — I'll use CapCut's auto captions"]),
-    ("Change it", ["Make the hook bigger", "Hold that line longer", "Swap the sound on the typing",
-                   "Move the label higher, it's on my face", "Fewer sounds", "Cut the pause after 'so'"]),
-    ("Teach it", ["Remember that", "Show me my rules", "Forget the rule about emojis",
-                  "Learn my sounds from my CapCut project called my favorites",
-                  "Use the sound effects in my inbox", "Save that as my spotlight effect", "I styled my design file"]),
-    ("Help", ["Show me the effects library", "Something's not working", "Check for an update"]),
-]
+from .prompts import LIBRARY as _PROMPTS
+SAY = [(f"{ic} {g}", [say for _, say in items]) for g, ic, items in _PROMPTS]
 
 
 def _sounds():

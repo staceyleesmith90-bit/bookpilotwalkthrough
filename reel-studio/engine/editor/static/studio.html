@@ -29,7 +29,7 @@
           font: 800 18px "Poppins"; color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,.12) inset; }
   .logo b { font-size: 17px; } .logo small { display: block; font-size: 11px; opacity: .7; letter-spacing: .08em; text-transform: uppercase; }
   nav { display: flex; gap: 4px; margin-left: 10px; }
-  nav button { border: 0; background: none; padding: 8px 14px; border-radius: 999px; color: rgba(255,255,255,.7); font-weight: 600; }
+  nav button { white-space: nowrap; border: 0; background: none; padding: 8px 12px; border-radius: 999px; color: rgba(255,255,255,.7); font-weight: 600; }
   nav button.on { background: rgba(255,255,255,.12); color: #fff; }
   .grow { flex: 1; }
   .cta { border: 0; border-radius: 999px; padding: 11px 20px; font-weight: 700; color: #fff; background: var(--grad); box-shadow: 0 10px 24px -12px #6A11CB; }
@@ -117,8 +117,38 @@
   .fprev { font-size: 40px; color: #EC4899; margin-top: 12px; line-height: 1.2; min-height: 54px; }
   @media (max-width: 820px) { .fontcard { grid-template-columns: 1fr; } }
   #tab-sounds ol { padding-left: 20px; line-height: 1.7; }
+  /* brands */
+  .brandsw span { white-space: nowrap; } .menu .dots2 i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--line); }
+  .cta { white-space: nowrap; }
+  .brandsw { border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .brandsw i, .bcard .dots2 i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,.4); }
+  .menu { position: absolute; top: 58px; right: 150px; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 6px; min-width: 240px; z-index: 20; }
+  .menu button { display: flex; width: 100%; gap: 10px; align-items: center; border: 0; background: none; padding: 10px 12px; border-radius: 10px; text-align: left; font-weight: 600; }
+  .menu button:hover { background: var(--soft); } .menu button.on::after { content: "✓"; margin-left: auto; color: var(--accent); }
+  .bcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 26px; }
+  .bcard { background: var(--card); border: 2px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); }
+  .bcard.on { border-color: var(--accent); } .bcard b { font-size: 16px; } .bcard .dots2 { display: flex; gap: 6px; } .bcard .dots2 i { width: 22px; height: 22px; border-color: var(--line); }
+  .bcard.add { border-style: dashed; align-items: center; justify-content: center; color: var(--muted); min-height: 130px; cursor: pointer; }
+  .routes { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .designs { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .design { border: 2px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--card); padding: 0; text-align: left; }
+  .design img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: var(--soft); }
+  .design .dd { padding: 8px 10px; } .design .dd span { display: block; color: var(--muted); font-size: 12px; } .design.on { border-color: var(--accent); }
+  .design .sw2 { display: flex; gap: 4px; margin-top: 6px; } .design .sw2 i { width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--line); }
+  .steps { margin: 0 0 14px; padding-left: 20px; color: var(--muted); line-height: 1.6; }
+  .lookpick { display: grid; gap: 14px; } .lookpick figure { margin: 0; background: var(--soft); border-radius: 16px; padding: 10px; }
+  .lookpick img { width: 100%; border-radius: 10px; display: block; } .lookpick figcaption { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 4px 2px; flex-wrap: wrap; }
+  .prompts h3 { margin: 26px 0 10px; } .pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  .pcard { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .pcard b { font-size: 14px; } .pcard p { margin: 0; color: var(--muted); font-size: 13px; } .pcard button { align-self: flex-start; margin-top: auto; }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 16px; border-radius: 12px; opacity: 0; transition: .2s; z-index: 50; pointer-events: none; }
+  .toast.on { opacity: 1; }
   footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-  @media (max-width: 820px) { .formats { grid-template-columns: 1fr 1fr; } .brandcard { grid-template-columns: 1fr; } nav { display: none; } }
+  @media (max-width: 820px) { .formats { grid-template-columns: 1fr 1fr; } .brandcard { grid-template-columns: 1fr; }
+    .top { flex-wrap: wrap; padding: 10px 16px; gap: 10px; } .logo small { display: none; }
+    nav { order: 5; width: 100%; margin: 0; overflow-x: auto; scrollbar-width: none; }
+    .brandsw { padding: 6px 10px; font-size: 13px; } .top .cta { padding: 8px 14px; font-size: 13px; }
+    .menu { right: 16px; top: 52px; } main { padding: 20px 16px 60px; } }
 </style>
 </head>
 <body>
@@ -128,10 +158,14 @@
     <button data-tab="home" class="on">Home</button>
     <button data-tab="templates">Templates</button>
     <button data-tab="looks">Looks</button>
-    <button data-tab="sounds">Trending sounds</button>
-    <button data-tab="brand">My brand</button>
+    <button data-tab="sounds">Sounds</button>
+    <button data-tab="brand">Brands</button>
+    <button data-tab="prompts">What to say</button>
+    <button onclick="window.open('/library','_blank')">Effects ↗</button>
   </nav>
   <span class="grow"></span>
+  <button class="brandsw" id="brandSw" title="Which brand you're making reels for"><span id="brandDots"></span><span id="brandName">Brand</span> ▾</button>
+  <div class="menu hidden" id="brandMenu"></div>
   <button class="cta" id="newBtn">＋ New reel</button>
 </div>
 
@@ -193,7 +227,9 @@
     <p class="sub" style="font-size:12px">Tip: ask Claude “what's trending on TikTok this week?” and it will look up public round-ups and save the ones that fit your brand.</p>
   </section>
 
-  <section id="tab-brand" class="hidden"><h2>My brand</h2><div id="brandBox"></div>
+  <section id="tab-brand" class="hidden"><h2>Your brands <small>one for you, or one per client: each keeps its own look, logo, sounds and rules</small></h2>
+    <div class="bcards" id="brandsList"></div>
+    <h2>The brand in use</h2><div id="brandBox"></div>
     <h2 style="margin-top:34px">Fonts <small>your own fonts work too, even ones that aren't on Google</small></h2>
     <div class="fontcard">
       <div>
@@ -222,13 +258,24 @@
       </div>
     </div>
   </section>
+  <section id="tab-prompts" class="hidden prompts">
+    <h2>What to say <small>tap Copy, then paste it to Claude. Change only the part in [brackets].</small></h2>
+    <div id="promptsBox"></div>
+  </section>
 </main>
+<div class="toast" id="toast"></div>
 <footer>Reel Studio · a Systems Pilot product · runs on your computer</footer>
 
 <dialog id="wz">
   <div class="wz-head"><div class="dots" id="dots"></div><button class="x" id="wzClose" aria-label="Close">✕</button></div>
   <div class="wz-body" id="wzBody"></div>
   <div class="wz-foot"><button class="ghost" id="back">Back</button><button class="cta" id="next">Next</button></div>
+</dialog>
+
+<dialog id="bs">
+  <div class="wz-head"><b style="flex:1" id="bsTitle">Set up a brand</b><button class="x" id="bsClose" aria-label="Close">✕</button></div>
+  <div class="wz-body" id="bsBody"></div>
+  <div class="wz-foot"><button class="ghost" id="bsBack">Back</button><button class="cta" id="bsNext">Next</button></div>
 </dialog>
 
 <script>
@@ -241,10 +288,10 @@ const q = o => new URLSearchParams(o).toString();
 // ------------------------------------------------------------ navigation
 function tab(name) {
   document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x.dataset.tab === name));
-  ["home", "templates", "looks", "sounds", "brand"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
+  ["home", "templates", "looks", "sounds", "brand", "prompts"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
   if (name === "looks") drawLooks();
 }
-document.querySelectorAll("nav button").forEach(b => b.onclick = () => tab(b.dataset.tab));
+document.querySelectorAll("nav button[data-tab]").forEach(b => b.onclick = () => tab(b.dataset.tab));
 document.querySelector("[data-nav=templates]").onclick = () => tab("templates");
 
 // ------------------------------------------------------------ home
@@ -262,7 +309,7 @@ async function load() {
       return `<div class="reel"><div class="cover" ${cover}><span class="chip">${st}</span></div><div class="meta"><b>${esc(p.brief.topic || p.slug)}</b>
         <span style="color:var(--muted);font-size:12px">${esc(p.created || "")}</span><div class="acts">${acts}</div></div></div>`;
     }).join("");
-  drawTemplates(); drawBrand(); drawSounds(); drawFonts();
+  drawTemplates(); drawBrand(); drawSounds(); drawFonts(); drawBrands(); drawPrompts();
 }
 
 // ------------------------------------------------------------ fonts
@@ -345,13 +392,121 @@ function drawLooks() {
 let tt; $("#tText").oninput = () => { clearTimeout(tt); tt = setTimeout(drawLooks, 400); };
 function drawBrand() {
   const b = O.brand;
-  if (!b) { $("#brandBox").innerHTML = `<div class="empty">Your brand isn't set up yet.<br>Open Claude and say <b>"set up my brand"</b> (about 10 minutes; START-HERE.md lists what to have ready).</div>`; return; }
+  if (!b) { $("#brandBox").innerHTML = `<div class="empty">This brand doesn't have a look yet.<br><button class="cta" style="margin-top:12px" onclick="openSetup(false)">Set up its look (1 minute)</button></div>`; return; }
   const sw = ["bg", "ink", "pop", "accent", "paper"].map(k => `<i title="${k} ${b.colors[k]}" style="background:${b.colors[k]}"></i>`).join("");
   $("#brandBox").innerHTML = `<div class="brandcard"><img src="/api/brand-preview?v=${Date.now()}" alt="Brand preview"><div><h2 style="margin:0">${esc(b.label || "My brand")}</h2>
     <p style="color:var(--muted);margin:4px 0">${esc(b.vibe || "")}</p><div class="sw">${sw}</div>
     <p><b>Fonts</b><br><span style="color:var(--muted)">Headlines ${esc(b.fonts.main)} · Accent ${esc(b.fonts.accent)} · Captions ${esc(b.fonts.caption)}</span></p>
     <p><b>Logo</b><br><span style="color:var(--muted)">${b.has_logo ? "On every reel (move it any time in the editor)" : "Not added yet"}</span></p>
-    <p class="note">Want changes? Tell Claude, e.g. "make my colours warmer" or "use my new logo".</p></div></div>`;
+    <p class="note">Want changes? Tell Claude, e.g. "make my colours warmer" or "use my new logo".</p>
+    <button class="ghost" onclick="openSetup(false)">Change this brand's look</button></div></div>`;
+}
+
+// ------------------------------------------------------------ brands
+let BR = null, DESIGNS = null, BS = {}, bsPoll = null;
+function toast(t) { const e = $("#toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 1600); }
+function copyText(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast("Copied. Paste it to Claude.")).catch(() => prompt("Copy this:", t)); }
+const dots = c => ["pop", "bg", "ink"].map(k => c && c[k] ? `<i style="background:${c[k]}"></i>` : "").join("");
+async function drawBrands() {
+  BR = await api("/api/brands");
+  const act = BR.brands.find(b => b.active);
+  $("#brandName").textContent = act ? act.label : "Set up a brand";
+  $("#brandDots").innerHTML = act ? dots(act.colors) : "";
+  $("#brandsList").innerHTML = BR.brands.map(b => `<div class="bcard ${b.active ? "on" : ""}"><b>${esc(b.label)}</b><div class="dots2">${dots(b.colors)}</div>
+      <span style="color:var(--muted);font-size:13px">${b.active ? "In use now" : "Saved"}${b.ready ? "" : " · look not set up yet"}</span>
+      ${b.active ? `<button class="ghost" onclick="openSetup(false)">${b.ready ? "Change its look" : "Set up its look"}</button>` : `<button class="ghost" onclick="useBrand('${b.slug}')">Use this brand</button>`}</div>`).join("")
+    + `<div class="bcard add" onclick="openSetup(true)"><div style="font-size:28px">＋</div><b>Add a brand</b><span style="font-size:13px">for you, a client or a new business</span></div>`;
+  $("#brandMenu").innerHTML = BR.brands.map(b => `<button class="${b.active ? "on" : ""}" onclick="useBrand('${b.slug}')"><span class="dots2" style="display:flex;gap:3px">${dots(b.colors)}</span>${esc(b.label)}</button>`).join("")
+    + `<button onclick="openSetup(true)">＋ Add a brand</button><button onclick="tab('brand');$('#brandMenu').classList.add('hidden')">Manage brands</button>`;
+  if (!BR.brands.length && !sessionStorage.getItem("bsAsked")) { sessionStorage.setItem("bsAsked", 1); openSetup(true); }
+}
+$("#brandSw").onclick = e => { e.stopPropagation(); $("#brandMenu").classList.toggle("hidden"); };
+document.addEventListener("click", () => $("#brandMenu").classList.add("hidden"));
+async function useBrand(slug) { await api("/api/brands/use", { slug }); toast("Switched brand"); load(); }
+
+function openSetup(isNew) { BS = { isNew, step: isNew ? "name" : "route" }; $("#bs").showModal(); drawSetup(); }
+$("#bsClose").onclick = () => { $("#bs").close(); clearInterval(bsPoll); load(); };
+const ROUTE_IC = { design: "🎨", video: "🎬", website: "🌐", image: "🖼️", file: "📄", vibe: "✨" };
+async function drawSetup() {
+  const body = $("#bsBody"), next = $("#bsNext"), back = $("#bsBack");
+  back.style.visibility = ["route", "name", "working"].includes(BS.step) ? "hidden" : "visible";
+  next.style.display = ""; next.disabled = false; next.style.opacity = 1; next.textContent = "Next";
+  $("#bsTitle").textContent = BS.isNew ? "Add a brand" : "Set up this brand's look";
+  if (BS.step === "name") {
+    body.innerHTML = `<h3>What's the brand called?</h3><p class="sub">Your own name, your business, or a client you make content for. Your other brands stay exactly as they are.</p>
+      <input type="text" id="bsName" placeholder="e.g. Sunny Bakery" value="${esc(BS.name || "")}">`;
+    next.onclick = async () => { BS.name = $("#bsName").value.trim(); if (!BS.name) return;
+      const r = await api("/api/brands/new", { name: BS.name }); if (r.error) return toast(r.error); BS.step = "route"; drawSetup(); };
+    return;
+  }
+  if (BS.step === "route") {
+    body.innerHTML = `<h3>How shall we make ${esc(BS.name || "this brand")}'s look?</h3><p class="sub">Pick whatever is easiest. You'll see your look before anything is saved, and you can change it any time.</p>
+      <div class="routes">${BR.routes.map(r => `<button class="opt ${BS.route === r.id ? "on" : ""}" data-route="${r.id}"><b>${ROUTE_IC[r.id] || ""} ${esc(r.title)}</b><span>${esc(r.about)}</span><span style="display:block;margin-top:6px;font-weight:700">${esc(r.time)}</span></button>`).join("")}</div>`;
+    body.querySelectorAll("[data-route]").forEach(b => b.onclick = () => { BS.route = b.dataset.route; BS.value = null; BS.step = "input"; drawSetup(); });
+    next.style.display = "none"; back.onclick = () => { BS.step = "name"; drawSetup(); }; return;
+  }
+  back.onclick = () => { BS.step = "route"; drawSetup(); };
+  if (BS.step === "input") {
+    const guide = `<ol class="steps">${(BR.guides[BS.route] || []).map(x => `<li>${esc(x)}</li>`).join("")}</ol>`;
+    let h = "";
+    if (BS.route === "design") {
+      DESIGNS = DESIGNS || await api("/api/designs");
+      h = `<h3>Pick a design</h3>${guide}<div class="designs">${DESIGNS.map(d => `<button class="design ${BS.value === d.name ? "on" : ""}" data-v="${d.name}"><img loading="lazy" src="${d.preview}" alt="" onerror="this.style.display='none'"><div class="dd"><b>${esc(d.title)}</b><span>${esc(d.about)}</span><div class="sw2">${["accent", "background", "text"].map(k => `<i style="background:${d.colors[k]}"></i>`).join("")}</div></div></button>`).join("")}</div>
+        <label class="f">Your own accent colour (optional)</label><input type="color" id="bsAcc" value="${BS.acc || "#E4572E"}"> <label><input type="checkbox" id="bsAccOn" ${BS.accOn ? "checked" : ""}> use my colour instead</label>
+        <p class="note">Designs from HyperFrames by HeyGen (open source). <a href="https://www.hyperframes.dev" target="_blank" rel="noopener">See them all on hyperframes.dev ↗</a></p>`;
+    } else if (BS.route === "website") {
+      h = `<h3>Your website</h3>${guide}<input type="text" id="bsVal" placeholder="www.yourbusiness.co.za" value="${esc(BS.value || "")}">`;
+    } else if (BS.route === "vibe") {
+      const sel = BS.vibes || [];
+      h = `<h3>How should it feel?</h3>${guide}<div class="pills">${BR.vibes.map(v => `<button class="pill ${sel.includes(v) ? "on" : ""}" data-vibe="${v}">${v}</button>`).join("")}</div>`;
+    } else if (BS.route === "video") {
+      const vids = O.inbox.filter(f => /\.(mp4|mov|m4v)$/i.test(f));
+      h = `<h3>Pick a video</h3>${guide}${vids.length ? `<div class="pills">${vids.map(f => `<button class="pill ${BS.value === f ? "on" : ""}" data-v="${esc(f)}">${esc(f.split("/").pop())}</button>`).join("")}</div>` : ""}
+        <div class="drop" id="bsDrop">${BS.value && !vids.includes(BS.value) ? "✅ " + esc(BS.value) : "Or drop a video here / <u>choose a file</u>"}<input type="file" id="bsFile" accept="video/*" hidden></div>`;
+    } else {
+      const acc = BS.route === "image" ? "image/*" : ".md,.txt,.css,.json,.pdf,.png,.jpg,.jpeg";
+      h = `<h3>${BS.route === "image" ? "Your logo or a photo" : "Your design file"}</h3>${guide}
+        <div class="drop" id="bsDrop">${BS.value ? "✅ " + esc(BS.value.split("/").pop()) : "Drop the file here / <u>choose a file</u>"}<input type="file" id="bsFile" accept="${acc}" hidden></div>`;
+    }
+    body.innerHTML = h;
+    body.querySelectorAll(".design[data-v], .pill[data-v]").forEach(b => b.onclick = () => { BS.value = b.dataset.v; keepAcc(); drawSetup(); });
+    body.querySelectorAll("[data-vibe]").forEach(b => b.onclick = () => { const v = b.dataset.vibe; BS.vibes = BS.vibes || [];
+      BS.vibes = BS.vibes.includes(v) ? BS.vibes.filter(x => x !== v) : [...BS.vibes, v].slice(-3); BS.value = BS.vibes.join(" "); drawSetup(); });
+    const drop = $("#bsDrop"), fin = $("#bsFile");
+    if (drop) { drop.onclick = () => fin.click(); const go = async f => { drop.innerHTML = "Uploading…"; BS.value = (await upload(f)).file; drawSetup(); };
+      fin.onchange = () => go(fin.files[0]); drop.ondragover = e => { e.preventDefault(); drop.classList.add("hover"); };
+      drop.ondragleave = () => drop.classList.remove("hover"); drop.ondrop = e => { e.preventDefault(); go(e.dataTransfer.files[0]); }; }
+    next.textContent = "Show me my looks ✨";
+    next.onclick = async () => { keepAcc(); if ($("#bsVal")) BS.value = $("#bsVal").value.trim(); if (!BS.value) return toast("Pick or add something first");
+      const overrides = BS.route === "design" && BS.accOn ? { accent: BS.acc } : null;
+      await api("/api/brand-setup", { route: BS.route, value: BS.value, overrides }); BS.step = "working"; drawSetup(); };
+    return;
+  }
+  if (BS.step === "working") {
+    next.style.display = "none";
+    body.innerHTML = `<h3>Making your looks…</h3><p class="sub">Reading colours and fonts, then drawing each look on a reel. Usually under a minute.</p><div class="bar"><i style="width:60%"></i></div>`;
+    clearInterval(bsPoll);
+    bsPoll = setInterval(async () => { const r = await api("/api/brands"); const j = r.job || {};
+      if (j.state === "looks") { clearInterval(bsPoll); BS.looks = j.looks; BS.t = j.t; BS.step = "looks"; drawSetup(); }
+      if (j.state === "error") { clearInterval(bsPoll); body.innerHTML = `<h3>That didn't work</h3><p class="sub">${esc(j.error)}</p><p class="note">Try another way, or tell Claude what happened and it will sort it out.</p>`; back.style.visibility = "visible"; } }, 1200);
+    return;
+  }
+  if (BS.step === "looks") {
+    next.style.display = "none";
+    body.innerHTML = `<h3>Tap the look you like</h3><p class="sub">Shown the way it will look in your reels.</p><div class="lookpick">${BS.looks.map(l => `<figure><img src="/api/look?i=${l.i}&t=${BS.t}" alt="Look ${l.i}"><figcaption><b>${l.i}. ${esc(l.feel)}</b>
+      <button class="cta" data-pick="${l.i}">Use this look</button></figcaption>${(l.notes || []).map(n => `<p class="note">${esc(n)}</p>`).join("")}</figure>`).join("")}</div>`;
+    body.querySelectorAll("[data-pick]").forEach(b => b.onclick = async () => { b.textContent = "Saving…"; await api("/api/brand-pick", { i: +b.dataset.pick });
+      $("#bs").close(); toast("Your look is saved ✨"); load(); });
+  }
+}
+function keepAcc() { if ($("#bsAcc")) { BS.acc = $("#bsAcc").value; BS.accOn = $("#bsAccOn").checked; } }
+
+// ------------------------------------------------------------ prompts
+let PR = null;
+async function drawPrompts() {
+  PR = PR || await api("/api/prompts");
+  $("#promptsBox").innerHTML = PR.map(g => `<h3>${g.icon} ${esc(g.group)}</h3><div class="pcards">${g.items.map(it => `<div class="pcard"><b>${esc(it.title)}</b><p>“${esc(it.say)}”</p><button class="ghost" data-say="${esc(it.say)}">Copy</button></div>`).join("")}</div>`).join("");
+  $("#promptsBox").querySelectorAll("[data-say]").forEach(b => b.onclick = () => copyText(b.dataset.say));
 }
 
 // ------------------------------------------------------------ wizard
@@ -361,12 +516,19 @@ const IDEAS = [["tips", "Tips / list", "\"3 ways to…\""], ["story", "Story tim
 const VIBES = ["calm", "cosy", "energetic", "funny", "luxe", "bold", "dreamy", "clean"];
 const vidFile = () => B.file && /\.(mp4|mov|m4v)$/i.test(B.file) ? B.file : "";
 const STEPS = [
-  { id: "format", show: () => true, ok: () => !!B.format, html: () => `<h3>What are we making?</h3><p class="sub">Choose the kind of reel.</p>
+  { id: "format", show: () => true, ok: () => !!B.format, html: () => `<h3>What are we making?</h3><p class="sub">Choose the kind of reel.${BR && BR.brands.find(b => b.active) ? ` For <b>${esc(BR.brands.find(b => b.active).label)}</b> (switch brand at the top).` : ""}</p>
       <div class="opts">${[["talking-head", "🎙️ Talk to camera", "you on camera"], ["voiceover", "🎬 Clips + voice", "your voice over b-roll"], ["faceless", "✍️ Text & photos", "no camera needed"], ["batch", "🗂️ A batch", "many clips at once"]]
       .map(([v, a, b]) => `<button class="opt ${B.format === v ? "on" : ""}" data-set="format" data-v="${v}"><b>${a}</b><span>${b}</span></button>`).join("")}</div>` },
   { id: "video", show: () => B.format !== "faceless", ok: () => !!(file || B.file), html: () => `<h3>Add your video</h3><p class="sub">Drop it here or pick one from your inbox. Messy takes are fine: pauses and retakes get cut.</p>
       <div class="drop" id="drop">${file ? `✅ <b>${esc(file.name)}</b> (${(file.size / 1e6).toFixed(0)} MB)` : B.file ? `✅ <b>${esc(B.file)}</b>` : "Drag your video here or <u>choose a file</u>"}<input type="file" id="fileIn" accept="video/*" hidden></div>
       ${O.inbox.filter(f => /\.(mp4|mov|m4v)$/i.test(f)).length ? `<label class="f">Or from your inbox</label><div class="pills">${O.inbox.filter(f => /\.(mp4|mov|m4v)$/i.test(f)).map(f => `<button class="pill ${B.file === f ? "on" : ""}" data-set="file" data-v="${esc(f)}">${esc(f.split("/").pop())}</button>`).join("")}</div>` : ""}` },
+  { id: "extras", show: () => B.format === "talking-head", ok: () => !!B.extras, html: () => `<h3>What should I do with it?</h3>
+      <p class="sub">You can change your mind after you see it.</p>
+      <div class="opts">${[["just-edit", "✂️ Just edit it", "cut the pauses, captions, a few touches in your brand"], ["broll", "🎞️ Add b-roll", "extra clips shown while you talk"],
+        ["full", "✨ Full designed reel", "b-roll, graphics and effects where they help"]].map(([v, a, b]) => `<button class="opt ${B.extras === v ? "on" : ""}" data-set="extras" data-v="${v}"><b>${a}</b><span>${b}</span></button>`).join("")}</div>
+      <p class="note"><b>What's b-roll?</b> Short clips shown over your voice while you keep talking: close-ups of the product, your hands at work, the place you're in. It makes talking videos much easier to watch.</p>
+      ${["broll", "full"].includes(B.extras) ? `<label class="f">Where should the b-roll come from?</label><div class="pills">${[["inbox", "Clips I've added to my inbox"], ["pick", "Pick the best moments for me"], ["film", "Tell me what to film"]].map(([v, a]) => `<button class="pill ${B.brollFrom === v ? "on" : ""}" data-set="brollFrom" data-v="${v}">${a}</button>`).join("")}</div>
+        <label class="f">How should the b-roll look?</label><div class="pills">${[["as is", "As filmed"], ["same", "Same as the rest"], ["black and white", "Black & white"], ["film", "Old film"], ["warm", "Warm"], ["soft", "Soft"], ["vivid", "Vivid"]].map(([v, a]) => `<button class="pill ${(B.brollLook || "same") === v ? "on" : ""}" data-set="brollLook" data-v="${v}">${a}</button>`).join("")}</div>` : ""}` },
   { id: "script", show: () => B.format === "faceless", ok: () => (B.script || "").trim().length > 3 || !!B.template, html: () => `<h3>Your words${B.template ? " (optional)" : ""}</h3><p class="sub">One line = one screen. Claude can polish them. Add photos/clips to your inbox to use them.</p>
       <textarea id="script" rows="7" placeholder="Stop editing for hours&#10;Your coffee deserves better&#10;Here's what I do instead…">${esc(B.script || "")}</textarea>` },
   { id: "idea", show: () => !B.template, ok: () => !!B.idea, html: () => `<h3>What's it about?</h3><p class="sub">This decides how it's edited: pacing, titles, stickers. No editing words needed.</p>

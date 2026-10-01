@@ -4,7 +4,7 @@
 
 Runs entirely on the user's computer. Nothing is uploaded anywhere.
 """
-import io, json, os, re, threading, traceback, urllib.parse
+import time, io, json, os, re, threading, traceback, urllib.parse
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from .. import brand, layout, music, packs, project, render, roughcut, stickers, titles
 
@@ -131,6 +131,34 @@ class Handler(SimpleHTTPRequestHandler):
                     os.makedirs(os.path.dirname(out), exist_ok=True)
                     brand.preview(packs.load(), out)
                 return self._file(out, "image/jpeg")
+            if u.path == "/api/brands":
+                from .. import brands as brs, brandsetup
+                rows = []
+                for sl, label, on in brs.listing():
+                    pk = brs.pack_for(sl) if (on and packs.has_brand()) or not on else None
+                    rows.append({"slug": sl, "label": label, "active": on,
+                                 "ready": bool(pk) and (not on or packs.has_brand()),
+                                 "colors": (pk or {}).get("colors", {})})
+                return self._json({"brands": rows, "routes": brandsetup.ROUTES, "guides": brandsetup.GUIDES,
+                                   "vibes": brandsetup.VIBE_WORDS, "job": JOBS.get("_brand")})
+            if u.path == "/api/designs":
+                from .. import brandsetup
+                return self._json(brandsetup.designs())
+            if u.path == "/api/look":
+                n = int(q.get("i", ["1"])[0])
+                return self._file(os.path.join(project.ROOT, "brand", "previews", f"look-{n}.jpg"), "image/jpeg")
+            if u.path == "/api/prompts":
+                from .. import prompts
+                return self._json(prompts.all_prompts())
+            if u.path == "/library":                     # the effects library page, fresh every time
+                from ..library_page import build
+                return self._file(build(open_it=False), "text/html")
+            if u.path.startswith(("/library/sfx/", "/brand/sounds/")):   # sounds the library page plays
+                rel = os.path.normpath(urllib.parse.unquote(u.path.lstrip("/")))
+                full = os.path.join(project.ROOT, rel)
+                if not rel.startswith(("library", "brand")) or ".." in rel or not full.endswith(".wav"):
+                    return self.send_error(404)
+                return self._file(full, "audio/wav")
             if u.path == "/review":
                 return self._file(os.path.join(STATIC, "review.html"), "text/html")
             if u.path == "/api/projects":
@@ -237,6 +265,48 @@ class Handler(SimpleHTTPRequestHandler):
                 moods = [m.strip().lower() for m in str(d.get("mood", "")).split(",") if m.strip()]
                 return self._json({"ok": True, "sound": trends.add(d["text"], moods, d.get("tempo"),
                                                                    bool(d.get("business")), d.get("link"))})
+            if u.path == "/api/brands/new":
+                from .. import brands as brs
+                d = self._body()
+                return self._json({"ok": True, "slug": brs.new(d.get("name") or "My brand")})
+            if u.path == "/api/brands/use":
+                from .. import brands as brs
+                d = self._body()
+                return self._json({"ok": True, "slug": brs.use(d.get("slug"))})
+            if u.path == "/api/brand-setup":
+                from .. import brandsetup
+                d = self._body()
+                value = d.get("value")
+                if d.get("route") in ("image", "file", "video") and value and not os.path.isabs(value):
+                    value = os.path.join(project.ROOT, value)
+                pending = os.path.join(project.ROOT, "brand", "brand-name.json")
+                name = d.get("name") or (json.load(open(pending, encoding="utf-8")).get("label")
+                                         if os.path.exists(pending) else None) or \
+                    (packs.load().get("label") if packs.has_brand() else "My brand")
+
+                def bjob():
+                    JOBS["_brand"] = {"state": "working", "route": d.get("route")}
+                    try:
+                        _, looks = brandsetup.run(d.get("route"), value, name, overrides=d.get("overrides"))
+                        JOBS["_brand"] = {"state": "looks", "looks": [
+                            {"i": i, "feel": lk["feel"], "colors": lk["pack"]["colors"],
+                             "notes": lk.get("notes", [])} for i, lk in enumerate(looks, 1)], "t": time.time()}
+                    except Exception as e:
+                        JOBS["_brand"] = {"state": "error", "error": str(e)[-400:]}
+                threading.Thread(target=bjob, daemon=True).start()
+                return self._json({"ok": True})
+            if u.path == "/api/brand-pick":
+                from .. import autolook
+                d = self._body()
+                pack = autolook.use(int(d.get("i", 1)), d.get("name"))
+                out = os.path.join(project.ROOT, "brand", "previews", "brand.jpg")
+                os.makedirs(os.path.dirname(out), exist_ok=True)
+                try:
+                    brand.preview(packs.load(), out)
+                except Exception:
+                    pass
+                JOBS.pop("_brand", None)
+                return self._json({"ok": True, "label": pack.get("label")})
             if u.path == "/api/new":
                 data = self._body()
                 src = data.get("file")
@@ -311,7 +381,8 @@ def overview():
                       "has_cover": os.path.exists(project.path(slug, "renders", "cover.jpg")),
                       "has_final": os.path.exists(project.path(slug, "renders", "final.mp4")),
                       "has_nomusic": os.path.exists(project.path(slug, "renders", "final-for-trending-sound.mp4")),
-                      "brief": project.load(slug, "brief.json") or {}, "job": JOBS.get(slug)})
+                      "brief": project.load(slug, "brief.json") or {}, "job": JOBS.get(slug),
+                      "brand": meta.get("brand")})
     b = packs.load() if packs.has_brand() else None
     return {"projects": items,
             "brand": ({"label": b.get("label"), "vibe": b.get("vibe"), "colors": b["colors"],

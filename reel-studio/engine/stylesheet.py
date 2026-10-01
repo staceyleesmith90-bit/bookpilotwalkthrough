@@ -45,11 +45,72 @@ def _flatten(obj, prefix=""):
         yield f"{prefix}: {obj}"
 
 
+def _lum(h):
+    r, g, b = brand.rgb_(h)
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255
+
+
+def _sat(h):
+    r, g, b = [x / 255 for x in brand.rgb_(h)]
+    return (max(r, g, b) - min(r, g, b)) / max(max(r, g, b), 1e-6)
+
+
+def read_frame(txt):
+    """A HyperFrames FRAME.md / design-system front matter: a `colors:` block and a `typography:` block
+    of `role: { fontFamily: "X", cqw: N … }` lines. -> spec, or None when the text isn't one."""
+    if not re.search(r"^colors:\s*$", txt, re.M) or "fontFamily" not in txt:
+        return None
+    cols, block = [], None
+    fams = []                                                 # (role, family, size)
+    for line in txt.splitlines():
+        if re.match(r"^\S", line):
+            block = line.split(":")[0].strip()
+            continue
+        if block == "colors":
+            m = re.match(r"\s+([\w-]+):\s*[\"']?(#[0-9a-fA-F]{3,6})\b", line)
+            if m:
+                cols.append((m.group(1).lower(), _hex6(m.group(2))))
+        elif block == "typography":
+            m = re.match(r"\s+([\w-]+):\s*\{.*?fontFamily:\s*[\"']([^\"']+)[\"'](.*)", line)
+            if m:
+                size = re.search(r"(?:cqw|px):\s*([\d.]+)", m.group(3))
+                fams.append((m.group(1).lower(), m.group(2), float(size.group(1)) if size else 0))
+    if not cols:
+        return None
+    hexes = [h for _, h in cols]
+    text = min(hexes, key=_lum)
+    lights = [h for h in hexes if _lum(h) > 0.8]
+    bg = next((h for h in lights if h != "#FFFFFF"), lights[0] if lights else "#FFFFFF")
+    named = [h for n, h in cols if re.search(r"accent|primary|brand|pop|highlight", n)
+             and h not in (text, bg) and _lum(h) < 0.85]
+    vivid = [h for h in hexes if _sat(h) > 0.35 and 0.12 < _lum(h) < 0.9 and h not in (text, bg)]
+    accent = (named + vivid + [h for h in hexes if h not in (text, bg)] + ["#E4572E"])[0]
+    fonts = {}
+    disp = [f for f in fams if re.search(r"hero|display|headline|title|jumbo|poster", f[0])]
+    if disp:
+        fonts["main"] = max(disp, key=lambda f: f[2])[1]
+    body = [f for f in fams if f[0].startswith("body")]
+    if body:
+        fonts["caption"] = body[0][1]
+    acc = [f for f in fams if re.search(r"script|hand|accent|quote|italic|signature", f[0])
+           and f[1] not in fonts.values()]
+    if acc:
+        fonts["accent"] = acc[0][1]
+    if fams:
+        fonts.setdefault("main", fams[0][1])
+        fonts.setdefault("caption", fonts["main"])
+    return {"colors": {"background": bg, "text": text, "accent": accent}, "fonts": fonts, "found": hexes}
+
+
 def read(path_or_text):
     """-> {"colors": {background,text,accent}, "fonts": {main,caption,accent}, "found": [...]}"""
     txt = path_or_text
     if os.path.exists(str(path_or_text)):
         txt = open(path_or_text, encoding="utf-8", errors="ignore").read()
+    fr = read_frame(txt)
+    if fr:
+        return fr
+    if True:
         if path_or_text.lower().endswith(".json"):
             try:
                 txt = "\n".join(_flatten(json.loads(txt)))

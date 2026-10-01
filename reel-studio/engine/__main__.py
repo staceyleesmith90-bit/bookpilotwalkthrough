@@ -40,6 +40,8 @@
   python -m engine font-use <font|auto> --role R  e.g. font-use "Satisfy" --role sticker (auto = brand match)
   python -m engine brands                       the brands you make content for (one is in use)
   python -m engine brand-new "<name>" | brand-use "<name>" | brand-delete "<name>"
+  python -m engine brand-setup <route> "<value>" [--name "<brand>"]  route: design|file|website|image|video|vibe
+  python -m engine designs                      the ready-made designs (HyperFrames presets) to pick from
   python -m engine look-from-video <project|video>  3 looks made from the colours in the video
   python -m engine look-use <1|2|3> [--name "<brand>"]  use one of those looks as the brand
   python -m engine library                      the effects library page (see, hear, copy what to say)
@@ -330,6 +332,18 @@ def main(argv=None):
     elif c == "brand-delete":
         from . import brands
         print("Deleted:", brands.delete(a.arg or a.name))
+    elif c == "designs":
+        from .brandsetup import designs
+        for d in designs():
+            c_ = d["colors"]
+            print(f"  {d['name']:18s} {d['title']:20s} {d['about']}  [{c_.get('accent')} on {c_.get('background')}]")
+    elif c == "brand-setup":
+        from . import brandsetup
+        route, value = a.arg, a.options
+        sheet, looks = brandsetup.run(route, value, a.name or "My brand")
+        for i, lk in enumerate(looks, 1):
+            print(f"  {i}. {lk['feel']}: accent {lk['pack']['colors']['pop']}" + "".join("  • " + n for n in lk.get("notes", [])))
+        print("Looks:", sheet, "\nSave one with: python -m engine look-use <number>")
     elif c == "look-from-video":
         from . import autolook
         src = a.arg if os.path.isfile(a.arg or "") else project.source_of(a.arg)

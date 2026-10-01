@@ -54,9 +54,21 @@ font once in CapCut so CapCut knows it.
 from their video: `python -m engine look-from-video <project>` → show `brand/previews/looks.jpg`
 → they tap 1, 2 or 3 → `python -m engine look-use N --name "<brand name>"`. Offer the full setup later.
 
+**H. "Show me some designs"** → 13 ready-made professional designs (HyperFrames frame presets, open
+source, bundled): `python -m engine designs` lists them. Offer 3–4 that fit what they told you as tap
+answers, then `python -m engine brand-setup design "<name>" --name "<brand>"` → show `looks.jpg` → `look-use N`.
+Their own accent colour: in the Studio (Brands → Add a brand → Pick a ready-made design → "use my colour").
+Guiding them to HyperFrames for more: hyperframes.dev → Design → pick one, change its colours, download its
+FRAME.md (or DESIGN.md) → drop it in the inbox → `brand-setup file inbox/<file>`.
+
+**The easiest way for most people is the Studio app**: Brands → *Add a brand* walks through every route
+above with buttons (name → how to make the look → see the looks on a reel → tap one). Point them there.
+Same routes from the chat: `python -m engine brand-setup <design|file|website|image|video|vibe> "<value>"`.
+
 **Several brands** (content creators, agencies, influencers with brand deals): each brand is set up once
-(`brand-new "<name>"`, then any route above). `brands` lists them; `brand-use "<name>"` switches; each
-keeps its own colours, fonts, logo, sounds, rules and voice. Projects remember their brand.
+(`brand-new "<name>"`, then any route above). `brands` lists them; `brand-use "<name>"` switches (also the
+brand menu at the top of the Studio); each keeps its own colours, fonts, logo, sounds, rules and voice.
+Projects remember their brand. One person with one brand never has to think about this.
 
 ## Step 2 — The 6 questions (skip any already answered by the route)
 1. **Vibe** — three words for how your content should feel.
