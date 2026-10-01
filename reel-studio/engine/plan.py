@@ -94,6 +94,7 @@ def _box(cx, cy, w, h):
     return (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
 
 
+SIZE_LABEL = {"s": "Small", "m": "Medium", "l": "Large", "xl": "Extra large", "xxl": "XXL"}
 SIZE_WORDS = {"s": ["small"], "m": ["medium"], "l": ["large"], "xl": ["extra", "xl"], "xxl": ["xxl", "double"]}
 
 
@@ -321,12 +322,13 @@ def to_timeline(plan, rc=None, source=None):
                 # CapCut way: each part pops in as a clean label the moment it's said, stacked
                 parts = _takeover_parts(arg or text)
                 times = _spoken_times(parts, ws, a, b_end)
+                parts = [SIZE_LABEL.get(p.lower(), p) for p in parts]      # show the word she says, not a code
                 n = len(parts)
                 y0 = 760 - (n - 1) * 75
                 for k, (part, t_in) in enumerate(zip(parts, times)):
                     last = k == n - 1
                     it = {"id": _id("take"), "type": "badge", "shape": "label", "text": part,
-                          "label_style": "pop" if last and n > 1 else "label", "px": 74 if n > 1 else 84,
+                          "label_style": "pop" if last and n > 1 else "label", "px": 84 if n > 1 else 96,
                           "start": t_in, "end": b_end, "x": W / 2, "y": y0 + k * 150, "anim": "pop",
                           "rotate": 0, "z": 12, "role": "takeover", "hide_captions": True}
                     items.append(it)
@@ -501,7 +503,7 @@ def to_timeline(plan, rc=None, source=None):
                 if kind == "badge":
                     it.update(type="badge", text=arg, shape=badge_shape)
                     if badge_shape == "label":
-                        it.update(rotate=[-3, 3][bi % 2], float=False, px=64)
+                        it.update(rotate=[-3, 3][bi % 2], float=False, px=74)
                 elif sticker_style and not name.startswith(("emoji:", "3d:", "anim:")) and \
                         (sticker_style == "glass" or not name.startswith(("stamp:", "custom:"))):
                     it["style"] = sticker_style               # one consistent sticker look for this reel
@@ -532,7 +534,7 @@ def to_timeline(plan, rc=None, source=None):
                 it = {"id": _id("cta"), "type": "badge", "text": arg or "Follow for more",
                       "shape": badge_shape if badge_shape in ("glass", "label") else "pill",
                       "size": 420 if badge_shape == "glass" else 760, "colour": "pop", "start": a, "end": b_end,
-                      "anim": "slide", "z": 40, "px": 58, "label_style": "pop"}
+                      "anim": "slide", "z": 40, "px": 66, "label_style": "pop"}
                 from .render import item_image
                 img = item_image(it, pack)
                 it["x"], it["y"], r, it["scale"] = _spot(img.size, taken, (W / 2, 1060 if on_video else 1200))
