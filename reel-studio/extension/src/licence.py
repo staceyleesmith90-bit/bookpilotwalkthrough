@@ -29,11 +29,18 @@ def status(home, key=None, now=None):
     """-> (ok: bool, message: str). Never raises."""
     key = (key if key is not None else os.environ.get("REEL_LICENSE_KEY", "")).strip()
     now = now or time.time()
-    if not key or key.startswith("${"):
+    if (not key or key.startswith("${")) and not os.environ.get("REEL_TESTER_UNTIL"):
         return False, ("No licence key yet. Open Claude → Settings → Extensions → Reel Studio and paste "
                        "the key from your Reel Studio account.")
     if os.environ.get("REEL_DEV") == "1" and key == "DEV":
         return True, "Developer mode."
+    until = os.environ.get("REEL_TESTER_UNTIL", "")         # private tester builds only (never sold)
+    if until and not until.startswith("${"):
+        try:
+            if now < time.mktime(time.strptime(until, "%Y-%m-%d")):
+                return True, f"Tester build — works until {until}."
+        except ValueError:
+            pass
     cache = {}
     try:
         cache = json.load(open(_cache_path(home), encoding="utf-8"))

@@ -41,9 +41,15 @@ def main():
     version = open(os.path.join(ROOT, "VERSION"), encoding="utf-8").read().strip()
     man = json.load(open(os.path.join(EXT, "manifest.json"), encoding="utf-8"))
     man["version"] = version
+    tester = "--tester-until" in sys.argv                  # private tester build: no key needed until a date
+    if tester:
+        until = sys.argv[sys.argv.index("--tester-until") + 1]
+        man["server"]["mcp_config"]["env"]["REEL_TESTER_UNTIL"] = until
+        man["user_config"]["licence_key"]["required"] = False
+        man["display_name"] += " (tester)"
     out_dir = os.path.join(ROOT, "dist")
     os.makedirs(out_dir, exist_ok=True)
-    out = os.path.join(out_dir, f"reel-studio-{version}.mcpb")
+    out = os.path.join(out_dir, f"reel-studio-{version}" + ("-tester" if tester else "") + ".mcpb")
     icon = os.path.join(EXT, "icon.png")
     if not os.path.exists(icon):
         make_icon(icon)
