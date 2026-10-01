@@ -37,6 +37,51 @@ Default is the **free built-in composer** (`python -m engine music <p>`): offlin
 royalty-free, from the brief's mood/genre/tempo/energy. `--eleven` uses ElevenLabs (paid,
 their key). Or their own track. Set `"music": {"file": ..., "gain": 0.18}` in the plan.
 
+## Never make them prompt (the golden rule)
+They may never have edited a video. Every question you ask comes with 2–4 short answers they can
+tap (use your multiple-choice question tool when you have one; otherwise a numbered list they answer
+with a number), plus "something else". Explain any editing word in one plain line the first time.
+After showing a version, always end with change buttons: **Bigger hook · Fewer extras · Calmer
+sounds · Move text off my face · Different colours · Tighter cut · Looks great**. Watch their footage
+(and any link) yourself and SUGGEST — don't wait for them to know what to ask for.
+
+## The start questions (one at a time, tap answers)
+1. **Which brand is this for?** (only if `python -m engine brands` lists more than one) → `brand-use`.
+   "A new brand / client" → `brand-new "<name>"` (their other brands stay as they are).
+   No brand at all → don't stop: after intake run `python -m engine look-from-video <project>`, show
+   `brand/previews/looks.jpg` (three looks drawn on THEIR video) and let them tap 1/2/3 → `look-use N`.
+   Hands-off → use look 1. They can set a real brand up later (design file, Canva, website, logo).
+2. **What should I do with this video?**
+   - *Just edit it* — tidy the cut, captions, a few on-brand touches. Nothing added.
+   - *Add b-roll* — "b-roll is extra footage shown over your voice: close-ups of the product, your
+     hands, the place — it makes talking videos far more watchable." Then: *use clips I'll add* /
+     *pick from my clips folder* / *suggest what to film*.
+   - *Make it a full designed reel* — b-roll + graphics + effects where they help.
+   - *Voiceover over clips* (no talking head) · *Text-only / animated* reel.
+3. If b-roll: **How should the b-roll look?** *As filmed · Black and white · Warm film · Soft ·
+   Vivid · Same as the rest* → plan.json `"broll_look": "black and white"` (or per clip:
+   `broll:<file>|film`).
+4. **Have a reel you love the look of?** (optional) *Paste a link · Skip* → inspiration-reels.
+5. Then the script (below), then the style plan, then **How finished?** (step 7).
+
+## The script, line by line
+After the rough cut, show the lines as a numbered list (the review page shows the same: play, remove,
+note, voice-note). Under it offer: *Keep as is · Tighten it · Make the hook stronger · Rewrite line N ·
+Remove the retakes*. Rewrites stay in their words (brand/voice.md); a rewritten line they must re-record
+is marked "🎙 record this line again".
+
+## "Make me one like this" (link first, no video yet)
+They paste a TikTok/Reel link and have nothing filmed: watch it (`watch` skill), then give a filming
+plan they can follow on their phone: *1 talking clip (what to say, ~N seconds), then N b-roll shots*
+— each shot one line ("close-up: pouring the coffee, 3 s", "hands typing, from above, 3 s"), plus
+where text, sounds and effects will go. They film, drop the clips in, you edit. Their own words and
+footage — never the creator's.
+
+## The editor is always there, and it's the last step
+When they say it looks right ("Looks great"), offer: *Post it (finished video) · Open the editor to
+move things myself · Open in CapCut*. They can open the editor at any point too (`manual-editor`),
+e.g. "it's on my face" → move it there and press Save.
+
 ## The flow (always in this order)
 
 1. **Intake.** Find the footage (chat attachment, `inbox/`, or a path). Then

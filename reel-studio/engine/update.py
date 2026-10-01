@@ -8,7 +8,7 @@ Source: a git checkout pulls; otherwise the zip at library/update.json -> "zip"
 import io, json, os, shutil, subprocess, sys, urllib.request, zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KEEP = {"brand", "projects", "inbox", "out", ".git", ".venv", "venv"}
+KEEP = {"brand", "brands", "projects", "inbox", "out", ".git", ".venv", "venv"}
 KEEP_LIB = {"emoji-cache", "models"}
 
 

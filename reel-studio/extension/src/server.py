@@ -31,7 +31,7 @@ def _home():
 
 
 HOME = _home()
-KEEP = {"brand", "projects", "inbox", "out", ".licence.json"}
+KEEP = {"brand", "brands", "projects", "inbox", "out", ".licence.json"}
 KEEP_LIB = {"emoji-cache", "models", "cache"}
 COPY = ["engine", "library", ".claude", "docs", "VERSION", "AGENTS.md", "CLAUDE.md", "requirements.txt", "scripts"]
 VIDEO_EXT = (".mp4", ".mov", ".m4v", ".avi", ".mkv", ".webm")
@@ -47,7 +47,7 @@ def _version(root):
 def ensure_home():
     """Create the Reel Studio folder and install/update the engine in it (never touching their files)."""
     os.makedirs(HOME, exist_ok=True)
-    for d in ("inbox", "projects", "brand", "out"):
+    for d in ("inbox", "projects", "brand", "brands", "out"):
         os.makedirs(os.path.join(HOME, d), exist_ok=True)
     if os.path.abspath(APP) == HOME or _version(HOME) == _version(APP) and os.path.isdir(os.path.join(HOME, "engine")):
         return

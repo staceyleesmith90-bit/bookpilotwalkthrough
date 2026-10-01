@@ -61,7 +61,8 @@ def build_base(tl, pack, out, scale=1.0, crf=18):
         else:
             inputs += ["-i", _abs(br["file"])]
         idx = len([x for x in inputs if x == "-i"]) - 1
-        fc.append(f"[{idx}:v]trim={si}:{si + d},setpts=PTS-STARTPTS+{s}/TB,{cover}[br{k}]")
+        look = grades.filter_for(br.get("look")) if br.get("look") and not grades.filter_for(br.get("look")).startswith("split") else ""
+        fc.append(f"[{idx}:v]trim={si}:{si + d},setpts=PTS-STARTPTS+{s}/TB,{cover}{',' + look if look else ''}[br{k}]")
         fc.append(f"[{v}][br{k}]overlay=eof_action=pass:enable='between(t,{s},{s + d})'[vbr{k}]")
         v = f"vbr{k}"
 

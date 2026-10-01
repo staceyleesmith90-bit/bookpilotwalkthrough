@@ -33,6 +33,12 @@ AUTO_SKIP = {"this", "here", "up", "next", "key", "yes", "no", "step", "top", "b
              "new", "easy", "works", "done", "text", "post", "like", "home", "time"}
 
 
+# plain words people tap for their b-roll -> filters (engine/grades.py)
+BROLL_LOOKS = {"black and white": "bw-classic", "bw": "bw-classic", "film": "vintage-fade",
+               "warm": "warm-film", "soft": "soft-matte", "vivid": "vivid", "moody": "moody",
+               "as is": "none", "natural": "none"}
+
+
 def _id(prefix):
     _ids[prefix] = _ids.get(prefix, 0) + 1
     return f"{prefix}{_ids[prefix]}"
@@ -522,7 +528,11 @@ def to_timeline(plan, rc=None, source=None):
                 items.append(it)
                 cues.append((it["start"], pack["sfx"]["sticker_in"], 0.55))
             elif kind == "broll":
-                broll.append({"file": arg, "start": a, "dur": round(b_end - a, 3)})
+                # broll:<file>[|<look>]  look = any filter name (bw-classic, warm-film…) or plan["broll_look"]
+                bfile, _, blook = arg.partition("|")
+                blook = (blook.strip() or plan.get("broll_look") or "").strip()
+                broll.append({"file": bfile.strip(), "start": a, "dur": round(b_end - a, 3),
+                              **({"look": BROLL_LOOKS.get(blook, blook)} if blook else {})})
                 ttype = pack.get("transition", "whip")
                 transitions.append({"t": round(a, 3), "type": ttype, "dur": 0.3})
                 cues.append((max(a - 0.1, 0), TRANSITION_SFX.get(ttype, pack["sfx"]["transition"]), 0.45))

@@ -23,3 +23,6 @@ dist/
 brand/sounds/
 brand/rules.json
 brand/effects.json
+brands/
+brand/looks.json
+brand/brand-name.json

@@ -43,7 +43,8 @@ def new(source=None, name=None):
         slug = f"{slug}-{time.strftime('%m%d%H%M')}"
     os.makedirs(path(slug, "source"), exist_ok=True)
     os.makedirs(path(slug, "renders"), exist_ok=True)
-    meta = {"slug": slug, "created": time.strftime("%Y-%m-%d %H:%M"), "source": None}
+    from .brands import active
+    meta = {"slug": slug, "created": time.strftime("%Y-%m-%d %H:%M"), "source": None, "brand": active()}
     if source:
         dst = path(slug, "source", os.path.basename(source))
         shutil.copy2(source, dst)
@@ -88,6 +89,10 @@ def build_timeline(slug):
     p = load(slug, "plan.json")
     rc = load(slug, "roughcut.json")
     src = source_of(slug)
+    from .brands import active
+    made_for = (load(slug, "project.json") or {}).get("brand")
+    if made_for and made_for != active() and p.get("pack") in (None, "brand"):
+        p = dict(p, pack="brand:" + made_for)              # a project always keeps the brand it was made for
     tl = planner.to_timeline(p, rc if src else None, os.path.relpath(src, ROOT) if src else None)
     save(slug, "timeline.json", tl)
     return tl

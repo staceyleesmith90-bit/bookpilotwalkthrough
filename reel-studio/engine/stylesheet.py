@@ -136,8 +136,9 @@ def make_pack(spec, name="My style", save=True):
     return pack, notes
 
 
-def overview(pack, out, name="your name", handle="what you do"):
-    """One sheet with every piece in the new look: hook, captions, side comment, takeover, name tag, end card."""
+def overview(pack, out, name="your name", handle="what you do", photo=None, only=None, heading=None):
+    """One sheet with every piece in the new look: hook, captions, side comment, takeover, name tag, end card.
+    photo = a frame from their own video to draw on; only = which panels; heading = a title above the row."""
     from PIL import Image, ImageDraw, ImageFont
     p = packs._resolve(json.loads(json.dumps(pack)))
     col = p["colors"]
@@ -154,18 +155,30 @@ def overview(pack, out, name="your name", handle="what you do"):
         except Exception:
             return ImageFont.load_default()
 
+    still = None
+    if photo and os.path.exists(photo):
+        from PIL import ImageOps, ImageEnhance
+        still = ImageEnhance.Brightness(ImageOps.fit(Image.open(photo).convert("RGB"), (W, H))).enhance(0.82)
+
     def panel(title, draw_fn, bg):
-        im = Image.new("RGB", (W, H), bg)
+        if only and title not in only:
+            return None
+        im = still.copy() if (bg == "photo" and still is not None) else Image.new("RGB", (W, H), "#5E646C" if bg == "photo" else bg)
         d = ImageDraw.Draw(im)
+        state["photo"] = bg == "photo"
         draw_fn(d)
         d.text((14, H - 30), title, fill="#888888", font=f("caption", 16))
         return im
 
+    state = {"photo": False}
+
     def center(d, y, text, font, fill):
         w = d.textlength(text, font=font)
+        if state["photo"]:                                # a soft shadow keeps text readable on footage
+            d.text(((W - w) / 2 + 2, y + 3), text, fill="#00000099", font=font)
         d.text(((W - w) / 2, y), text, fill=fill, font=font)
 
-    photo = "#5E646C"                 # stands in for their footage
+    photo = "photo"                   # their own footage (or grey when there is none)
     panels = [
         panel("hook headline", lambda d: (center(d, 150, "STOP THE", f("main", 52), "#FFFFFF"),
                                           center(d, 210, "SCROLL", f("main", 52), col["pop"])), photo),
@@ -184,9 +197,15 @@ def overview(pack, out, name="your name", handle="what you do"):
                                      center(d, 318, "REEL", f("main", 74), col["pop"]),
                                      center(d, 410, "and i'll send you the link", f("caption", 20), col["ink"])), col["bg"]),
     ]
-    sheet = Image.new("RGB", (W * 3 + pad * 4, H * 2 + pad * 3), "#F4F1EA")
+    panels = [x for x in panels if x is not None]
+    cols = min(3, len(panels))
+    rows = (len(panels) + cols - 1) // cols
+    top = 56 if heading else 0
+    sheet = Image.new("RGB", (W * cols + pad * (cols + 1), top + H * rows + pad * (rows + 1)), "#F4F1EA")
+    if heading:
+        ImageDraw.Draw(sheet).text((pad, 18), heading, fill="#16181D", font=f("main", 30))
     for i, im in enumerate(panels):
-        sheet.paste(im, (pad + (i % 3) * (W + pad), pad + (i // 3) * (H + pad)))
+        sheet.paste(im, (pad + (i % cols) * (W + pad), top + pad + (i // cols) * (H + pad)))
     os.makedirs(os.path.dirname(out), exist_ok=True)
     sheet.save(out, quality=92)
     return out

@@ -38,6 +38,10 @@
   python -m engine fonts                        list fonts (yours + library) and the sticker fonts in use
   python -m engine font-add <file.ttf|otf> [--role R]  use your own font (not on Google), e.g. --role sticker
   python -m engine font-use <font|auto> --role R  e.g. font-use "Satisfy" --role sticker (auto = brand match)
+  python -m engine brands                       the brands you make content for (one is in use)
+  python -m engine brand-new "<name>" | brand-use "<name>" | brand-delete "<name>"
+  python -m engine look-from-video <project|video>  3 looks made from the colours in the video
+  python -m engine look-use <1|2|3> [--name "<brand>"]  use one of those looks as the brand
   python -m engine library                      the effects library page (see, hear, copy what to say)
   python -m engine sounds-learn [<folder>] [--options capcut --name "<CapCut project>"] [--role EVENT]
                                                 learn the user's own sounds (inbox/sound-effects by default)
@@ -308,6 +312,36 @@ def main(argv=None):
     elif c == "update":
         from .update import update
         print(update())
+    elif c == "brands":
+        from . import brands
+        rows = brands.listing()
+        if not rows:
+            print("No brands yet. Set one up, or I'll make a look from your first video.")
+        for sl, label, on in rows:
+            print(("▶ " if on else "  ") + label + ("  (in use)" if on else ""))
+    elif c == "brand-new":
+        from . import brands
+        s_ = brands.new(a.arg or a.name)
+        print(f"New brand '{a.arg or a.name}' started (your other brands are kept). Next: set it up, "
+              "or make a look from a video with look-from-video.")
+    elif c == "brand-use":
+        from . import brands
+        print("Now using:", brands.use(a.arg or a.name))
+    elif c == "brand-delete":
+        from . import brands
+        print("Deleted:", brands.delete(a.arg or a.name))
+    elif c == "look-from-video":
+        from . import autolook
+        src = a.arg if os.path.isfile(a.arg or "") else project.source_of(a.arg)
+        sheet, looks = autolook.make_looks(src, a.name or "My brand")
+        for i, lk in enumerate(looks, 1):
+            c_ = lk["pack"]["colors"]
+            print(f"  {i}. {lk['feel']}: accent {c_['pop']} · full-screen {c_['bg']}")
+        print("Looks (drawn on your own video):", sheet)
+    elif c == "look-use":
+        from . import autolook
+        pack = autolook.use(a.arg or 1, a.name)
+        print(f"Saved '{pack['label']}' as your brand look.")
     elif c == "library":
         from .library_page import build
         print("Effects library:", build(open_it=not a.no_browser))

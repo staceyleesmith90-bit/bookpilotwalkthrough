@@ -88,6 +88,9 @@ def has_brand():
 def load(name=None):
     """name=None -> the user's brand if set up, else the 'bold' preset."""
     # a fresh install must never crash before onboarding: "brand" without a brand -> 'bold'
+    if isinstance(name, str) and name.startswith("brand:"):      # another brand of theirs (engine/brands.py)
+        from .brands import pack_for
+        return pack_for(name[6:])
     if name in (None, "brand") and has_brand():
         return _resolve(json.load(open(BRAND, encoding="utf-8")))
     p = presets()

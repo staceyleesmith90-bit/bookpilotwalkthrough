@@ -50,6 +50,14 @@ and run style-from on it. No connector → ask for the page exported as PNG/PDF 
 Fonts not on Google Fonts: ask for the font file (`font-add`). Remind CapCut users to pick each
 font once in CapCut so CapCut knows it.
 
+**G. "No brand / not now"** (the default for anyone in a hurry) → don't block them. Make a look
+from their video: `python -m engine look-from-video <project>` → show `brand/previews/looks.jpg`
+→ they tap 1, 2 or 3 → `python -m engine look-use N --name "<brand name>"`. Offer the full setup later.
+
+**Several brands** (content creators, agencies, influencers with brand deals): each brand is set up once
+(`brand-new "<name>"`, then any route above). `brands` lists them; `brand-use "<name>"` switches; each
+keeps its own colours, fonts, logo, sounds, rules and voice. Projects remember their brand.
+
 ## Step 2 — The 6 questions (skip any already answered by the route)
 1. **Vibe** — three words for how your content should feel.
 2. **Colours** — main brand colour(s), plus light or dark background preference.
