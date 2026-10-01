@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>__TITLE__</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
@@ -32,6 +33,10 @@ video { width: 100%; max-width: 100%; aspect-ratio: 9 / 16; background: #000; bo
 textarea { width: 100%; min-height: 76px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font: 400 14px var(--body); background: var(--bg); color: var(--fg); box-sizing: border-box; }
 .quick { display: flex; flex-wrap: wrap; gap: 6px; }
 .quick button { background: var(--chip); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; font: 500 12.5px var(--body); cursor: pointer; }
+.device { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .9rem; color: var(--muted); }
+.device button { background: var(--chip); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font: 600 13px var(--body); cursor: pointer; }
+.device button[aria-pressed="true"] { background: var(--grad); color: #fff; border-color: transparent; }
+.row2 { display: flex; gap: 8px; flex-wrap: wrap; }
 .mic { background: var(--chip); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; font: 600 14px var(--body); cursor: pointer; }
 .mic[aria-pressed="true"] { border-color: var(--pink); color: var(--pink); }
 .go { background: var(--grad); color: #fff; border: 0; border-radius: 999px; padding: 10px 18px; font: 600 14px var(--body); cursor: pointer; justify-self: start; }
@@ -67,12 +72,26 @@ details audio { width: 100%; margin-top: 10px; }
       <h1>__TITLE__<span class="ver">__VERSION__</span></h1>
       <p class="meta">__DURATION__ · tap play for sound</p>
     </div>
+    <div class="device" role="group" aria-label="Where are you watching?">
+      <span>Watching on</span>
+      <button type="button" data-dev="phone" aria-pressed="false">📱 Phone</button>
+      <button type="button" data-dev="computer" aria-pressed="false">💻 Computer</button>
+    </div>
     <video id="reel" controls playsinline preload="metadata" poster="poster.jpg">
       <source src="reel-opus.mp4" type='video/mp4; codecs="avc1.640028, opus"'>
       <source src="reel.webm" type='video/webm; codecs="vp9, opus"'>
       <source src="reel.mp4" type="video/mp4">
     </video>
     <p class="hint" id="playHelp" hidden>The video won't play in this view. <a href="reel.mp4" target="_blank" rel="noopener">Open the video on its own</a> or <a href="reel.webm" target="_blank" rel="noopener">try this version</a>.</p>
+    <div class="card phonecard" id="phoneCard" hidden>
+      <h2>No sound on your phone?</h2>
+      <p class="hint">Videos inside apps stay quiet while the <b>silent switch</b> on the side of an iPhone is on. Flip it (no orange showing), turn the volume up, and play again.</p>
+      <div class="row2">
+        <button type="button" class="mic" id="beep">🔊 Sound check</button>
+        <button type="button" class="go" id="saveBtn">Save video to my phone</button>
+      </div>
+      <p class="hint" id="phoneStatus" role="status">Saving puts it in Photos, which always plays with sound — and it's the file you post.</p>
+    </div>
     <details class="card">
       <summary>No sound?</summary>
       <p class="hint">Play the soundtrack on its own. If this plays, your speakers are fine.</p>
@@ -166,24 +185,72 @@ async function viaBlob(el, files) {
   }
   return null;
 }
-{ const help = document.getElementById("playHelp");
-  let rescuing = false;
-  const rescue = async () => {
-    if (rescuing || video.readyState > 0) return;
-    rescuing = true;
+const help = document.getElementById("playHelp");
+const MOBILE = IOS || /Android/i.test(navigator.userAgent);
+let mode = null;
+async function setMode(m) {
+  mode = m;
+  try { localStorage.setItem("reel-device", m); } catch (e) {}
+  document.querySelectorAll("[data-dev]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.dev === m)));
+  document.getElementById("phoneCard").hidden = m !== "phone";
+  video.muted = false;
+  if (m === "phone") {
+    // phones: the standard iPhone/Android file (H.264 + AAC), loaded by the page itself so in-app
+    // viewers that block direct media loading still play it
     help.hidden = false; help.textContent = "Loading the video…";
-    const order = IOS ? [["reel.mp4", "video/mp4"], ["reel-opus.mp4", "video/mp4"]]
-                      : [["reel-opus.mp4", "video/mp4"], ["reel.webm", "video/webm"], ["reel.mp4", "video/mp4"]];
-    const got = await viaBlob(video, order);
-    if (got) { help.hidden = true; return; }
-    help.textContent = "The video won't play in this view. Open this page in your browser (Share → Open in browser), or ask Claude to send the file.";
-  };
-  if (IOS) rescue();                                   // don't wait for the player to fail on iPhone
-  const srcs = video.querySelectorAll("source");
-  if (srcs.length) srcs[srcs.length - 1].addEventListener("error", rescue);
-  video.addEventListener("error", rescue);
-  setTimeout(() => { if (video.readyState === 0 && !video.played.length) rescue(); }, 6000);
-  const audio = document.querySelector("audio");
+    const got = await viaBlob(video, [["reel.mp4", "video/mp4"], ["reel-opus.mp4", "video/mp4"], ["reel.webm", "video/webm"]]);
+    help.hidden = !!got;
+    if (!got) help.textContent = "The video won't play in this view — use “Save video to my phone” below.";
+  } else {
+    help.hidden = true;
+    video.removeAttribute("src"); video.load();      // computers: let the browser pick from the sources
+    setTimeout(async () => {
+      if (mode !== "computer" || video.readyState > 0) return;
+      help.hidden = false; help.textContent = "Loading the video…";
+      const got = await viaBlob(video, [["reel-opus.mp4", "video/mp4"], ["reel.webm", "video/webm"], ["reel.mp4", "video/mp4"]]);
+      help.hidden = !!got;
+      if (!got) help.textContent = "The video won't play in this view. Try the Phone option, or ask Claude for the file.";
+    }, 5000);
+  }
+}
+document.querySelectorAll("[data-dev]").forEach(b => b.addEventListener("click", () => setMode(b.dataset.dev)));
+{ let saved = null; try { saved = localStorage.getItem("reel-device"); } catch (e) {}
+  const pref = ["phone", "computer"].includes(DATA.device) ? DATA.device : null;   // chosen at setup
+  setMode(saved || (MOBILE ? "phone" : pref || "computer")); }
+
+// sound check: a short soft tone — if you can't hear it, it's the phone's silent switch / volume
+document.getElementById("beep").addEventListener("click", async () => {
+  const st = document.getElementById("phoneStatus");
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    await ac.resume();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.value = 660; g.gain.setValueAtTime(0.0001, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.25, ac.currentTime + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.6);
+    o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + 0.65);
+    st.textContent = "Heard a beep? Sound works — play the video again. No beep? Flip the silent switch and turn the volume up.";
+  } catch (e) { st.textContent = "Sound check isn't available here — try “Save video to my phone”."; }
+});
+
+// save the real file (opens the phone's share sheet → Save Video → Photos, with sound)
+(async () => {
+  const btn = document.getElementById("saveBtn"), st = document.getElementById("phoneStatus");
+  const dl = await (window.claude?.use ? claude.use("downloads") : null);
+  if (!dl) { btn.hidden = true; return; }
+  btn.addEventListener("click", async () => {
+    btn.disabled = true; st.textContent = "Getting the video…";
+    try {
+      const res = await fetch("reel.mp4", { credentials: "include" });
+      const blob = await res.blob();
+      await dl.save({ filename: (DATA.title || "reel").replace(/[^A-Za-z0-9 _-]+/g, "").trim() + ".mp4", data: blob });
+      st.textContent = "Saved. Open it from Photos (or Files) — it plays with sound and is ready to post.";
+    } catch (e) {
+      st.textContent = e && e.code === "declined" ? "No problem — tap again whenever you want it." : "Couldn't save it here. Ask Claude to send you the file.";
+    }
+    btn.disabled = false;
+  });
+})();
+{ const audio = document.querySelector("audio");
   if (audio) {
     let tried = false;
     const fix = async () => { if (tried) return; tried = true; await viaBlob(audio, [["soundtrack.mp3", "audio/mpeg"]]); };

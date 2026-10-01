@@ -75,3 +75,9 @@ they say yes. Tell them they can change it any time ("change my brand colours").
   specific font?" only if they care (`font-use "<font>" --role sticker`).
 - One loud font only. Pair opposites (see typography doc).
 - Keep it short. If they seem tired, finish with sensible defaults and move on to editing.
+
+## Where they'll watch their edits (ask once, at the end)
+"Where will you usually watch your edits — on your phone, your computer, or both?" Save it as
+`"review_device": "phone" | "computer" | "both"` in brand/brand.json. The review page opens in that
+mode (phones get the iPhone/Android-safe video, a sound check and "Save video to my phone";
+computers get the browser player). They can switch any time with the Phone/Computer buttons.

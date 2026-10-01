@@ -20,6 +20,15 @@ def _dur(path):
     return float(out or 0)
 
 
+def review_device():
+    """Where the user watches their edits (asked once at setup): phone · computer · both."""
+    try:
+        b = json.load(open(os.path.join(HERE, "..", "brand", "brand.json"), encoding="utf-8"))
+        return b.get("review_device", "both")
+    except Exception:
+        return "both"
+
+
 def script_lines(project_dir):
     """The kept lines with where they start in the finished reel (for the line-by-line review)."""
     try:
@@ -59,7 +68,8 @@ def build(project_dir, title=None, version="v1", did=None):
     d = _dur(final)
     title = title or os.path.basename(project_dir.rstrip("/")).replace("-", " ").title()
     html = open(os.path.join(HERE, "review_page.html")).read()
-    data = json.dumps({"title": title, "version": version, "did": did or [], "lines": script_lines(project_dir)}).replace("</", "<\\/")
+    data = json.dumps({"title": title, "version": version, "did": did or [], "lines": script_lines(project_dir),
+                       "device": review_device()}).replace("</", "<\\/")
     html = (html.replace("__TITLE__", title).replace("__VERSION__", version)
             .replace("__DURATION__", f"{int(d // 60)}:{int(d % 60):02d}").replace("__DATA__", data))
     open(os.path.join(out, "index.html"), "w").write(html)
