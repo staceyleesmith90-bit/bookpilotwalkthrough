@@ -48,13 +48,21 @@ def setup_check():
         found = shutil.which(b)
         print(("✓" if found else "✗"), b, found or "(missing)")
         ok &= bool(found) or b == "yt-dlp"
-    for m in ("PIL", "resvg_py", "numpy", "faster_whisper", "mediapipe"):
+    for m in ("PIL", "resvg_py", "numpy", "faster_whisper", "mediapipe", "pycapcut", "playwright"):
         try:
             __import__(m)
             print("✓", m)
         except Exception:
             print("✗", m, "(pip install -r requirements.txt)")
             ok = False
+    try:                                   # the hidden browser that draws animation windows
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p_:
+            print("✓ browser for animation windows", p_.chromium.executable_path if os.path.exists(p_.chromium.executable_path) else "")
+            if not os.path.exists(p_.chromium.executable_path):
+                raise FileNotFoundError
+    except Exception:
+        print("• animation windows need: python -m playwright install chromium")
     print("✓ brand set up" if packs.has_brand() else "• brand not set up yet (run the onboarding)")
     from .update import check
     note = check()
@@ -285,4 +293,9 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
+    import sys as _sys
+    if os.name == "nt" and not _sys.flags.utf8_mode:
+        # Windows: run in UTF-8 mode so emoji, accents and curly quotes never crash a read or a print
+        import subprocess as _sp
+        raise SystemExit(_sp.call([_sys.executable, "-X", "utf8", "-m", "engine"] + _sys.argv[1:]))
     main()

@@ -94,6 +94,51 @@ def _box(cx, cy, w, h):
     return (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
 
 
+SIZE_WORDS = {"s": ["small"], "m": ["medium"], "l": ["large"], "xl": ["extra", "xl"], "xxl": ["xxl", "double"]}
+
+
+def _takeover_parts(txt):
+    """'M · L · XL' -> ['M', 'L', 'XL']; 'best of the best' -> ['best of', 'the best'] (short lines)."""
+    if re.search(r"\s[·|/•]\s|,", txt):
+        return [p.strip() for p in re.split(r"\s*[·|/•,]\s*", txt) if p.strip()]
+    words = txt.split()
+    if len(words) <= 2 or len(txt) <= 12:
+        return [txt]
+    n_lines = 2 if len(txt) <= 26 else 3
+    target = len(txt) / n_lines                 # balanced lines, like an editor would break them
+    lines, cur = [], ""
+    for w in words:
+        if cur and len(lines) < n_lines - 1 and len(cur) + 1 + len(w) / 2 > target:
+            lines.append(cur)
+            cur = w
+        else:
+            cur = (cur + " " + w).strip()
+    lines.append(cur)
+    return lines
+
+
+def _spoken_times(parts, ws, a, b_end):
+    """When each part is said (its first word, or the size word for S/M/L/XL); evenly spread if unsure."""
+    out, i = [], 0
+    norm = [re.sub(r"[^a-z0-9]", "", w.get("w", "").lower()) for w in (ws or [])]
+    for k, p in enumerate(parts):
+        key = re.sub(r"[^a-z0-9 ]", "", p.lower()).split()
+        cands = SIZE_WORDS.get(key[0], [key[0]]) if key else []
+        hit = next((j for j in range(i, len(norm)) if norm[j] in cands), None)
+        if hit is None:
+            out.append(None)
+        else:
+            out.append(ws[hit]["start"])
+            i = hit + 1
+    span = max(b_end - a, 0.6)
+    for k, t in enumerate(out):                 # fill gaps evenly, keep order
+        if t is None:
+            out[k] = a + 0.15 + span * 0.6 * k / max(len(out), 1)
+    for k in range(1, len(out)):
+        out[k] = max(out[k], out[k - 1] + 0.12)
+    return [round(min(t, b_end - 0.3), 3) for t in out]
+
+
 def _spot(size, taken, near, shrink=True, min_k=0.68):
     """Nearest free spot. Keeps stickers readable: first try clear of the whole face/body area,
     then allow overlapping shoulders/background (never the head), and only then shrink (to 68%
@@ -237,7 +282,8 @@ def to_timeline(plan, rc=None, source=None):
     look = plan.get("look", "clean")
     sticker_style = plan.get("sticker_style") or ("glass" if look in ("premium", "clean") else None)
     style = sticker_style or pack.get("sticker", {}).get("style", "doodle")
-    badge_shape = plan.get("badge_shape") or ("glass" if style == "glass" else "chip")
+    # clean look: badges are CapCut-style text labels (flat rounded box), not glass or stickers
+    badge_shape = plan.get("badge_shape") or ("label" if look == "clean" else "glass" if style == "glass" else "chip")
 
     for bi, (a, b_end, beat, text, ws) in enumerate(windows):
         from .styleplan import expand
@@ -271,6 +317,22 @@ def to_timeline(plan, rc=None, source=None):
                 items.append(it)
                 taken.append(r)
                 cues.append((0.0, pack["sfx"]["hook"], 0.8))
+            elif kind == "takeover" and on_video and look == "clean":
+                # CapCut way: each part pops in as a clean label the moment it's said, stacked
+                parts = _takeover_parts(arg or text)
+                times = _spoken_times(parts, ws, a, b_end)
+                n = len(parts)
+                y0 = 760 - (n - 1) * 75
+                for k, (part, t_in) in enumerate(zip(parts, times)):
+                    last = k == n - 1
+                    it = {"id": _id("take"), "type": "badge", "shape": "label", "text": part,
+                          "label_style": "pop" if last and n > 1 else "label", "px": 74 if n > 1 else 84,
+                          "start": t_in, "end": b_end, "x": W / 2, "y": y0 + k * 150, "anim": "pop",
+                          "rotate": 0, "z": 12, "role": "takeover", "hide_captions": True}
+                    items.append(it)
+                    cues.append((t_in, "pop", 0.5))
+                big_text = _box(W / 2, y0 + (n - 1) * 75, 760, n * 150)
+                taken.append(big_text)
             elif kind == "takeover":
                 txt = arg or text
                 box_h = 820 if on_video else 680
@@ -438,6 +500,8 @@ def to_timeline(plan, rc=None, source=None):
                     it["auto_pick"] = True
                 if kind == "badge":
                     it.update(type="badge", text=arg, shape=badge_shape)
+                    if badge_shape == "label":
+                        it.update(rotate=[-3, 3][bi % 2], float=False, px=64)
                 elif sticker_style and not name.startswith(("emoji:", "3d:", "anim:")) and \
                         (sticker_style == "glass" or not name.startswith(("stamp:", "custom:"))):
                     it["style"] = sticker_style               # one consistent sticker look for this reel
@@ -466,9 +530,9 @@ def to_timeline(plan, rc=None, source=None):
                 cues.append((max(a - 0.1, 0), pack["sfx"]["transition"], 0.5))
             elif kind == "cta":
                 it = {"id": _id("cta"), "type": "badge", "text": arg or "Follow for more",
-                      "shape": "glass" if badge_shape == "glass" else "pill",
+                      "shape": badge_shape if badge_shape in ("glass", "label") else "pill",
                       "size": 420 if badge_shape == "glass" else 760, "colour": "pop", "start": a, "end": b_end,
-                      "anim": "slide", "z": 40}
+                      "anim": "slide", "z": 40, "px": 58, "label_style": "pop"}
                 from .render import item_image
                 img = item_image(it, pack)
                 it["x"], it["y"], r, it["scale"] = _spot(img.size, taken, (W / 2, 1060 if on_video else 1200))

@@ -32,6 +32,8 @@ video { width: 100%; max-width: 100%; aspect-ratio: 9 / 16; background: #000; bo
 textarea { width: 100%; min-height: 76px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font: 400 14px var(--body); background: var(--bg); color: var(--fg); box-sizing: border-box; }
 .quick { display: flex; flex-wrap: wrap; gap: 6px; }
 .quick button { background: var(--chip); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; font: 500 12.5px var(--body); cursor: pointer; }
+.mic { background: var(--chip); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; font: 600 14px var(--body); cursor: pointer; }
+.mic[aria-pressed="true"] { border-color: var(--pink); color: var(--pink); }
 .go { background: var(--grad); color: #fff; border: 0; border-radius: 999px; padding: 10px 18px; font: 600 14px var(--body); cursor: pointer; justify-self: start; }
 button:focus-visible, textarea:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 .notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
@@ -65,10 +67,12 @@ details audio { width: 100%; margin-top: 10px; }
       <h1>__TITLE__<span class="ver">__VERSION__</span></h1>
       <p class="meta">__DURATION__ · tap play for sound</p>
     </div>
-    <video id="reel" controls playsinline preload="metadata">
+    <video id="reel" controls playsinline preload="metadata" poster="poster.jpg">
       <source src="reel-opus.mp4" type='video/mp4; codecs="avc1.640028, opus"'>
+      <source src="reel.webm" type='video/webm; codecs="vp9, opus"'>
       <source src="reel.mp4" type="video/mp4">
     </video>
+    <p class="hint" id="playHelp" hidden>The video won't play in this view. <a href="reel.mp4" target="_blank" rel="noopener">Open the video on its own</a> or <a href="reel.webm" target="_blank" rel="noopener">try this version</a>.</p>
     <details class="card">
       <summary>No sound?</summary>
       <p class="hint">Play the soundtrack on its own. If this plays, your speakers are fine.</p>
@@ -92,7 +96,10 @@ details audio { width: 100%; margin-top: 10px; }
       </div>
       <label for="noteText" class="hint">Your note</label>
       <textarea id="noteText" placeholder="e.g. make the title bigger, use a softer sound here"></textarea>
-      <button class="go" id="addNote" type="button">Add note</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="go" id="addNote" type="button">Add note</button>
+        <button class="mic" id="micBtn" type="button" aria-pressed="false">🎤 Speak</button>
+      </div>
       <p class="hint" id="status" role="status"></p>
     </div>
 
@@ -116,8 +123,33 @@ details audio { width: 100%; margin-top: 10px; }
 
 <script id="reel-data" type="application/json">__DATA__</script>
 <script>
+
+// Voice notes: speak instead of typing. Uses the browser's speech-to-text where it's allowed
+// (Chrome, Edge, Safari); otherwise points to the microphone key on the phone keyboard.
+function attachMic(btn, box, hint, onText) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null, base = "";
+  btn.addEventListener("click", () => {
+    if (rec) { rec.stop(); return; }
+    if (!SR) { box.focus(); if (hint) hint.textContent = "Tip: tap the 🎤 on your keyboard and just talk."; return; }
+    rec = new SR(); rec.lang = navigator.language || "en-US"; rec.interimResults = true; rec.continuous = true;
+    base = box.value ? box.value.replace(/\s*$/, " ") : "";
+    btn.textContent = "● Listening… tap to stop"; btn.setAttribute("aria-pressed", "true");
+    rec.onresult = e => { let t = ""; for (const r of e.results) t += r[0].transcript; box.value = base + t; if (onText) onText(box.value); };
+    rec.onerror = e => { if (hint) hint.textContent = e.error === "not-allowed" || e.error === "service-not-allowed"
+        ? "This view can't use the microphone. Tap the 🎤 on your keyboard instead." : "Didn't catch that — try again."; };
+    rec.onend = () => { rec = null; btn.textContent = "🎤 Speak"; btn.setAttribute("aria-pressed", "false"); };
+    try { rec.start(); } catch (e) { rec = null; box.focus(); if (hint) hint.textContent = "Tap the 🎤 on your keyboard and just talk."; }
+  });
+}
 const DATA = JSON.parse(document.getElementById("reel-data").textContent);
 const video = document.getElementById("reel");
+// if every source fails (or nothing loads in 8 s), show direct links instead of a dead player
+{ const help = () => { document.getElementById("playHelp").hidden = false; };
+  const srcs = video.querySelectorAll("source");
+  srcs[srcs.length - 1].addEventListener("error", help);
+  video.addEventListener("error", help);
+  setTimeout(() => { if (video.readyState === 0 && !video.played.length) help(); }, 8000); }
 const fmt = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
 const did = document.getElementById("did");
 (DATA.did || []).forEach(line => { const li = document.createElement("li"); li.textContent = line; did.appendChild(li); });
@@ -147,7 +179,7 @@ function renderLines() {
     mid.append(p, secs);
     const acts = document.createElement("div"); acts.className = "acts";
     const note = document.createElement("button"); note.type = "button"; note.textContent = "Note";
-    note.addEventListener("click", () => { const box = document.getElementById("noteText"); box.value = `Line ${l.n} (“${l.text.slice(0, 40)}…”): `; if (l.t != null) video.currentTime = l.t; box.focus(); });
+    note.addEventListener("click", () => { const box = document.getElementById("noteText"); box.value = `Line ${l.n} (“${l.text.slice(0, 40)}…”): `; if (l.t != null) video.currentTime = l.t; box.focus(); document.getElementById("micBtn").scrollIntoView({block: "center"}); });
     const cut = document.createElement("button"); cut.type = "button"; cut.textContent = cutLines.has(l.n) ? "Cut ✓" : "Cut";
     cut.addEventListener("click", async () => { if (!addNote || cutLines.has(l.n)) return; await addNote(`Cut line ${l.n}: “${l.text}”`, l.t ?? 0, { line: l.n, action: "cut" }); });
     acts.append(note, cut);
@@ -155,6 +187,7 @@ function renderLines() {
   });
 }
 renderLines();
+attachMic(document.getElementById("micBtn"), document.getElementById("noteText"), document.getElementById("status"));
 
 function renderNotes(list) {
   cutLines.clear(); list.forEach(n => { if (n.action === "cut" && n.line) cutLines.add(n.line); }); renderLines();

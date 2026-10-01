@@ -252,3 +252,32 @@ def photo_card(img, px=380, label=None, pack=None, rotate=0):
         card = card.rotate(rotate, expand=True, resample=Image.BICUBIC)
     out, _ = _soft_shadow(card, (0, 12), 18, 0.4, pad=36)
     return out
+
+
+def label(text, pack, px=64, style="label", max_w=900):
+    """CapCut-style text box: the look of CapCut's 'text with background' — a clean rounded box
+    hugging bold text. style: "label" (white box, near-black text), "pop" (brand colour box,
+    white text), "dark" (near-black box, white text). No glass, no gloss: flat, crisp, native."""
+    from .textfit import load_font
+    c = pack["colors"]
+    fill, ink = {"label": ("#FFFFFF", c.get("ink", "#111111")),
+                 "pop": (c.get("pop", "#1E63FF"), "#FFFFFF"),
+                 "dark": ("#111111", "#FFFFFF")}.get(style, ("#FFFFFF", "#111111"))
+    bold = os.path.join(ROOT, "library", "fonts", "Poppins-Bold.ttf")
+    f = pack["fonts"].get("caption") or pack["fonts"]["main"]
+    font_file = bold if "poppins" in os.path.basename(f["file"]).lower() else f["file"]
+    size = int(px)
+    font = load_font(font_file, size)
+    while font.getlength(text) > max_w - size and size > 24:
+        size -= 2
+        font = load_font(font_file, size)
+    asc, desc = font.getmetrics()
+    padx, pady = int(size * 0.42), int(size * 0.22)
+    w = int(font.getlength(text)) + padx * 2
+    h = asc + desc + pady * 2
+    box = Image.new("RGBA", (w, h))
+    d = ImageDraw.Draw(box)
+    d.rounded_rectangle((0, 0, w - 1, h - 1), radius=int(h * 0.28), fill=fill)
+    d.text((padx, pady - int(desc * 0.15)), text, font=font, fill=ink)
+    out, _ = _soft_shadow(box, offset=(0, 6), blur=12, alpha=0.22, pad=24)
+    return out

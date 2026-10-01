@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Review Your Cut</title>
 <style>
+.micb{margin:6px 8px 6px 0;padding:6px 12px;border-radius:999px;border:1px solid #ccd;background:#f3f4fa;cursor:pointer;font:600 13px system-ui}.micb[aria-pressed="true"]{color:#EC4899;border-color:#EC4899}.mhint{font-size:12px;color:#667}
   :root { --bg: #f6f4f0; --panel: #fff; --ink: #1d1b19; --muted: #6f6a64; --line: #e4dfd8; --accent: #2f6bff; --off: #c9c3bb; --warn: #e4572e; }
   @media (prefers-color-scheme: dark) { :root { --bg: #151413; --panel: #1f1d1b; --ink: #f2efe9; --muted: #a39d95; --line: #34302c; --off: #5a544e; } }
   * { box-sizing: border-box; }
@@ -87,11 +88,31 @@ function draw() {
   rc.lines.forEach(l => { if (state[l.id].note || state[l.id].attach) extra(l.id); });
   stats();
 }
+
+// Voice notes: speak instead of typing. Uses the browser's speech-to-text where it's allowed
+// (Chrome, Edge, Safari); otherwise points to the microphone key on the phone keyboard.
+function attachMic(btn, box, hint, onText) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null, base = "";
+  btn.addEventListener("click", () => {
+    if (rec) { rec.stop(); return; }
+    if (!SR) { box.focus(); if (hint) hint.textContent = "Tip: tap the 🎤 on your keyboard and just talk."; return; }
+    rec = new SR(); rec.lang = navigator.language || "en-US"; rec.interimResults = true; rec.continuous = true;
+    base = box.value ? box.value.replace(/\s*$/, " ") : "";
+    btn.textContent = "● Listening… tap to stop"; btn.setAttribute("aria-pressed", "true");
+    rec.onresult = e => { let t = ""; for (const r of e.results) t += r[0].transcript; box.value = base + t; if (onText) onText(box.value); };
+    rec.onerror = e => { if (hint) hint.textContent = e.error === "not-allowed" || e.error === "service-not-allowed"
+        ? "This view can't use the microphone. Tap the 🎤 on your keyboard instead." : "Didn't catch that — try again."; };
+    rec.onend = () => { rec = null; btn.textContent = "🎤 Speak"; btn.setAttribute("aria-pressed", "false"); };
+    try { rec.start(); } catch (e) { rec = null; box.focus(); if (hint) hint.textContent = "Tap the 🎤 on your keyboard and just talk."; }
+  });
+}
 function extra(id) {
   const s = state[id], x = $("#x" + id);
-  x.innerHTML = `<textarea placeholder="e.g. too big a gap here, tighten it · put my product photo here · make this a big full-screen moment">${s.note}</textarea>
+  x.innerHTML = `<button type="button" class="micb" aria-pressed="false">🎤 Speak</button><span class="mhint"></span><textarea placeholder="e.g. too big a gap here, tighten it · put my product photo here · make this a big full-screen moment">${s.note}</textarea>
     <select><option value="">📎 no attachment</option>${inbox.map(f => `<option ${s.attach === f ? "selected" : ""}>${f}</option>`).join("")}</select>`;
   x.querySelector("textarea").oninput = e => { s.note = e.target.value; };
+  attachMic(x.querySelector(".micb"), x.querySelector("textarea"), x.querySelector(".mhint"), v => { s.note = v; });
   x.querySelector("select").onchange = e => { s.attach = e.target.value || null; };
 }
 function act(id, what) {

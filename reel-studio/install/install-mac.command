@@ -13,6 +13,7 @@ PY="$(brew --prefix)/bin/python3.12"
 "$PY" -m venv .venv
 ./.venv/bin/pip install --upgrade pip
 ./.venv/bin/pip install -r requirements.txt
+./.venv/bin/python -m playwright install chromium   # draws the animation windows
 ./.venv/bin/python scripts/fetch_icons.py >/dev/null 2>&1 || true
 ./.venv/bin/python -m engine setup-check
 echo ""

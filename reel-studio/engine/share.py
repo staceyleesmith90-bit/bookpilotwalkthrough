@@ -48,6 +48,12 @@ def build(project_dir, title=None, version="v1", did=None):
                    ["-c:a", "libopus", "-b:a", "128k", "-ac", "2", "-ar", "48000", os.path.join(out, "reel-opus.mp4")], check=True)
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", final] + v +
                    ["-c:a", "aac", "-b:a", "128k", "-ac", "2", os.path.join(out, "reel.mp4")], check=True)
+    # a WebM copy (VP9 + Opus): plays in players that can't decode H.264 at all
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", final, "-vf", "scale=720:1280", "-c:v", "libvpx-vp9",
+                    "-b:v", "1300k", "-deadline", "realtime", "-cpu-used", "8", "-row-mt", "1",
+                    "-c:a", "libopus", "-b:a", "128k", os.path.join(out, "reel.webm")], check=True)
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", "1.2", "-i", final, "-frames:v", "1", "-vf", "scale=720:1280",
+                    "-q:v", "4", os.path.join(out, "poster.jpg")], check=True)
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", final, "-vn", "-b:a", "128k",
                     os.path.join(out, "soundtrack.mp3")], check=True)
     d = _dur(final)

@@ -12,7 +12,7 @@ Built from HTML in the brand's colours and fonts, drawn frame by frame in a hidd
 (Chromium via Playwright), transparent background. Frames are cached per design, so re-renders
 are instant. Our own designs — nothing copied.
 """
-import hashlib, html, json, os
+import hashlib, html, json, os, pathlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, "library", "cache", "windows")
@@ -23,7 +23,7 @@ KINDS = ("app", "chat", "checklist", "stat", "doc", "product")
 def _font_url(pack, role):
     f = pack["fonts"].get(role) or pack["fonts"]["main"]
     p = f["file"] if os.path.isabs(f["file"]) else os.path.join(ROOT, f["file"])
-    return "file://" + p.replace("\\", "/")
+    return pathlib.Path(p).resolve().as_uri()        # file:///C:/... on Windows, file:///Users/... on Mac
 
 
 PAGE = r"""<!doctype html><html><head><meta charset="utf-8"><style>
@@ -135,7 +135,7 @@ def frames(it, pack, fps=FPS):
     img = None
     if kind == "product" and len(args) > 1 and args[1]:
         p = args[1] if os.path.isabs(args[1]) else os.path.join(ROOT, args[1])
-        img = "file://" + p.replace("\\", "/") if os.path.exists(p) else None
+        img = pathlib.Path(p).resolve().as_uri() if os.path.exists(p) else None
     page = build_html(kind, args, pack, dur, img=img)
     key = hashlib.md5((page + str(fps)).encode()).hexdigest()[:16]
     folder = os.path.join(CACHE, key)
@@ -157,7 +157,7 @@ def frames(it, pack, fps=FPS):
         pg = b.new_page(viewport={"width": 1000, "height": 900})
         html_path = os.path.join(folder, "page.html")
         open(html_path, "w", encoding="utf-8").write(page)
-        pg.goto("file://" + html_path.replace("\\", "/"))
+        pg.goto(pathlib.Path(html_path).resolve().as_uri())
         pg.wait_for_timeout(250)
         for i in range(n):
             pg.evaluate(f"draw({i / fps})")

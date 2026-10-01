@@ -165,6 +165,9 @@ def item_image(it, pack):
         from .premium import callout
         return callout(it["text"], pack, it.get("sub"), it.get("length", 200), it.get("side", "right"),
                        it.get("size", 320), it.get("colour", "pop"), it.get("max_w"))
+    if t == "badge" and it.get("shape") == "label":   # CapCut-style text box (flat, crisp)
+        from .premium import label
+        return label(it["text"], pack, it.get("px", 64), it.get("label_style", "label"))
     if t == "badge":
         return stickers.badge(it["text"], pack, it.get("shape", "burst"), it.get("size", 300), it.get("colour", "pop"),
                               it.get("font"))
