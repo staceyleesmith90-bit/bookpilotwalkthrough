@@ -145,6 +145,13 @@ class Handler(SimpleHTTPRequestHandler):
                 from .. import resources, mysounds, grades
                 return self._json({"groups": resources.all_resources(), "luts": grades.my_luts(),
                                    "sounds": mysounds.index().get("sounds", [])})
+            if u.path == "/api/hero-photo":           # the home banner: their newest reel cover, or the sample photo
+                import glob as _g
+                covers = sorted(_g.glob(os.path.join(project.ROOT, "projects", "*", "renders", "cover.jpg")), key=os.path.getmtime)
+                return self._file(covers[-1] if covers else os.path.join(project.ROOT, "library", "samples", "filter-sample.jpg"),
+                                  "image/jpeg")
+            if u.path == "/api/sample-photo":
+                return self._file(os.path.join(project.ROOT, "library", "samples", "filter-sample.jpg"), "image/jpeg")
             if u.path == "/api/designs":
                 from .. import brandsetup
                 return self._json(brandsetup.designs())
@@ -423,7 +430,16 @@ def overview():
                             "light-leak": "warm light leak", "film-burn": "film burn", "shape-wipe": "brand-colour circle",
                             "dip-white": "soft fade to white", "dip-black": "fade to black", "blur": "soft blur",
                             "pixelate": "pixel", "spin": "spin", "rgb-split": "colour split"},
-            "inbox": inbox_all()}
+            "inbox": inbox_all(), "sound_counts": _sound_counts()}
+
+
+def _sound_counts():
+    import glob as _g
+    L = os.path.join(project.ROOT, "library", "sfx")
+    return {"interface": len(_g.glob(os.path.join(L, "uisfx", "*", "*.wav"))),
+            "recorded": len(_g.glob(os.path.join(L, "foley", "*.wav"))),
+            "air": len(_g.glob(os.path.join(L, "cc0pack", "*.wav"))) + len(_g.glob(os.path.join(L, "kenney", "*.wav"))),
+            "yours": len(_g.glob(os.path.join(project.ROOT, "brand", "sounds", "*", "*.wav")))}
 
 
 def inbox_all():

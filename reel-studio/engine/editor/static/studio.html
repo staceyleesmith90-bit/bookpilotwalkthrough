@@ -6,83 +6,147 @@
 <title>Reel Studio · Systems Pilot</title>
 <style>
   @font-face { font-family: "Inter"; src: url("/fonts/Inter-Variable.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "Poppins"; src: url("/fonts/Poppins-ExtraBold.ttf"); font-weight: 800; }
+  @font-face { font-family: "Poppins"; src: url("/fonts/Poppins-Bold.ttf"); font-weight: 700; }
+  @font-face { font-family: "Poppins"; src: url("/fonts/Poppins-SemiBold.ttf"); font-weight: 600; }
+  @font-face { font-family: "Brush"; src: url("/fonts/KaushanScript-Regular.ttf"); }
+  @font-face { font-family: "Hand"; src: url("/fonts/Caveat-Variable.ttf"); font-weight: 400 700; }
+  @font-face { font-family: "Bebas"; src: url("/fonts/BebasNeue-Regular.ttf"); }
   :root {
-    --bg: #F6F5F2; --surface: #FFFFFF; --ink: #101830; --muted: #636B7E; --faint: #8A91A1; --line: #E6E4DE; --soft: #F1EFEA;
-    --accent: #1F4FD6; --accent-ink: #FFFFFF; --accent-soft: #EAF0FD; --ok: #157F4B; --navy: #0B1533;
-    --brand: linear-gradient(135deg, #00B5D9 0%, #1E63FF 40%, #6A11CB 72%, #EC4899 100%);
-    --r: 14px; --r-sm: 10px; --shadow: 0 1px 2px rgba(16, 24, 48, .05); --shadow-lg: 0 24px 60px -24px rgba(16, 24, 48, .35);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #0E1117; --surface: #161A22; --ink: #ECEEF3; --muted: #9AA3B3; --faint: #737B8B; --line: #262B36; --soft: #1C2029;
-            --accent: #6E8FFF; --accent-ink: #0B1020; --accent-soft: #1C2440; --ok: #3DD68C; }
+    --navy: #0A1240; --navy2: #121C5C; --navy3: #1C2A7A; --side-ink: #C9D0F0;
+    --bg: #F3F5FB; --surface: #FFFFFF; --ink: #0E1638; --muted: #5F6889; --faint: #8C93AE; --line: #E3E7F2; --soft: #EEF1F9;
+    --accent: #2E5BFF; --accent-ink: #FFFFFF; --accent-soft: #E8EEFF; --ok: #13865A;
+    --grad: linear-gradient(100deg, #18A9F5 0%, #3D5CFF 42%, #8A3BF0 75%, #E64BC8 100%);
+    --r: 16px; --r-sm: 11px; --shadow: 0 1px 2px rgba(14,22,56,.06), 0 6px 18px -12px rgba(14,22,56,.18); --shadow-lg: 0 28px 70px -28px rgba(10,18,64,.5);
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body { font: 14.5px/1.5 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
-  h1, h2, h3 { font-weight: 650; letter-spacing: -0.015em; margin: 0; }
+  h1, h2, h3 { font-family: "Poppins", "Inter", sans-serif; font-weight: 700; letter-spacing: -0.015em; margin: 0; }
   button { font: inherit; cursor: pointer; color: inherit; }
   a { color: var(--accent); }
-  .ico { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .ico { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* ---- app frame: sidebar + content ---- */
-  .top { position: fixed; inset: 0 auto 0 0; width: 236px; display: flex; flex-direction: column; gap: 6px; padding: 18px 14px;
-         background: var(--surface); border-right: 1px solid var(--line); z-index: 10; }
-  .logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px 14px; }
-  .mark { width: 30px; height: 30px; border-radius: 8px; background: var(--brand); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 15px; }
-  .logo b { font-size: 15px; display: block; line-height: 1.2; } .logo small { display: block; font-size: 11.5px; color: var(--faint); }
-  .top .cta { order: 1; margin: 0 4px 10px; justify-content: center; }
-  nav { order: 2; display: flex; flex-direction: column; gap: 2px; }
-  nav button { display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 8px 10px; border-radius: 8px; color: var(--muted); font-weight: 500; text-align: left; white-space: nowrap; }
-  nav button:hover { background: var(--soft); color: var(--ink); }
-  nav button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-  nav .sep { height: 1px; background: var(--line); margin: 8px 6px; }
-  .grow { order: 3; flex: 1; }
-  .brandsw { order: 4; display: flex; align-items: center; gap: 10px; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-sm); padding: 10px 12px; font-weight: 600; text-align: left; }
-  .brandsw:hover { border-color: var(--faint); }
-  .brandsw small { display: block; font-weight: 500; font-size: 11.5px; color: var(--faint); }
-  .brandsw .chev { margin-left: auto; color: var(--faint); }
-  #brandDots { display: flex; gap: 3px; } #brandDots i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
-  .menu { position: fixed; left: 14px; bottom: 74px; width: 208px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px; z-index: 30; }
+  /* ---------------- sidebar ---------------- */
+  .top { position: fixed; inset: 0 auto 0 0; width: 228px; display: flex; flex-direction: column; gap: 4px; padding: 18px 14px; overflow-y: auto;
+         background: linear-gradient(180deg, var(--navy) 0%, #0D1650 100%); color: #fff; z-index: 20; }
+  .logo { display: flex; align-items: center; gap: 11px; padding: 2px 6px 18px; }
+  .mark { width: 38px; height: 38px; border-radius: 10px; background: var(--grad); display: grid; place-items: center; color: #fff; font: 800 19px "Poppins"; box-shadow: 0 6px 18px -6px #6a3cf0; }
+  .logo b { font: 700 19px/1.1 "Poppins"; display: block; letter-spacing: -.02em; } .logo small { display: block; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #9AA4D6; margin-top: 3px; }
+  .newreel { display: flex; align-items: center; gap: 10px; border: 0; border-radius: 12px; padding: 13px 16px; background: var(--grad); color: #fff; font: 600 16px "Inter"; margin-bottom: 16px; box-shadow: 0 10px 26px -12px #8a3bf0; }
+  .newreel .ico:last-child { margin-left: auto; width: 18px; height: 18px; }
+  nav { display: flex; flex-direction: column; gap: 3px; }
+  nav button { display: flex; align-items: center; gap: 13px; border: 1px solid transparent; background: none; padding: 10px 12px; border-radius: 11px; color: var(--side-ink); font-weight: 500; text-align: left; white-space: nowrap; }
+  nav button:hover { background: rgba(255,255,255,.06); color: #fff; }
+  nav button.on { background: var(--navy3); border-color: rgba(140,160,255,.35); color: #fff; font-weight: 600; }
+  nav .sep { height: 1px; background: rgba(255,255,255,.1); margin: 12px 8px; }
+  .grow { flex: 1; min-height: 12px; }
+  .plan { border: 1px solid rgba(140,160,255,.25); background: rgba(255,255,255,.04); border-radius: 14px; padding: 14px; font-size: 12.5px; color: var(--side-ink); }
+  .plan b { display: flex; align-items: center; gap: 8px; color: #fff; font: 600 15px "Inter"; } .plan b .ico { color: #FFC24B; }
+  .plan ul { list-style: none; padding: 0; margin: 10px 0 12px; line-height: 1.9; } .plan li::before { content: "✓"; margin-right: 8px; color: #8FA2FF; }
+  .plan a { display: block; text-align: center; border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 7px; color: #fff; text-decoration: none; font-weight: 600; font-size: 13.5px; }
+  .plan a:hover { background: rgba(255,255,255,.08); }
+
+  /* ---------------- top bar ---------------- */
+  .bar-top { position: sticky; top: 0; z-index: 15; margin-left: 228px; height: 64px; display: flex; align-items: center; gap: 16px; padding: 0 28px; background: var(--navy); color: #fff; }
+  .search { position: relative; flex: 1; max-width: 420px; margin-left: auto; }
+  .bar-top .search input[type=text] { width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); color: #fff; border-radius: 12px; padding: 10px 14px 10px 40px; font: inherit; }
+  .bar-top .search input::placeholder { color: #9AA4D6; } .bar-top .search input[type=text]:focus { outline: none; border-color: #8FA2FF; box-shadow: none; }
+  .search > .ico { position: absolute; left: 13px; top: 11px; color: #9AA4D6; pointer-events: none; }
+  .results { position: absolute; top: 46px; left: 0; right: 0; background: var(--surface); color: var(--ink); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px; max-height: 420px; overflow: auto; }
+  .results button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 9px 10px; border-radius: 8px; }
+  .results button:hover { background: var(--soft); } .results small { color: var(--muted); display: block; font-size: 12px; }
+  .brandsw { display: flex; align-items: center; gap: 10px; border: 0; background: none; color: #fff; font-weight: 600; padding: 4px 6px; border-radius: 12px; }
+  .brandsw:hover { background: rgba(255,255,255,.06); }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; overflow: hidden; border: 2px solid rgba(255,255,255,.7); }
+  #brandDots { display: flex; width: 100%; height: 100%; } #brandDots i { flex: 1; height: 100%; display: block; }
+  .brandsw small { display: block; font-weight: 500; font-size: 11px; color: #9AA4D6; line-height: 1.1; text-align: left; } #brandName { display: block; text-align: left; }
+  .menu { position: fixed; right: 24px; top: 62px; width: 240px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px; z-index: 30; }
   .menu button { display: flex; width: 100%; gap: 10px; align-items: center; border: 0; background: none; padding: 9px 10px; border-radius: 8px; text-align: left; font-weight: 500; }
   .menu button:hover { background: var(--soft); } .menu button.on { font-weight: 650; } .menu button.on::after { content: "✓"; margin-left: auto; color: var(--accent); }
   .menu .dots2 { display: flex; gap: 3px; } .menu .dots2 i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
-  main { margin-left: 236px; padding: 36px 44px 80px; max-width: 1240px; }
+  main { margin-left: 228px; padding: 22px 24px 60px; }
 
-  /* ---- buttons ---- */
-  .cta { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: var(--r-sm); padding: 10px 16px; font-weight: 600; color: var(--accent-ink); background: var(--accent); white-space: nowrap; text-decoration: none; }
-  .cta:hover { filter: brightness(1.08); }
-  .ghost { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-sm); padding: 8px 14px; font-weight: 550; color: var(--ink); text-decoration: none; }
+  /* ---------------- buttons ---------------- */
+  .cta { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 10px 18px; font-weight: 600; color: #fff; background: var(--grad); white-space: nowrap; text-decoration: none; }
+  .cta:hover { filter: brightness(1.07); }
+  .ghost { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 15px; font-weight: 550; color: var(--ink); text-decoration: none; }
   .ghost:hover { border-color: var(--faint); }
 
-  /* ---- page headings ---- */
-  section > h2 { font-size: 22px; margin: 0 0 4px; } h2 small { display: block; font-size: 14px; font-weight: 400; color: var(--muted); letter-spacing: 0; margin: 4px 0 0; }
+  /* ---------------- home: hero ---------------- */
+  .hero { position: relative; overflow: hidden; border-radius: 22px; padding: 40px 36px; min-height: 330px; color: #fff;
+          background: radial-gradient(circle at 78% 30%, #3346c9 0%, transparent 45%), radial-gradient(circle at 30% 120%, #2a1d8f 0%, transparent 50%), linear-gradient(120deg, #0A1240 0%, #121B62 60%, #1B2C9A 100%); }
+  .hero .eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: #C9D0F0; font-weight: 600; }
+  .hero .eyebrow i { font-style: normal; margin: 0 12px; opacity: .5; }
+  .hero h1 { font: 800 50px/1.05 "Poppins"; margin: 16px 0 16px; max-width: 560px; letter-spacing: -.03em; }
+  .hero h1 em { font: 400 1.05em "Brush"; font-style: normal; background: linear-gradient(90deg, #4FC3FF, #5D7BFF 60%, #A77BFF); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 8px; }
+  .hero p { color: #D4DAF5; font-size: 16.5px; max-width: 520px; margin: 0 0 26px; }
+  .hero .btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero .cta { padding: 13px 22px; font-size: 15.5px; } .hero .outline { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid rgba(255,255,255,.65); background: none; color: #fff; border-radius: 999px; padding: 12px 22px; font-weight: 600; font-size: 15.5px; }
+  .hero .outline:hover { background: rgba(255,255,255,.08); }
+  .art { position: absolute; right: 30px; top: 0; bottom: 0; width: 470px; pointer-events: none; }
+  .phone { position: absolute; left: 120px; top: 18px; width: 200px; height: 400px; border-radius: 34px; background: #0b0d18; padding: 9px; transform: rotate(7deg); box-shadow: 0 30px 60px -20px rgba(0,0,0,.7); }
+  .phone .scr { width: 100%; height: 100%; border-radius: 26px; background: #222 center/cover no-repeat; position: relative; overflow: hidden; }
+  .phone .scr b { position: absolute; left: 14px; bottom: 54px; font: 400 34px/0.95 "Bebas"; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.5); transform: rotate(-6deg); }
+  .phone .scr i { position: absolute; left: 14px; right: 14px; bottom: 26px; height: 4px; border-radius: 9px; background: rgba(255,255,255,.35); }
+  .phone .scr i::before { content: ""; position: absolute; left: 0; top: -4px; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
+  .polaroid { position: absolute; left: 30px; top: 190px; width: 112px; height: 104px; background: #fff center/cover no-repeat; border: 5px solid #fff; border-radius: 6px; transform: rotate(-9deg); box-shadow: 0 16px 30px -12px rgba(0,0,0,.6); }
+  .chiplist { position: absolute; right: 0; top: 40px; width: 140px; background: #fff; color: var(--ink); border-radius: 14px; padding: 12px 14px; transform: rotate(4deg); box-shadow: 0 18px 40px -16px rgba(0,0,0,.6); font-size: 13px; }
+  .chiplist div { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-weight: 500; } .chiplist .ico { width: 16px; height: 16px; }
+  .note-hand { position: absolute; right: 6px; top: 220px; background: #fff; color: var(--ink); font: 700 21px/1.1 "Hand"; padding: 10px 14px; border-radius: 6px; transform: rotate(-8deg); box-shadow: 0 14px 30px -12px rgba(0,0,0,.6); }
+  .slash { position: absolute; left: 70px; top: 40px; width: 40px; height: 60px; border-left: 3px solid #fff; opacity: .8; transform: rotate(-40deg); border-radius: 2px; }
+
+  /* ---------------- home: format cards ---------------- */
+  .formats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 16px 0 26px; }
+  .fmt { display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto; align-items: center; column-gap: 14px; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 16px 16px; box-shadow: var(--shadow); transition: transform .15s, box-shadow .15s; }
+  .fmt:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -16px rgba(14,22,56,.35); }
+  .fmt .ic { grid-row: 1 / span 2; width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; }
+  .fmt .ic .ico { width: 28px; height: 28px; stroke-width: 2; }
+  .fmt b { font: 700 16.5px "Poppins"; align-self: end; white-space: nowrap; } .fmt span { color: var(--muted); font-size: 13.5px; align-self: start; }
+  .fmt .go { grid-row: 1 / span 2; grid-column: 3; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink); }
+  .fmt .go .ico { width: 18px; height: 18px; }
+  .t1 .ic { background: #DDF4FF; color: #0A1240; } .t2 .ic { background: #E3E6FF; color: #0A1240; } .t3 .ic { background: #E1EEFF; color: #0A1240; } .t4 .ic { background: #F1E4FF; color: #4B1BA8; }
+
+  /* ---------------- home: recent reels ---------------- */
+  .rowhead { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 12px; }
+  .rowhead h2 { font-size: 21px; } .rowhead a, .viewall { font-weight: 600; font-size: 14px; color: var(--ink); text-decoration: none; display: inline-flex; gap: 6px; align-items: center; cursor: pointer; border: 0; background: none; }
+  .rowhead a .ico, .viewall .ico { width: 16px; height: 16px; }
+  .reels { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+  .rc { position: relative; } .rc .cover { position: relative; aspect-ratio: 4/3; border-radius: 12px; background: var(--soft) center/cover no-repeat; overflow: hidden; display: block; box-shadow: var(--shadow); }
+  .rc .dur { position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,.72); color: #fff; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+  .rc .st { position: absolute; left: 8px; top: 8px; background: rgba(10,18,64,.75); color: #fff; font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+  .rc .meta { display: grid; grid-template-columns: 1fr auto; padding: 8px 2px 0; } .rc .meta b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rc .meta small { grid-column: 1; color: var(--muted); } .rc .kebab { grid-row: 1 / span 2; grid-column: 2; border: 0; background: none; width: 30px; height: 30px; border-radius: 8px; color: var(--muted); font-size: 18px; line-height: 1; }
+  .rc .kebab:hover { background: var(--soft); }
+  .rc .pop { position: absolute; right: 0; top: calc(100% - 4px); z-index: 5; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px; min-width: 190px; }
+  .rc .pop a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--ink); text-decoration: none; font-weight: 500; } .rc .pop a:hover { background: var(--soft); }
+  .empty { border: 1.5px dashed var(--line); background: var(--surface); border-radius: var(--r); padding: 34px; text-align: center; color: var(--muted); grid-column: 1 / -1; }
+
+  /* ---------------- home: three panels ---------------- */
+  .panels { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 16px; margin-top: 28px; }
+  .panel { border-radius: var(--r); padding: 18px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+  .panel.p1 { background: linear-gradient(160deg, #EEF4FF, #FFFFFF 60%); } .panel.p2 { background: linear-gradient(160deg, #F6EEFF, #FFFFFF 60%); } .panel.p3 { background: linear-gradient(160deg, #E9FAF7, #FFFFFF 60%); }
+  .panel .ph { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; margin-bottom: 14px; }
+  .panel .pi { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; } .p1 .pi { background: #DCE7FF; color: #2E5BFF; } .p2 .pi { background: #EADBFF; color: #7A2FE0; } .p3 .pi { background: #CFF3EC; color: #0E7C6B; }
+  .panel h3 { font-size: 17px; } .panel .ph small { display: block; color: var(--muted); font-size: 12.5px; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; align-items: start; }
+  .tile { display: flex; flex-direction: column; border: 0; background: none; padding: 0; text-align: left; min-width: 0; }
+  .tile .im { width: 100%; aspect-ratio: 1 / 1; border-radius: 10px; background: #1b1b2a center 18%/cover no-repeat; display: grid; place-items: center; color: #fff; overflow: hidden; box-shadow: var(--shadow); }
+  .tile b { display: block; font-size: 12.5px; font-weight: 600; margin-top: 6px; } .tile small { display: block; font-size: 11.5px; color: var(--muted); }
+  .tile .aa { font: 700 30px "Poppins"; color: #fff; } .tile .im .ico { width: 30px; height: 30px; }
+  .wave { display: flex; gap: 3px; align-items: center; height: 34px; } .wave i { width: 3px; border-radius: 3px; background: rgba(255,255,255,.9); }
+  .inspire { margin-top: 18px; display: flex; align-items: center; gap: 18px; padding: 16px 20px; border-radius: var(--r); background: linear-gradient(100deg, #0A1240, #16206B 70%, #2a2c8f); color: #fff; }
+  .inspire .bulb { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.5); display: grid; place-items: center; }
+  .inspire b { font: 700 21px "Poppins"; } .inspire span { color: #C9D0F0; flex: 1; } .inspire .cta { padding: 11px 22px; }
+
+  /* ---------------- other tabs ---------------- */
+  section > h2 { font-size: 24px; margin: 6px 0 4px; } h2 small { display: block; font: 400 14px "Inter"; color: var(--muted); letter-spacing: 0; margin: 4px 0 0; }
   section > h2 + * { margin-top: 20px; }
-  section h3.sub { font-size: 15px; margin: 32px 0 12px; }
+  section h3.sub { font-size: 16px; margin: 30px 0 12px; }
   p.sub { color: var(--muted); max-width: 720px; }
-
-  /* ---- home ---- */
-  .hero { margin-bottom: 36px; }
-  .hero h1 { font-size: 26px; } .hero h1 em { font-style: normal; }
-  .hero p { color: var(--muted); margin: 6px 0 20px; }
-  .formats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-  .fmt { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); transition: border-color .15s, box-shadow .15s; }
-  .fmt:hover { border-color: var(--accent); box-shadow: 0 6px 20px -12px rgba(31, 79, 214, .45); }
-  .fmt .ic { width: 38px; height: 38px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; margin-bottom: 14px; }
-  .fmt .ic .ico { width: 20px; height: 20px; }
-  .fmt b { display: block; font-size: 15px; margin-bottom: 2px; } .fmt span { color: var(--muted); font-size: 13px; }
-  h2 { font-size: 17px; margin: 0 0 14px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-  .reel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
-  .reel .cover { aspect-ratio: 9/16; background: var(--soft) center/cover no-repeat; display: flex; align-items: flex-start; }
-  .chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: rgba(16,24,48,.72); color: #fff; margin: 10px; backdrop-filter: blur(4px); }
+  h2 { font-size: 18px; margin: 0 0 14px; }
+  .chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: rgba(10,18,64,.75); color: #fff; margin: 10px; }
   .chip.ok { background: var(--ok); color: #fff; }
-  .reel .meta { padding: 12px; } .reel .meta b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
-  .acts { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-  .acts a, .acts button { font-size: 12.5px; font-weight: 550; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: var(--soft); border: 0; color: var(--ink); }
-  .acts a:hover { background: var(--accent-soft); color: var(--accent); }
-  .empty { border: 1px dashed var(--line); background: var(--surface); border-radius: var(--r); padding: 40px; text-align: center; color: var(--muted); }
-
-  /* ---- templates ---- */
   .tpls { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; }
   .tpl { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
   .tpl .cat { font-size: 11.5px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
@@ -90,8 +154,6 @@
   .tpl ul { margin: 4px 0 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
   .tpl .row { display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px; } .tpl .row span { background: var(--soft); padding: 3px 9px; border-radius: 999px; }
   .tpl .go { margin-top: auto; align-self: flex-start; }
-
-  /* ---- looks: filters, captions, titles (real pictures, plain names) ---- */
   .filters { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
   .look { border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); padding: 0; overflow: hidden; text-align: left; box-shadow: var(--shadow); }
   .look img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: var(--soft); }
@@ -105,8 +167,6 @@
   .tcard { border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); padding: 0; text-align: left; }
   .tcard img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #3a3430; }
   .tcard span { display: block; padding: 8px 10px; font-size: 12.5px; color: var(--muted); } .tcard.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-
-  /* ---- brand ---- */
   .brandcard { display: grid; grid-template-columns: 240px 1fr; gap: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; box-shadow: var(--shadow); }
   .brandcard img { width: 100%; border-radius: 10px; } .sw { display: flex; gap: 8px; margin: 10px 0 16px; } .sw i { width: 36px; height: 36px; border-radius: 9px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
   .bcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 30px; }
@@ -124,14 +184,10 @@
   .steps { margin: 0 0 16px; padding-left: 20px; color: var(--muted); line-height: 1.65; }
   .lookpick { display: grid; gap: 14px; } .lookpick figure { margin: 0; background: var(--soft); border-radius: 12px; padding: 10px; }
   .lookpick img { width: 100%; border-radius: 8px; display: block; } .lookpick figcaption { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 4px 2px; flex-wrap: wrap; }
-
-  /* ---- prompts + resources ---- */
-  .prompts h3 { margin: 30px 0 12px; font-size: 15px; } .pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
+  .prompts h3 { margin: 30px 0 12px; font-size: 16px; } .pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
   .pcard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); }
   .pcard b { font-size: 14px; } .pcard p { margin: 0; color: var(--muted); font-size: 13px; } .pcard button, .pcard a { align-self: flex-start; margin-top: auto; }
-  .pcard .chip { margin: 0; background: var(--soft); color: var(--muted); backdrop-filter: none; } .pcard .chip.ok { background: #E7F6EE; color: var(--ok); }
-
-  /* ---- fonts / sounds ---- */
+  .pcard .chip { margin: 0; background: var(--soft); color: var(--muted); } .pcard .chip.ok { background: #E3F6EC; color: var(--ok); }
   .fontcard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; background: var(--surface); border-radius: var(--r); padding: 22px; border: 1px solid var(--line); box-shadow: var(--shadow); }
   .fontcard select { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; }
   .fprev { font-size: 36px; color: var(--accent); margin-top: 12px; line-height: 1.2; min-height: 50px; }
@@ -140,14 +196,14 @@
   .snd .x { margin-left: auto; } .snd .chip { margin: 0; }
   #tab-sounds a.cta, #tab-sounds a.ghost { text-decoration: none; } #tab-sounds ol { padding-left: 20px; line-height: 1.7; }
 
-  /* ---- dialogs ---- */
-  dialog { border: 0; padding: 0; border-radius: 18px; width: min(840px, 95vw); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-lg); }
-  dialog::backdrop { background: rgba(11, 21, 51, .45); backdrop-filter: blur(3px); }
+  /* ---------------- dialogs ---------------- */
+  dialog { border: 0; padding: 0; border-radius: 20px; width: min(840px, 95vw); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-lg); }
+  dialog::backdrop { background: rgba(10, 18, 64, .5); backdrop-filter: blur(3px); }
   .wz-head { padding: 20px 24px 0; display: flex; align-items: center; gap: 12px; }
-  .dots { display: flex; gap: 5px; flex: 1; } .dots i { height: 4px; flex: 1; border-radius: 9px; background: var(--line); } .dots i.on { background: var(--accent); }
+  .dots { display: flex; gap: 5px; flex: 1; } .dots i { height: 4px; flex: 1; border-radius: 9px; background: var(--line); } .dots i.on { background: var(--grad); }
   .x { border: 0; background: var(--soft); width: 32px; height: 32px; border-radius: 50%; color: var(--muted); }
   .wz-body { padding: 18px 24px; max-height: 68vh; overflow: auto; }
-  .wz-body h3 { font-size: 21px; margin: 6px 0 4px; } .wz-body p.sub { margin: 0 0 18px; }
+  .wz-body h3 { font-size: 22px; margin: 6px 0 4px; } .wz-body p.sub { margin: 0 0 18px; }
   .wz-foot { display: flex; justify-content: space-between; padding: 14px 24px 20px; border-top: 1px solid var(--line); }
   .opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
   .opt { border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px; padding: 14px; text-align: left; }
@@ -162,64 +218,94 @@
   .drop.hover { border-color: var(--accent); background: var(--accent-soft); }
   .note { font-size: 13px; color: var(--muted); background: var(--soft); border-radius: 10px; padding: 10px 12px; margin-top: 12px; }
   .toggle { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-weight: 550; }
-  .bar { height: 6px; background: var(--soft); border-radius: 9px; overflow: hidden; margin-top: 10px; } .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  .bar { height: 6px; background: var(--soft); border-radius: 9px; overflow: hidden; margin-top: 10px; } .bar i { display: block; height: 100%; width: 0; background: var(--grad); transition: width .2s; }
   .seg { display: inline-flex; background: var(--soft); border-radius: 10px; padding: 3px; gap: 3px; flex-wrap: wrap; }
   .seg button { border: 0; background: none; padding: 6px 13px; border-radius: 8px; font-weight: 550; color: var(--muted); } .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
   audio { width: 100%; margin-top: 10px; }
   .hidden { display: none !important; }
-  .toast { position: fixed; bottom: 22px; left: calc(50% + 118px); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; opacity: 0; transition: .2s; z-index: 50; pointer-events: none; }
+  .toast { position: fixed; bottom: 22px; left: calc(50% + 114px); transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: .2s; z-index: 50; pointer-events: none; }
   .toast.on { opacity: 1; }
-  footer { margin-left: 236px; text-align: center; color: var(--faint); font-size: 12px; padding: 20px; }
+  footer { margin-left: 228px; text-align: center; color: var(--faint); font-size: 12px; padding: 0 20px 24px; }
 
-  /* ---- phones and small screens: top bar + scrolling tabs ---- */
-  @media (max-width: 900px) {
-    .top { position: sticky; inset: 0 auto auto 0; width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 14px; border-right: 0; border-bottom: 1px solid var(--line); gap: 8px; }
-    .logo { padding: 0; } .logo small { display: none; }
-    .grow { display: none; } .brandsw { order: 2; width: auto; margin-left: auto; padding: 6px 10px; } .brandsw small, .brandsw .chev { display: none; }
-    .top .cta { order: 3; margin: 0; padding: 7px 11px; font-size: 13px; }
-    .brandsw { max-width: 150px; } #brandName { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 90px; }
-    .logo b { font-size: 14px; } .logo > div:last-child { display: none; }
-    nav { order: 5; width: 100%; flex-direction: row; overflow-x: auto; scrollbar-width: none; } nav .sep { display: none; }
-    .menu { left: auto; right: 14px; top: 56px; bottom: auto; }
-    main { margin: 0; padding: 22px 16px 60px; } footer { margin: 0; } .toast { left: 50%; }
-    .formats { grid-template-columns: 1fr 1fr; } .brandcard { grid-template-columns: 1fr; } .fontcard { grid-template-columns: 1fr; }
+  @media (max-width: 1280px) { .art { width: 380px; right: 0; opacity: .9; } .panels { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 1100px) { .formats { grid-template-columns: 1fr 1fr; } .art { display: none; } }
+  /* ---------------- phones ---------------- */
+  @media (max-width: 860px) {
+    .top { position: sticky; top: 0; width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 14px; gap: 8px; overflow: visible; }
+    .logo { padding: 0; margin-right: auto; } .logo small { display: none; } .logo b { font-size: 16px; } .mark { width: 32px; height: 32px; font-size: 16px; }
+    .newreel { margin: 0; padding: 8px 12px; font-size: 14px; } .newreel .ico:last-child { display: none; }
+    nav { order: 5; width: 100%; flex-direction: row; overflow-x: auto; scrollbar-width: none; } nav .sep, .grow, .plan { display: none; }
+    .bar-top { margin: 0; height: auto; padding: 8px 14px; position: static; } .search { max-width: none; margin: 0; }
+    .brandsw small, #brandName { display: none; } .menu { right: 14px; top: 110px; }
+    main { margin: 0; padding: 14px 14px 50px; } footer { margin: 0; } .toast { left: 50%; }
+    .hero { padding: 26px 20px; min-height: 0; } .hero h1 { font-size: 34px; }
+    .formats { grid-template-columns: 1fr; } .panels { grid-template-columns: 1fr; } .brandcard, .fontcard { grid-template-columns: 1fr; }
+    .inspire { flex-wrap: wrap; } .inspire span { flex-basis: 100%; }
   }
 </style>
 </head>
 <body>
 <div class="top">
-  <div class="logo"><div class="mark">S</div><div><b>Reel Studio</b><small>by Systems Pilot</small></div></div>
-  <button class="cta" id="newBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New reel</button>
+  <div class="logo"><div class="mark">S</div><div><b>ReelStudio</b><small>by Systems Pilot</small></div></div>
+  <button class="newreel" id="newBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New reel <svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
   <nav>
     <button data-tab="home" class="on"><svg class="ico" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg> Home</button>
-    <button data-tab="templates"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Templates</button>
-    <button data-tab="looks"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" opacity=".35"/><circle cx="12" cy="12" r="4"/></svg> Looks</button>
-    <button data-tab="sounds"><svg class="ico" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 8.5a5 5 0 0 1 0 7M19.5 6a8.5 8.5 0 0 1 0 12"/></svg> Sounds</button>
-    <button data-tab="brand"><svg class="ico" viewBox="0 0 24 24"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg> Brands</button>
-    <div class="sep"></div>
-    <button data-tab="prompts"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg> What to say</button>
-    <button data-tab="free"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg> Free resources</button>
-    <button onclick="window.open('/library','_blank')"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l2.2 5.3L20 9l-4.4 3.8L17 18.5 12 15.6 7 18.5l1.4-5.7L4 9l5.8-.7z"/></svg> Effects library</button>
+    <button data-tab="reels"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="m10 9 5 3-5 3z"/></svg> My reels</button>
+    <button data-tab="templates"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg> Templates</button>
+    <button data-tab="looks"><svg class="ico" viewBox="0 0 24 24"><circle cx="7" cy="17" r="3"/><path d="M15 3l1.4 3.6L20 8l-3.6 1.4L15 13l-1.4-3.6L10 8l3.6-1.4z"/><path d="M8 8l.7 1.3L10 10l-1.3.7L8 12l-.7-1.3L6 10l1.3-.7z"/></svg> Looks</button>
+    <button data-tab="sounds"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 16V8l5-1v8"/><circle cx="8.5" cy="16" r="1.5"/><circle cx="13.5" cy="15" r="1.5"/></svg> Sounds</button>
+    <button onclick="window.open('/library','_blank')"><svg class="ico" viewBox="0 0 24 24"><path d="M5 19 19 5M14 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1zM18 13l.7 1.3L20 15l-1.3.7L18 17l-.7-1.3L16 15l1.3-.7zM7 3l.7 1.3L9 5l-1.3.7L7 7l-.7-1.3L5 5l1.3-.7z"/></svg> Effects</button>
+    <button data-tab="brand"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="M9 12l2 2 4-4"/></svg> Brands</button>
+    <button data-tab="prompts"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 11h6M9 14h4"/></svg> What to say</button>
+    <button data-tab="free"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg> Resources</button>
   </nav>
   <span class="grow"></span>
-  <button class="brandsw" id="brandSw" title="Which brand you're making reels for"><span id="brandDots"></span><span><small>Brand</small><span id="brandName">Brand</span></span><span class="chev">⌃</span></button>
+  <div class="plan"><b><svg class="ico" viewBox="0 0 24 24"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/></svg> Monthly plan</b>
+    <ul><li>Unlimited reels</li><li>Every effect &amp; sound</li><li>Free updates</li><li>Your files stay with you</li></ul>
+    <a href="https://reelstudio.systemspilot.co.za/account" target="_blank" rel="noopener">Manage plan</a></div>
+</div>
+
+<div class="bar-top">
+  <div class="search"><svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" type="text" placeholder="Search templates, sounds, effects…" autocomplete="off"><div class="results hidden" id="qres"></div></div>
+  <button class="brandsw" id="brandSw" title="Which brand you're making reels for"><span class="avatar"><span id="brandDots"></span></span><span><small>Brand</small><span id="brandName">Brand</span></span> ▾</button>
   <div class="menu hidden" id="brandMenu"></div>
 </div>
 
 <main>
   <section id="tab-home">
     <div class="hero">
-      <h1>What are we making today?</h1>
-      <p>Pick a kind of reel. A few quick taps, then Claude edits it in your brand.</p>
-      <div class="formats">
-        <button class="fmt" data-fmt="talking-head"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><b>Talk to camera</b><span>Pauses cut, styled in your brand.</span></button>
-        <button class="fmt" data-fmt="voiceover"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></div><b>Clips + voice</b><span>Your b-roll, cut to your words.</span></button>
-        <button class="fmt" data-fmt="faceless"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 6V4h16v2M12 4v16M9 20h6"/></svg></div><b>Text &amp; photos</b><span>No camera needed.</span></button>
-        <button class="fmt" data-nav="templates"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><b>From a template</b><span>Start from a proven idea.</span></button>
+      <div class="eyebrow">Film<i>|</i>Edit<i>|</i>Style<i>|</i>Post</div>
+      <h1>Create scroll-stopping reels, <em>faster.</em></h1>
+      <p>Templates, sounds, effects and AI-powered editing, all in one place. Built for busy entrepreneurs and teams.</p>
+      <div class="btns"><button class="cta" onclick="openWizard()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Create a new reel</button>
+        <button class="outline" onclick="tab('templates')">Explore templates <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <div class="art" aria-hidden="true">
+        <span class="slash"></span>
+        <div class="polaroid" style="background-image:url(/api/sample-photo)"></div>
+        <div class="phone"><div class="scr" style="background-image:url(/api/hero-photo)"><b>TURN<br>IDEAS INTO<br>REELS</b><i></i></div></div>
+        <div class="chiplist"><div><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg> Templates</div><div><svg class="ico" viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg> Sounds</div><div><svg class="ico" viewBox="0 0 24 24"><path d="M5 19 19 5M14 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1zM18 13l.7 1.3L20 15l-1.3.7L18 17l-.7-1.3L16 15l1.3-.7zM7 3l.7 1.3L9 5l-1.3.7L7 7l-.7-1.3L5 5l1.3-.7z"/></svg> Effects</div><div><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 10.5a2 2 0 1 0 0 3M16 10.5a2 2 0 1 0 0 3"/></svg> Captions</div><div><svg class="ico" viewBox="0 0 24 24"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg> and more…</div></div>
+        <div class="note-hand">Your brand.<br>Your style.<br>Made easy.</div>
       </div>
     </div>
-    <h2>Your reels</h2>
-    <div class="grid" id="reels"></div>
+    <div class="formats">
+      <button class="fmt t1" data-fmt="talking-head"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div><b>Talk to camera</b><span>Pauses cut and styled in your brand.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
+      <button class="fmt t2" data-fmt="voiceover"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 10h16v10H4z"/><path d="M4 10 6 4l14 3-1 3M9 5l2 4M14 6l2 4"/></svg></div><b>Clips + voice</b><span>Your b-roll, cut to your words.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
+      <button class="fmt t3" data-fmt="faceless"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="1.6"/><path d="m20 15-4-4-9 9"/></svg></div><b>Text &amp; photos</b><span>No camera needed.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
+      <button class="fmt t4" data-nav="templates"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></div><b>From a template</b><span>Start with a proven idea.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
+    </div>
+    <div class="rowhead"><h2>Your recent reels</h2><button class="viewall" onclick="tab('reels')">View all <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    <div class="reels" id="reelsRecent"></div>
+    <div class="panels">
+      <div class="panel p1"><div class="ph"><div class="pi"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></div><div><h3>Templates</h3><small>Ready-to-use reels for every type of content.</small></div><button class="viewall" onclick="tab('templates')">View all <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><div class="tiles" id="pTpl"></div></div>
+      <div class="panel p2"><div class="ph"><div class="pi"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></div><div><h3>Effects &amp; looks</h3><small>Make your reels look on-brand in seconds.</small></div><button class="viewall" onclick="tab('looks')">View all <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><div class="tiles" id="pFx"></div></div>
+      <div class="panel p3"><div class="ph"><div class="pi"><svg class="ico" viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg></div><div><h3>Sounds</h3><small>Real sound effects, organised and ready.</small></div><button class="viewall" onclick="tab('sounds')">View all <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><div class="tiles" id="pSnd"></div></div>
+    </div>
+    <div class="inspire"><div class="bulb"><svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></svg></div><b>Need inspiration?</b><span>Visit What to say for ready scripts, shot lists and hook ideas.</span><button class="cta" onclick="tab('prompts')">Explore ideas <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+  </section>
+
+  <section id="tab-reels" class="hidden">
+    <h2>My reels <small>Everything you've made for this brand and the others. Tap ⋮ for review, edit and download.</small></h2>
+    <div class="reels" id="reels"></div>
   </section>
 
   <section id="tab-templates" class="hidden">
@@ -340,7 +426,7 @@ const q = o => new URLSearchParams(o).toString();
 // ------------------------------------------------------------ navigation
 function tab(name) {
   document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x.dataset.tab === name));
-  ["home", "templates", "looks", "sounds", "brand", "prompts", "free"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
+  ["home", "reels", "templates", "looks", "sounds", "brand", "prompts", "free"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
   if (name === "looks") drawLooks();
   if (name === "free") drawFree();
 }
@@ -351,19 +437,66 @@ document.querySelector("[data-nav=templates]").onclick = () => tab("templates");
 async function load() {
   O = await api("/api/overview");
   TPL = await api("/api/templates");
-  const g = $("#reels");
-  g.innerHTML = !O.projects.length ? `<div class="empty">No reels yet. Tap <b>＋ New reel</b> or pick a template.</div>` :
-    O.projects.map(p => {
-      const st = p.job?.state === "roughcut" ? "Cutting…" : p.job?.state === "rendering" ? "Rendering…" : p.has_final ? "Finished" : p.has_timeline ? "Styled" : p.job?.state === "ready-for-review" ? "Ready to review" : "Draft";
-      const cover = p.has_cover ? `style="background-image:url(/api/p/${p.slug}/cover.jpg)"` : "";
-      const acts = [!p.faceless ? `<a href="/review?p=${p.slug}">Review cut</a>` : "", p.has_timeline ? `<a href="/editor?p=${p.slug}">Edit</a>` : "",
-        p.has_final ? `<a href="/api/p/${p.slug}/render/final.mp4" download>Download</a>` : "",
-        p.has_nomusic ? `<a href="/api/p/${p.slug}/render/final-for-trending-sound.mp4" download title="Your voice + sound effects, no music: add a trending sound in TikTok">For TikTok sound</a>` : ""].join("");
-      return `<div class="reel"><div class="cover" ${cover}><span class="chip">${st}</span></div><div class="meta"><b>${esc(p.brief.topic || p.slug)}</b>
-        <span style="color:var(--muted);font-size:12px">${esc(p.created || "")}</span><div class="acts">${acts}</div></div></div>`;
-    }).join("");
+  const card = p => {
+    const st = p.job?.state === "roughcut" ? "Cutting…" : p.job?.state === "rendering" ? "Rendering…" : p.has_final ? "" : p.has_timeline ? "Styled" : p.job?.state === "ready-for-review" ? "Ready to review" : "Draft";
+    const cover = p.has_cover ? `style="background-image:url(/api/p/${p.slug}/cover.jpg)"` : "";
+    const d = p.duration ? `${Math.floor(p.duration / 60)}:${String(Math.round(p.duration % 60)).padStart(2, "0")}` : "";
+    const acts = [!p.faceless ? `<a href="/review?p=${p.slug}">Review the cut</a>` : "", p.has_timeline ? `<a href="/editor?p=${p.slug}">Edit (drag &amp; drop)</a>` : "",
+      p.has_final ? `<a href="/api/p/${p.slug}/render/final.mp4" download>Download video</a>` : "",
+      p.has_nomusic ? `<a href="/api/p/${p.slug}/render/final-for-trending-sound.mp4" download>Version for a TikTok sound</a>` : ""].join("") || `<a>Nothing to open yet</a>`;
+    const date = (p.created || "").slice(0, 10) ? new Date((p.created || "").slice(0, 10)).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "";
+    return `<div class="rc"><a class="cover" ${cover} href="${p.has_timeline ? "/editor?p=" + p.slug : "/review?p=" + p.slug}">${st ? `<span class="st">${st}</span>` : ""}${d ? `<span class="dur">${d}</span>` : ""}</a>
+      <div class="meta"><b title="${esc(p.brief.topic || p.slug)}">${esc(p.brief.topic || p.slug)}</b><button class="kebab" aria-label="More">⋮</button><small>${esc(date)}</small></div>
+      <div class="pop hidden">${acts}</div></div>`;
+  };
+  const none = `<div class="empty">No reels yet. Tap <b>New reel</b> to make your first one.</div>`;
+  $("#reels").innerHTML = O.projects.length ? O.projects.map(card).join("") : none;
+  $("#reelsRecent").innerHTML = O.projects.length ? O.projects.slice(0, 6).map(card).join("") : none;
+  document.querySelectorAll(".rc .kebab").forEach(k => k.onclick = e => { e.stopPropagation(); const pop = k.closest(".rc").querySelector(".pop");
+    document.querySelectorAll(".rc .pop").forEach(x => x !== pop && x.classList.add("hidden")); pop.classList.toggle("hidden"); });
+  drawPanels();
   drawTemplates(); drawBrand(); drawSounds(); drawFonts(); drawBrands(); drawPrompts();
 }
+
+// ------------------------------------------------------------ home panels (real previews)
+function drawPanels() {
+  const tpls = Object.entries(TPL).slice(0, 4);
+  $("#pTpl").innerHTML = tpls.map(([id, t]) => `<button class="tile" onclick="fromTemplate('${id}')"><div class="im" style="background-image:url('${titleImg(t.title.template, (t.title.title || t.name).replace(/\{.*?\}/g, "").trim() || t.name)}')"></div><b>${esc(t.name)}</b><small>${esc(t.category)}</small></button>`).join("");
+  const firstGrade = Object.values(O.grades)[0][1] || "warm-film";
+  $("#pFx").innerHTML = [
+    [`<span class="aa">Aa</span>`, "background:#2B2A33", "Text styles", "titles & captions"],
+    ["", `background-image:url('/api/title-preview?${q({ template: "with-me", title: "Day One", kicker: "mini vlog" })}')`, "Titles", "in your brand"],
+    [`<svg class="ico" viewBox="0 0 24 24"><path d="M5 19 19 5M14 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></svg>`, "background:#1F2A6B", "Effects", "400+ premium"],
+    ["", `background-image:url('/api/grade-preview?grade=${firstGrade}')`, "Filters", "on your video"],
+  ].map(([inner, st, b, sm], i) => `<button class="tile" onclick="${i === 2 ? "window.open('/library','_blank')" : "tab('looks')"}"><div class="im" style="${st}">${inner}</div><b>${b}</b><small>${sm}</small></button>`).join("");
+  const sc = O.sound_counts || {}, wave = h => `<div class="wave">${h.map(x => `<i style="height:${x}px"></i>`).join("")}</div>`;
+  $("#pSnd").innerHTML = [["#123A4A", "Clicks & pops", sc.interface, [8, 18, 26, 14, 30, 20, 10]], ["#155E8A", "Real recordings", sc.recorded, [12, 24, 16, 32, 22, 14, 8]],
+    ["#8A3B3B", "Whooshes & air", sc.air, [6, 14, 28, 34, 24, 12, 6]], ["#4E7F7A", "Your sounds", sc.yours, [10, 16, 22, 16, 22, 16, 10]]]
+    .map(([c, n, k, h]) => `<button class="tile" onclick="window.open('/library','_blank')"><div class="im" style="background:${c}">${wave(h)}</div><b>${n}</b><small>${k || 0} sounds</small></button>`).join("");
+}
+document.addEventListener("click", () => document.querySelectorAll(".rc .pop").forEach(x => x.classList.add("hidden")));
+
+// ------------------------------------------------------------ search (templates, what to say, looks, resources)
+let QI = null;
+async function searchIndex() {
+  if (QI) return QI;
+  const [pr, rs] = await Promise.all([api("/api/prompts"), api("/api/resources")]);
+  QI = [...Object.entries(TPL).map(([id, t]) => ({ t: t.name, s: "Template · " + t.category, go: () => fromTemplate(id) })),
+    ...pr.flatMap(g => g.items.map(it => ({ t: it.title, s: "What to say · " + it.say, go: () => { copyText(it.say); } }))),
+    ...Object.values(O.grades).flat().map(k => ({ t: niceName(k), s: "Filter · " + ((O.grade_desc || {})[k] || ""), go: () => tab("looks") })),
+    ...Object.entries(O.captions).map(([k, d]) => ({ t: k + " captions", s: "Caption style · " + d, go: () => tab("looks") })),
+    ...rs.groups.flatMap(g => g.items.map(it => ({ t: it.name, s: "Free resource · " + g.group, go: () => window.open(it.url, "_blank") }))),
+    { t: "Effects library", s: "400+ premium effects, every sound", go: () => window.open("/library", "_blank") },
+    { t: "Brands", s: "Add or switch brands", go: () => tab("brand") }];
+  return QI;
+}
+$("#q").oninput = async () => { const v = $("#q").value.trim().toLowerCase(), box = $("#qres");
+  if (!v) return box.classList.add("hidden");
+  const hits = (await searchIndex()).filter(x => (x.t + " " + x.s).toLowerCase().includes(v)).slice(0, 12);
+  box.innerHTML = hits.length ? hits.map((h, i) => `<button data-i="${i}"><b>${esc(h.t)}</b><small>${esc(h.s.slice(0, 90))}</small></button>`).join("") : `<button disabled><small>Nothing found. Try “typing”, “warm” or “hook”.</small></button>`;
+  box.classList.remove("hidden");
+  box.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { hits[+b.dataset.i].go(); box.classList.add("hidden"); $("#q").value = ""; }); };
+$("#q").onblur = () => setTimeout(() => $("#qres").classList.add("hidden"), 200);
 
 // ------------------------------------------------------------ fonts
 const loadedFonts = new Set();
@@ -465,7 +598,7 @@ async function drawBrands() {
   BR = await api("/api/brands");
   const act = BR.brands.find(b => b.active);
   $("#brandName").textContent = act ? act.label : "Set up a brand";
-  $("#brandDots").innerHTML = act ? dots(act.colors) : "";
+  $("#brandDots").innerHTML = act ? ["pop", "accent", "bg"].map(k => `<i style="background:${(act.colors || {})[k] || "#8C93AE"}"></i>`).join("") : "";
   $("#brandsList").innerHTML = BR.brands.map(b => `<div class="bcard ${b.active ? "on" : ""}"><b>${esc(b.label)}</b><div class="dots2">${dots(b.colors)}</div>
       <span style="color:var(--muted);font-size:13px">${b.active ? "In use now" : "Saved"}${b.ready ? "" : " · look not set up yet"}</span>
       ${b.active ? `<button class="ghost" onclick="openSetup(false)">${b.ready ? "Change its look" : "Set up its look"}</button>` : `<button class="ghost" onclick="useBrand('${b.slug}')">Use this brand</button>`}</div>`).join("")
