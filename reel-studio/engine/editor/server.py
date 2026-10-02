@@ -145,11 +145,44 @@ class Handler(SimpleHTTPRequestHandler):
                 from .. import resources, mysounds, grades
                 return self._json({"groups": resources.all_resources(), "luts": grades.my_luts(),
                                    "sounds": mysounds.index().get("sounds", [])})
-            if u.path == "/api/hero-photo":           # the home banner: their newest reel cover, or the sample photo
-                import glob as _g
-                covers = sorted(_g.glob(os.path.join(project.ROOT, "projects", "*", "renders", "cover.jpg")), key=os.path.getmtime)
-                return self._file(covers[-1] if covers else os.path.join(project.ROOT, "library", "samples", "filter-sample.jpg"),
-                                  "image/jpeg")
+            if u.path == "/api/hero-photo":           # the home banner phone: a mock-up photo (Pexels)
+                return self._file(os.path.join(project.ROOT, "library", "samples", "hero-phone.jpg"), "image/jpeg")
+            if u.path == "/api/hero-card":
+                return self._file(os.path.join(project.ROOT, "library", "samples", "hero-photo.jpg"), "image/jpeg")
+            if u.path == "/api/plan":                 # subscription status (from the extension's daily licence check)
+                import time as _t
+                info = {}
+                try:
+                    info = json.load(open(os.path.join(project.ROOT, ".licence.json"), encoding="utf-8"))
+                except Exception:
+                    pass
+                return self._json({"known": bool(info), "active": bool(info.get("valid")), "renews": info.get("renews"),
+                                   "message": info.get("message"), "checked": info.get("checked"),
+                                   "account": "https://reelstudio.systemspilot.co.za/account",
+                                   "dev": os.environ.get("REEL_DEV") == "1" or bool(os.environ.get("REEL_TESTER_UNTIL"))})
+            if u.path == "/api/favourites":
+                from .. import library_user as lu
+                return self._json(lu.favourites())
+            if u.path == "/api/uploads":
+                from .. import library_user as lu
+                return self._json(lu.uploads())
+            if u.path in ("/api/upload-file", "/api/upload-thumb"):
+                from .. import library_user as lu
+                name = q.get("name", [""])[0]
+                try:
+                    if u.path == "/api/upload-thumb":
+                        return self._file(lu.video_thumb(name), "image/jpeg")
+                    import mimetypes
+                    pth = lu.upload_path(name)
+                    return self._file(pth, mimetypes.guess_type(pth)[0] or "application/octet-stream")
+                except (ValueError, FileNotFoundError):
+                    return self.send_error(404)
+            if u.path == "/api/trash":
+                from .. import library_user as lu
+                return self._json(lu.trash_list())
+            if u.path == "/api/notifications":
+                from .. import library_user as lu
+                return self._json(lu.notifications(JOBS))
             if u.path == "/api/sample-photo":
                 return self._file(os.path.join(project.ROOT, "library", "samples", "filter-sample.jpg"), "image/jpeg")
             if u.path == "/api/designs":
@@ -294,6 +327,19 @@ class Handler(SimpleHTTPRequestHandler):
                 moods = [m.strip().lower() for m in str(d.get("mood", "")).split(",") if m.strip()]
                 return self._json({"ok": True, "sound": trends.add(d["text"], moods, d.get("tempo"),
                                                                    bool(d.get("business")), d.get("link"))})
+            if u.path in ("/api/favourite", "/api/trash/add", "/api/trash/restore", "/api/trash/empty"):
+                from .. import library_user as lu
+                d = self._body()
+                try:
+                    if u.path == "/api/favourite":
+                        return self._json({"ok": True, "on": lu.toggle_favourite(d["kind"], d["id"], d.get("title") or d["id"], d.get("extra"))})
+                    if u.path == "/api/trash/add":
+                        return self._json({"ok": True, "id": lu.to_trash(d["kind"], d["id"], d.get("title"))})
+                    if u.path == "/api/trash/restore":
+                        return self._json({"ok": True, "name": lu.restore(d["id"])})
+                    return self._json({"ok": True, "removed": lu.empty_trash()})
+                except (ValueError, FileNotFoundError, KeyError) as e:
+                    return self._json({"ok": False, "error": str(e)})
             if u.path == "/api/brands/new":
                 from .. import brands as brs
                 d = self._body()

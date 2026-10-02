@@ -1,2 +1,4 @@
 filter-sample.jpg — photo from Pexels (pexels.com/photo/3768894), Pexels License (free to use and modify).
 Used only as the preview picture for filters when the user has no video of their own yet.
+hero-phone.jpg — photo from Pexels (pexels.com/photo/12232876), Pexels License. Home banner phone mock-up.
+hero-photo.jpg — photo from Pexels (pexels.com/photo/3762372), Pexels License. Home banner photo card.

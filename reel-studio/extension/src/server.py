@@ -31,7 +31,7 @@ def _home():
 
 
 HOME = _home()
-KEEP = {"brand", "brands", "projects", "inbox", "out", ".licence.json"}
+KEEP = {"brand", "brands", "projects", "inbox", "out", "trash", ".licence.json"}
 KEEP_LIB = {"emoji-cache", "models", "cache"}
 COPY = ["engine", "library", ".claude", "docs", "VERSION", "AGENTS.md", "CLAUDE.md", "requirements.txt", "scripts"]
 VIDEO_EXT = (".mp4", ".mov", ".m4v", ".avi", ".mkv", ".webm")
