@@ -103,3 +103,17 @@ def test_library_page(tmp_path, monkeypatch):
     out = library_page.build(open_it=False)
     html = open(out, encoding="utf-8").read()
     assert "Effects Library" in html and "</script>" in html
+
+
+def test_resources_and_lut_upload(tmp_path, monkeypatch):
+    from engine import resources, grades
+    rs = resources.all_resources()
+    assert {g["group"] for g in rs} >= {"Sound effects", "B-roll video", "Filters (LUTs)", "GIFs"}
+    assert all(i["url"].startswith("https://") for g in rs for i in g["items"])
+    monkeypatch.setattr(grades, "ROOT", str(tmp_path))
+    bad = tmp_path / "x.cube"; bad.write_text("hello")
+    with pytest.raises(ValueError):
+        grades.add_lut(str(bad), "x.cube")
+    good = tmp_path / "w.cube"; good.write_text("LUT_3D_SIZE 2\n" + "0 0 0\n" * 8)
+    assert grades.add_lut(str(good), "My Warm.cube") == "My-Warm.cube"
+    assert grades.my_luts() == ["My-Warm.cube"]

@@ -141,6 +141,10 @@ class Handler(SimpleHTTPRequestHandler):
                                  "colors": (pk or {}).get("colors", {})})
                 return self._json({"brands": rows, "routes": brandsetup.ROUTES, "guides": brandsetup.GUIDES,
                                    "vibes": brandsetup.VIBE_WORDS, "job": JOBS.get("_brand")})
+            if u.path == "/api/resources":
+                from .. import resources, mysounds, grades
+                return self._json({"groups": resources.all_resources(), "luts": grades.my_luts(),
+                                   "sounds": mysounds.index().get("sounds", [])})
             if u.path == "/api/designs":
                 from .. import brandsetup
                 return self._json(brandsetup.designs())
@@ -237,6 +241,24 @@ class Handler(SimpleHTTPRequestHandler):
                         f.write(chunk)
                         remaining -= len(chunk)
                 return self._json({"ok": True, "file": os.path.relpath(dst, project.ROOT)})
+            if u.path in ("/api/lut-upload", "/api/sound-upload"):   # raw body; ?name=Warm.cube / pop.mp3
+                import tempfile
+                n = int(self.headers.get("Content-Length", 0))
+                if n > 60 * 1024 * 1024:
+                    return self._json({"ok": False, "error": "That file is too big."})
+                name = os.path.basename(q.get("name", ["file"])[0])
+                tmp = os.path.join(tempfile.mkdtemp(), name)
+                open(tmp, "wb").write(self.rfile.read(n))
+                try:
+                    if u.path == "/api/lut-upload":
+                        from .. import grades
+                        return self._json({"ok": True, "name": grades.add_lut(tmp, name)})
+                    from .. import mysounds
+                    if not name.lower().endswith(mysounds.AUDIO_EXT):
+                        return self._json({"ok": False, "error": "That isn't a sound file (mp3, wav, m4a…)."})
+                    return self._json({"ok": True, "name": name, "events": mysounds.learn(tmp)})
+                except ValueError as e:
+                    return self._json({"ok": False, "error": str(e)})
             if u.path == "/api/font-upload":  # raw font body; ?name=MyFont.otf&role=sticker
                 import tempfile
                 n = int(self.headers.get("Content-Length", 0))
@@ -392,7 +414,9 @@ def overview():
                       for k, v in packs.presets().items()},
             "titles": {k: v[1] for k, v in titles.TEMPLATES.items()},
             "music": {"providers": music.available(), "moods": music.MOODS, "genres": music.GENRES},
-            "grades": __import__("engine.grades", fromlist=["x"]).GROUPS,
+            "grades": dict(__import__("engine.grades", fromlist=["x"]).GROUPS,
+                           **({"Yours": __import__("engine.grades", fromlist=["x"]).my_luts()}
+                              if __import__("engine.grades", fromlist=["x"]).my_luts() else {})),
             "grade_desc": __import__("engine.grades", fromlist=["x"]).DESCRIPTIONS,
             "captions": __import__("engine.captions", fromlist=["x"]).STYLES,
             "transitions": {"whip": "fast swipe", "flash": "white flash", "zoom-blur": "zoom through", "glitch": "digital glitch",

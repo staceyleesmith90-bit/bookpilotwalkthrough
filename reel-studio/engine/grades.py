@@ -113,7 +113,7 @@ def filter_for(grade):
     if not grade or grade == "none":
         return ""
     if grade.endswith(".cube"):
-        for d in ("brand", "inbox", "library/luts"):
+        for d in ("brand/luts", "brand", "inbox", "library/luts"):
             p = os.path.join(ROOT, d, grade)
             if os.path.exists(p):
                 # ffmpeg filter paths: forward slashes, escaped drive colon (Windows-safe)
@@ -121,3 +121,24 @@ def filter_for(grade):
                 return f"lut3d='{safe}'"
         raise FileNotFoundError(grade)
     return GRADES[grade]
+
+
+def my_luts():
+    """Filters the user uploaded (.cube files in brand/luts) — shown as "Yours" next to the built-in ones."""
+    d = os.path.join(ROOT, "brand", "luts")
+    return sorted(f for f in os.listdir(d) if f.lower().endswith(".cube")) if os.path.isdir(d) else []
+
+
+def add_lut(src, name):
+    """Save an uploaded .cube filter for this brand. Checks it really is a LUT."""
+    import re, shutil
+    name = re.sub(r"[^A-Za-z0-9._-]+", "-", os.path.basename(name))
+    if not name.lower().endswith(".cube"):
+        raise ValueError("Filters need to be .cube files (the standard LUT format; most free packs include them).")
+    head = open(src, encoding="utf-8", errors="ignore").read(4000)
+    if "LUT_3D_SIZE" not in head and "LUT_1D_SIZE" not in head:
+        raise ValueError("That file isn't a LUT filter (.cube). Look for the .cube files inside the pack.")
+    d = os.path.join(ROOT, "brand", "luts")
+    os.makedirs(d, exist_ok=True)
+    shutil.copy(src, os.path.join(d, name))
+    return name

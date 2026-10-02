@@ -161,6 +161,7 @@
     <button data-tab="sounds">Sounds</button>
     <button data-tab="brand">Brands</button>
     <button data-tab="prompts">What to say</button>
+    <button data-tab="free">Free resources</button>
     <button onclick="window.open('/library','_blank')">Effects ↗</button>
   </nav>
   <span class="grow"></span>
@@ -258,6 +259,21 @@
       </div>
     </div>
   </section>
+  <section id="tab-free" class="hidden prompts">
+    <h2>Free resources <small>more sounds, music, b-roll, photos, filters and GIFs — all free</small></h2>
+    <div class="fontcard" style="margin-bottom:10px">
+      <div><h3 class="sub" style="margin-top:0">Add your own sounds</h3>
+        <p class="note">Downloaded a sound you love? Add it here. It's used first in your reels, matched to the moment by its name (typing, pop, whoosh, ding…).</p>
+        <label class="cta" style="display:inline-block;cursor:pointer">Choose sound files<input type="file" id="sndFiles" accept="audio/*" multiple hidden></label><p class="note" id="sndMsg"></p></div>
+      <div><h3 class="sub" style="margin-top:0">Add your own filters</h3>
+        <p class="note">Free filter packs come as <b>.cube</b> files (LUTs). Add them here and they appear under <b>Looks → Filters → Yours</b> for this brand.</p>
+        <label class="cta" style="display:inline-block;cursor:pointer">Choose .cube files<input type="file" id="lutFiles" accept=".cube" multiple hidden></label><p class="note" id="lutMsg"></p></div>
+      <div><h3 class="sub" style="margin-top:0">B-roll, photos and GIFs</h3>
+        <p class="note">Download clips, photos or GIFs from the sites below and drop them into your <b>Inbox</b> folder (Documents → Reel Studio → inbox). Claude uses them where they fit.</p></div>
+    </div>
+    <div id="freeBox"></div>
+    <p class="note">Two labels: <b>Free for your reels</b> means download what you need for your own videos (their rules don't allow collecting them into another library). <b>Open licence</b> means free for anything. Licences can change: the site is always the final word.</p>
+  </section>
   <section id="tab-prompts" class="hidden prompts">
     <h2>What to say <small>tap Copy, then paste it to Claude. Change only the part in [brackets].</small></h2>
     <div id="promptsBox"></div>
@@ -288,8 +304,9 @@ const q = o => new URLSearchParams(o).toString();
 // ------------------------------------------------------------ navigation
 function tab(name) {
   document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x.dataset.tab === name));
-  ["home", "templates", "looks", "sounds", "brand", "prompts"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
+  ["home", "templates", "looks", "sounds", "brand", "prompts", "free"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
   if (name === "looks") drawLooks();
+  if (name === "free") drawFree();
 }
 document.querySelectorAll("nav button[data-tab]").forEach(b => b.onclick = () => tab(b.dataset.tab));
 document.querySelector("[data-nav=templates]").onclick = () => tab("templates");
@@ -502,6 +519,24 @@ async function drawSetup() {
   }
 }
 function keepAcc() { if ($("#bsAcc")) { BS.acc = $("#bsAcc").value; BS.accOn = $("#bsAccOn").checked; } }
+
+// ------------------------------------------------------------ free resources
+async function drawFree() {
+  const R = await api("/api/resources");
+  $("#freeBox").innerHTML = R.groups.map(g => `<h3>${esc(g.group)}</h3><div class="pcards">${g.items.map(it => `<div class="pcard"><b>${esc(it.name)}</b>
+    <span class="chip ${it.kind === "open" ? "ok" : ""}" style="margin:0;align-self:flex-start">${esc(it.kind_label)}</span><p>${esc(it.about)}</p>
+    <a class="ghost" style="text-decoration:none;align-self:flex-start;margin-top:auto" href="${esc(it.url)}" target="_blank" rel="noopener">Open ↗</a></div>`).join("")}</div>`).join("");
+  $("#lutMsg").textContent = R.luts.length ? "Your filters: " + R.luts.join(", ") : "";
+  $("#sndMsg").textContent = R.sounds.length ? `${R.sounds.length} sound(s) of your own` : "";
+}
+async function sendFiles(files, url, msg) {
+  const out = [];
+  for (const f of files) { const r = await (await fetch(url + "?name=" + encodeURIComponent(f.name), { method: "POST", body: f })).json();
+    out.push(r.ok ? "✓ " + (r.name || f.name) + (r.events ? " → " + r.events.join(", ") : "") : "✗ " + f.name + ": " + r.error); }
+  $(msg).textContent = out.join(" · "); load();
+}
+$("#lutFiles").onchange = e => sendFiles([...e.target.files], "/api/lut-upload", "#lutMsg");
+$("#sndFiles").onchange = e => sendFiles([...e.target.files], "/api/sound-upload", "#sndMsg");
 
 // ------------------------------------------------------------ prompts
 let PR = null;
