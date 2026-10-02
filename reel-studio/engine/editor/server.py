@@ -463,22 +463,27 @@ def title_preview(qs):
 
 
 def _sample_frame():
-    """A neutral sample 'photo' (soft gradient scene) for filter previews without footage."""
-    from PIL import Image, ImageDraw, ImageFilter
-    p = os.path.join(project.ROOT, "out", "sample-frame.jpg")
-    if not os.path.exists(p):
-        os.makedirs(os.path.dirname(p), exist_ok=True)
-        im = Image.new("RGB", (540, 960))
-        d = ImageDraw.Draw(im)
-        for y in range(960):
-            k = y / 960
-            d.line((0, y, 540, y), fill=(int(120 + 110 * (1 - k)), int(150 + 60 * (1 - k)), int(190 - 60 * k)))
-        d.ellipse((140, 160, 400, 420), fill=(250, 214, 160))
-        d.rectangle((0, 640, 540, 960), fill=(92, 120, 84))
-        d.ellipse((180, 520, 360, 900), fill=(205, 120, 110))
-        d.ellipse((215, 400, 325, 520), fill=(232, 190, 160))
-        im.filter(ImageFilter.GaussianBlur(2)).save(p, quality=92)
-    return p
+    """A real picture to preview looks on: a frame from their newest video if they have one,
+    otherwise a real photo that ships with Reel Studio (library/samples)."""
+    import glob, subprocess
+    vids = [p for p in glob.glob(os.path.join(project.ROOT, "projects", "*", "source", "*"))
+            + glob.glob(os.path.join(project.ROOT, "inbox", "*"))
+            if p.lower().endswith((".mp4", ".mov", ".m4v"))]
+    if vids:
+        newest = max(vids, key=os.path.getmtime)
+        out = os.path.join(project.ROOT, "out", "preview-frame-%d.jpg" % int(os.path.getmtime(newest)))
+        if not os.path.exists(out):
+            os.makedirs(os.path.dirname(out), exist_ok=True)
+            try:
+                dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
+                                            newest], capture_output=True, text=True).stdout.strip() or 4)
+            except ValueError:
+                dur = 4
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(dur * 0.3), "-i", newest, "-frames:v", "1",
+                            "-vf", "scale=540:960:force_original_aspect_ratio=increase,crop=540:960", out])
+        if os.path.exists(out):
+            return out
+    return os.path.join(project.ROOT, "library", "samples", "filter-sample.jpg")
 
 
 def grade_preview(grade, file=None):
@@ -493,7 +498,7 @@ def grade_preview(grade, file=None):
         g = grades.graph(grade, "0:v", "o").replace(",format=yuv420p", "")
         pre = ["-ss", "1"] if src.lower().endswith((".mp4", ".mov", ".m4v")) else []
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y"] + pre + ["-i", src, "-frames:v", "1", "-filter_complex",
-                        f"[0:v]scale=270:480:force_original_aspect_ratio=increase,crop=270:480[s];" + g.replace("[0:v]", "[s]", 1),
+                        f"[0:v]scale=360:640:force_original_aspect_ratio=increase,crop=360:640[s];" + g.replace("[0:v]", "[s]", 1),
                         "-map", "[o]", out])
     return out
 

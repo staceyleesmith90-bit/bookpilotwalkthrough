@@ -1,0 +1,2 @@
+filter-sample.jpg — photo from Pexels (pexels.com/photo/3768894), Pexels License (free to use and modify).
+Used only as the preview picture for filters when the user has no video of their own yet.

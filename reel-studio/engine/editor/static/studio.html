@@ -5,181 +5,217 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reel Studio · Systems Pilot</title>
 <style>
-  @font-face { font-family: "Poppins"; src: url("/fonts/Poppins-ExtraBold.ttf"); font-weight: 800; }
   @font-face { font-family: "Inter"; src: url("/fonts/Inter-Variable.ttf"); font-weight: 100 900; }
-  @font-face { font-family: "Script"; src: url("/fonts/Caveat-Variable.ttf"); font-weight: 400 700; }
-  /* Systems Pilot brand: navy, teal → blue → purple → pink */
   :root {
-    --navy: #06123D; --teal: #14B8A6; --cyan: #00B5D9; --blue: #1E63FF; --purple: #6A11CB; --pink: #EC4899;
-    --grad: linear-gradient(115deg, #00B5D9 0%, #1E63FF 38%, #6A11CB 70%, #EC4899 100%);
-    --bg: #F6F8FC; --card: #FFFFFF; --ink: #06123D; --muted: #5E6A8A; --line: #E3E8F3; --soft: #EEF2FA;
-    --accent: #1E63FF; --r: 18px; --shadow: 0 12px 32px -20px rgba(6, 18, 61, .45);
+    --bg: #F6F5F2; --surface: #FFFFFF; --ink: #101830; --muted: #636B7E; --faint: #8A91A1; --line: #E6E4DE; --soft: #F1EFEA;
+    --accent: #1F4FD6; --accent-ink: #FFFFFF; --accent-soft: #EAF0FD; --ok: #157F4B; --navy: #0B1533;
+    --brand: linear-gradient(135deg, #00B5D9 0%, #1E63FF 40%, #6A11CB 72%, #EC4899 100%);
+    --r: 14px; --r-sm: 10px; --shadow: 0 1px 2px rgba(16, 24, 48, .05); --shadow-lg: 0 24px 60px -24px rgba(16, 24, 48, .35);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #040B26; --card: #0B1740; --ink: #EEF2FF; --muted: #9AA6CC; --line: #1B2A5C; --soft: #0F1D4D; --accent: #4C8BFF; }
+    :root { --bg: #0E1117; --surface: #161A22; --ink: #ECEEF3; --muted: #9AA3B3; --faint: #737B8B; --line: #262B36; --soft: #1C2029;
+            --accent: #6E8FFF; --accent-ink: #0B1020; --accent-soft: #1C2440; --ok: #3DD68C; }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 15px/1.5 "Inter", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
-  h1, h2, h3, .logo b { font-family: "Poppins", "Inter", sans-serif; letter-spacing: -.02em; }
+  html, body { margin: 0; }
+  body { font: 14.5px/1.5 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-weight: 650; letter-spacing: -0.015em; margin: 0; }
   button { font: inherit; cursor: pointer; color: inherit; }
-  .top { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 18px; padding: 12px 24px;
-         background: var(--navy); color: #fff; }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .mark { width: 32px; height: 32px; border-radius: 9px; background: var(--grad); display: grid; place-items: center;
-          font: 800 18px "Poppins"; color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,.12) inset; }
-  .logo b { font-size: 17px; } .logo small { display: block; font-size: 11px; opacity: .7; letter-spacing: .08em; text-transform: uppercase; }
-  nav { display: flex; gap: 4px; margin-left: 10px; }
-  nav button { white-space: nowrap; border: 0; background: none; padding: 8px 12px; border-radius: 999px; color: rgba(255,255,255,.7); font-weight: 600; }
-  nav button.on { background: rgba(255,255,255,.12); color: #fff; }
-  .grow { flex: 1; }
-  .cta { border: 0; border-radius: 999px; padding: 11px 20px; font-weight: 700; color: #fff; background: var(--grad); box-shadow: 0 10px 24px -12px #6A11CB; }
-  .ghost { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 9px 16px; font-weight: 600; }
-  main { max-width: 1200px; margin: 0 auto; padding: 28px 24px 80px; }
-  .hero { border-radius: 26px; padding: 34px; margin-bottom: 30px; color: #fff; background: var(--navy); position: relative; overflow: hidden; }
-  .hero::after { content: ""; position: absolute; inset: auto -10% -60% 40%; height: 140%; background: var(--grad); filter: blur(70px); opacity: .55; }
-  .hero > * { position: relative; z-index: 1; }
-  .hero h1 { font-size: 36px; margin: 0 0 6px; }
-  .hero h1 em { font-family: "Script"; font-style: normal; font-weight: 700; font-size: 1.3em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .hero p { color: rgba(255,255,255,.75); margin: 0 0 22px; max-width: 620px; }
-  .formats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .fmt { text-align: left; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color: #fff; border-radius: 16px; padding: 16px; transition: transform .15s, background .15s; }
-  .fmt:hover { transform: translateY(-2px); background: rgba(255,255,255,.12); }
-  .fmt .ic { font-size: 24px; } .fmt b { display: block; margin: 6px 0 2px; } .fmt span { color: rgba(255,255,255,.7); font-size: 13px; }
-  h2 { font-size: 21px; margin: 0 0 14px; } h2 small { font: 500 14px "Inter"; color: var(--muted); margin-left: 8px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }
-  .reel { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
-  .reel .cover { aspect-ratio: 9/16; background: var(--soft) center/cover no-repeat; display: flex; align-items: flex-end; }
-  .chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(6,18,61,.7); color: #fff; margin: 10px; }
-  .reel .meta { padding: 10px 12px 12px; } .reel .meta b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .acts { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-  .acts a, .acts button { font-size: 12px; font-weight: 700; text-decoration: none; padding: 5px 10px; border-radius: 999px; background: var(--soft); border: 0; color: var(--ink); }
-  .empty { border: 2px dashed var(--line); border-radius: var(--r); padding: 36px; text-align: center; color: var(--muted); }
-  .tpls { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-  .tpl { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
-  .tpl .cat { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .tpl h3 { margin: 0; font-size: 18px; } .tpl p { margin: 0; color: var(--muted); font-size: 13.5px; }
+  a { color: var(--accent); }
+  .ico { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---- app frame: sidebar + content ---- */
+  .top { position: fixed; inset: 0 auto 0 0; width: 236px; display: flex; flex-direction: column; gap: 6px; padding: 18px 14px;
+         background: var(--surface); border-right: 1px solid var(--line); z-index: 10; }
+  .logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px 14px; }
+  .mark { width: 30px; height: 30px; border-radius: 8px; background: var(--brand); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 15px; }
+  .logo b { font-size: 15px; display: block; line-height: 1.2; } .logo small { display: block; font-size: 11.5px; color: var(--faint); }
+  .top .cta { order: 1; margin: 0 4px 10px; justify-content: center; }
+  nav { order: 2; display: flex; flex-direction: column; gap: 2px; }
+  nav button { display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 8px 10px; border-radius: 8px; color: var(--muted); font-weight: 500; text-align: left; white-space: nowrap; }
+  nav button:hover { background: var(--soft); color: var(--ink); }
+  nav button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  nav .sep { height: 1px; background: var(--line); margin: 8px 6px; }
+  .grow { order: 3; flex: 1; }
+  .brandsw { order: 4; display: flex; align-items: center; gap: 10px; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-sm); padding: 10px 12px; font-weight: 600; text-align: left; }
+  .brandsw:hover { border-color: var(--faint); }
+  .brandsw small { display: block; font-weight: 500; font-size: 11.5px; color: var(--faint); }
+  .brandsw .chev { margin-left: auto; color: var(--faint); }
+  #brandDots { display: flex; gap: 3px; } #brandDots i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+  .menu { position: fixed; left: 14px; bottom: 74px; width: 208px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px; z-index: 30; }
+  .menu button { display: flex; width: 100%; gap: 10px; align-items: center; border: 0; background: none; padding: 9px 10px; border-radius: 8px; text-align: left; font-weight: 500; }
+  .menu button:hover { background: var(--soft); } .menu button.on { font-weight: 650; } .menu button.on::after { content: "✓"; margin-left: auto; color: var(--accent); }
+  .menu .dots2 { display: flex; gap: 3px; } .menu .dots2 i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+  main { margin-left: 236px; padding: 36px 44px 80px; max-width: 1240px; }
+
+  /* ---- buttons ---- */
+  .cta { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: var(--r-sm); padding: 10px 16px; font-weight: 600; color: var(--accent-ink); background: var(--accent); white-space: nowrap; text-decoration: none; }
+  .cta:hover { filter: brightness(1.08); }
+  .ghost { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-sm); padding: 8px 14px; font-weight: 550; color: var(--ink); text-decoration: none; }
+  .ghost:hover { border-color: var(--faint); }
+
+  /* ---- page headings ---- */
+  section > h2 { font-size: 22px; margin: 0 0 4px; } h2 small { display: block; font-size: 14px; font-weight: 400; color: var(--muted); letter-spacing: 0; margin: 4px 0 0; }
+  section > h2 + * { margin-top: 20px; }
+  section h3.sub { font-size: 15px; margin: 32px 0 12px; }
+  p.sub { color: var(--muted); max-width: 720px; }
+
+  /* ---- home ---- */
+  .hero { margin-bottom: 36px; }
+  .hero h1 { font-size: 26px; } .hero h1 em { font-style: normal; }
+  .hero p { color: var(--muted); margin: 6px 0 20px; }
+  .formats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .fmt { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); transition: border-color .15s, box-shadow .15s; }
+  .fmt:hover { border-color: var(--accent); box-shadow: 0 6px 20px -12px rgba(31, 79, 214, .45); }
+  .fmt .ic { width: 38px; height: 38px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; margin-bottom: 14px; }
+  .fmt .ic .ico { width: 20px; height: 20px; }
+  .fmt b { display: block; font-size: 15px; margin-bottom: 2px; } .fmt span { color: var(--muted); font-size: 13px; }
+  h2 { font-size: 17px; margin: 0 0 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+  .reel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
+  .reel .cover { aspect-ratio: 9/16; background: var(--soft) center/cover no-repeat; display: flex; align-items: flex-start; }
+  .chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: rgba(16,24,48,.72); color: #fff; margin: 10px; backdrop-filter: blur(4px); }
+  .chip.ok { background: var(--ok); color: #fff; }
+  .reel .meta { padding: 12px; } .reel .meta b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+  .acts { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .acts a, .acts button { font-size: 12.5px; font-weight: 550; text-decoration: none; padding: 5px 10px; border-radius: 8px; background: var(--soft); border: 0; color: var(--ink); }
+  .acts a:hover { background: var(--accent-soft); color: var(--accent); }
+  .empty { border: 1px dashed var(--line); background: var(--surface); border-radius: var(--r); padding: 40px; text-align: center; color: var(--muted); }
+
+  /* ---- templates ---- */
+  .tpls { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; }
+  .tpl { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
+  .tpl .cat { font-size: 11.5px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+  .tpl h3 { font-size: 16px; } .tpl p { margin: 0; color: var(--muted); font-size: 13.5px; }
   .tpl ul { margin: 4px 0 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
-  .tpl .row { display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px; }
-  .tpl .row span { background: var(--soft); padding: 3px 9px; border-radius: 999px; }
+  .tpl .row { display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px; } .tpl .row span { background: var(--soft); padding: 3px 9px; border-radius: 999px; }
   .tpl .go { margin-top: auto; align-self: flex-start; }
-  .filters { display: flex; gap: 14px; flex-wrap: wrap; }
-  .look { border: 2px solid transparent; border-radius: 14px; background: var(--card); padding: 0; overflow: hidden; width: 128px; text-align: left; box-shadow: var(--shadow); }
+
+  /* ---- looks: filters, captions, titles (real pictures, plain names) ---- */
+  .filters { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .look { border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); padding: 0; overflow: hidden; text-align: left; box-shadow: var(--shadow); }
   .look img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: var(--soft); }
-  .look span { display: block; padding: 6px 8px; font-size: 12px; font-weight: 600; }
-  .look.on { border-color: var(--accent); }
-  .caps { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
-  .cap { border: 2px solid transparent; border-radius: 12px; overflow: hidden; background: var(--card); padding: 0; text-align: left; box-shadow: var(--shadow); }
-  .cap img { width: 100%; display: block; } .cap span { display: block; padding: 6px 10px; font-size: 12px; }
-  .cap.on { border-color: var(--accent); }
+  .look span { display: block; padding: 8px 10px 0; font-size: 13px; font-weight: 600; } .look em { display: block; padding: 2px 10px 10px; font-size: 12px; font-style: normal; color: var(--muted); line-height: 1.35; }
+  .look.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .caps { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .cap { border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); padding: 0; text-align: left; }
+  .cap img { width: 100%; display: block; } .cap span { display: block; padding: 8px 10px; font-size: 12.5px; color: var(--muted); } .cap span b { color: var(--ink); }
+  .cap.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   .titles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-  .tcard { border: 2px solid transparent; border-radius: 16px; overflow: hidden; background: var(--card); padding: 0; text-align: left; box-shadow: var(--shadow); }
+  .tcard { border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); padding: 0; text-align: left; }
   .tcard img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #3a3430; }
-  .tcard span { display: block; padding: 8px 10px; font-size: 12px; color: var(--muted); } .tcard.on { border-color: var(--accent); }
-  .brandcard { display: grid; grid-template-columns: 240px 1fr; gap: 24px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); }
-  .brandcard img { width: 100%; border-radius: 14px; } .sw { display: flex; gap: 8px; margin: 10px 0 16px; } .sw i { width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--line); }
-  section h3.sub { margin: 26px 0 10px; font-size: 16px; }
-  /* wizard */
-  dialog { border: 0; padding: 0; border-radius: 26px; width: min(820px, 95vw); background: var(--card); color: var(--ink); box-shadow: 0 30px 80px -30px rgba(0,0,0,.6); }
-  dialog::backdrop { background: rgba(6, 18, 61, .55); backdrop-filter: blur(4px); }
-  .wz-head { padding: 22px 26px 0; display: flex; align-items: center; gap: 12px; }
-  .dots { display: flex; gap: 6px; flex: 1; } .dots i { height: 5px; flex: 1; border-radius: 9px; background: var(--line); } .dots i.on { background: var(--grad); }
-  .x { border: 0; background: var(--soft); width: 34px; height: 34px; border-radius: 50%; }
-  .wz-body { padding: 18px 26px; max-height: 68vh; overflow: auto; }
-  .wz-body h3 { font-size: 24px; margin: 6px 0 4px; } .wz-body p.sub { color: var(--muted); margin: 0 0 18px; }
-  .wz-foot { display: flex; justify-content: space-between; padding: 14px 26px 22px; border-top: 1px solid var(--line); }
-  .opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-  .opt { border: 1.5px solid var(--line); background: var(--card); border-radius: 16px; padding: 14px; text-align: left; }
-  .opt b { display: block; } .opt span { color: var(--muted); font-size: 12.5px; }
-  .opt.on, .pill.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--card)); }
-  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-  .pill { border: 1.5px solid var(--line); background: var(--card); border-radius: 999px; padding: 7px 14px; font-weight: 600; font-size: 13.5px; }
-  label.f { display: block; font-weight: 700; font-size: 13px; margin: 14px 0 6px; }
-  input[type=text], textarea { width: 100%; font: inherit; color: inherit; background: var(--soft); border: 1.5px solid transparent; border-radius: 12px; padding: 11px 13px; }
-  input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); }
-  .drop { border: 2px dashed var(--line); border-radius: 18px; padding: 34px; text-align: center; color: var(--muted); } .drop.hover { border-color: var(--accent); background: var(--soft); }
-  .note { font-size: 12.5px; color: var(--muted); background: var(--soft); border-radius: 12px; padding: 10px 12px; margin-top: 12px; }
-  .toggle { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-weight: 600; }
-  .bar { height: 8px; background: var(--soft); border-radius: 9px; overflow: hidden; margin-top: 10px; } .bar i { display: block; height: 100%; width: 0; background: var(--grad); transition: width .2s; }
-  .seg { display: inline-flex; background: var(--soft); border-radius: 999px; padding: 4px; gap: 4px; flex-wrap: wrap; }
-  .seg button { border: 0; background: none; padding: 7px 14px; border-radius: 999px; font-weight: 600; } .seg button.on { background: var(--card); box-shadow: 0 2px 8px -4px rgba(0,0,0,.3); }
-  audio { width: 100%; margin-top: 10px; }
-  .hidden { display: none !important; }
-  .sndform { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
-  .sndform input[type=text] { flex: 1; min-width: 200px; }
-  .snd { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px; background: var(--card, #fff); margin-bottom: 8px; border: 1px solid rgba(0,0,0,.06); }
-  .snd .x { margin-left: auto; }
-  .snd .chip { margin: 0; }
-  #tab-sounds a.cta, #tab-sounds a.ghost { text-decoration: none; display: inline-block; color: inherit; }
-  #tab-sounds a.cta { color: #fff; }
-  .chip.ok { background: #16a34a; color: #fff; }
-  .fontcard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; background: var(--card); border-radius: 18px; padding: 20px; border: 1px solid var(--line); }
-  .fontcard select { width: 100%; padding: 9px; border-radius: 10px; border: 1px solid var(--line); }
-  .fprev { font-size: 40px; color: #EC4899; margin-top: 12px; line-height: 1.2; min-height: 54px; }
-  @media (max-width: 820px) { .fontcard { grid-template-columns: 1fr; } }
-  #tab-sounds ol { padding-left: 20px; line-height: 1.7; }
-  /* brands */
-  .brandsw span { white-space: nowrap; } .menu .dots2 i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--line); }
-  .cta { white-space: nowrap; }
-  .brandsw { border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-  .brandsw i, .bcard .dots2 i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,.4); }
-  .menu { position: absolute; top: 58px; right: 150px; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 6px; min-width: 240px; z-index: 20; }
-  .menu button { display: flex; width: 100%; gap: 10px; align-items: center; border: 0; background: none; padding: 10px 12px; border-radius: 10px; text-align: left; font-weight: 600; }
-  .menu button:hover { background: var(--soft); } .menu button.on::after { content: "✓"; margin-left: auto; color: var(--accent); }
-  .bcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 26px; }
-  .bcard { background: var(--card); border: 2px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); }
-  .bcard.on { border-color: var(--accent); } .bcard b { font-size: 16px; } .bcard .dots2 { display: flex; gap: 6px; } .bcard .dots2 i { width: 22px; height: 22px; border-color: var(--line); }
-  .bcard.add { border-style: dashed; align-items: center; justify-content: center; color: var(--muted); min-height: 130px; cursor: pointer; }
+  .tcard span { display: block; padding: 8px 10px; font-size: 12.5px; color: var(--muted); } .tcard.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  /* ---- brand ---- */
+  .brandcard { display: grid; grid-template-columns: 240px 1fr; gap: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; box-shadow: var(--shadow); }
+  .brandcard img { width: 100%; border-radius: 10px; } .sw { display: flex; gap: 8px; margin: 10px 0 16px; } .sw i { width: 36px; height: 36px; border-radius: 9px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
+  .bcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 30px; }
+  .bcard { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); }
+  .bcard.on { border-color: var(--accent); } .bcard b { font-size: 15px; }
+  .bcard .dots2 { display: flex; gap: 6px; } .bcard .dots2 i { width: 20px; height: 20px; border-radius: 6px; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+  .bcard.add { border-style: dashed; align-items: center; justify-content: center; color: var(--muted); min-height: 140px; cursor: pointer; box-shadow: none; }
+  .bcard.add:hover { border-color: var(--accent); color: var(--accent); }
   .routes { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
   .designs { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-  .design { border: 2px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--card); padding: 0; text-align: left; }
+  .design { border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); padding: 0; text-align: left; }
   .design img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: var(--soft); }
-  .design .dd { padding: 8px 10px; } .design .dd span { display: block; color: var(--muted); font-size: 12px; } .design.on { border-color: var(--accent); }
-  .design .sw2 { display: flex; gap: 4px; margin-top: 6px; } .design .sw2 i { width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--line); }
-  .steps { margin: 0 0 14px; padding-left: 20px; color: var(--muted); line-height: 1.6; }
-  .lookpick { display: grid; gap: 14px; } .lookpick figure { margin: 0; background: var(--soft); border-radius: 16px; padding: 10px; }
-  .lookpick img { width: 100%; border-radius: 10px; display: block; } .lookpick figcaption { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 4px 2px; flex-wrap: wrap; }
-  .prompts h3 { margin: 26px 0 10px; } .pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-  .pcard { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
-  .pcard b { font-size: 14px; } .pcard p { margin: 0; color: var(--muted); font-size: 13px; } .pcard button { align-self: flex-start; margin-top: auto; }
-  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 16px; border-radius: 12px; opacity: 0; transition: .2s; z-index: 50; pointer-events: none; }
+  .design .dd { padding: 10px; } .design .dd span { display: block; color: var(--muted); font-size: 12px; } .design.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .design .sw2 { display: flex; gap: 4px; margin-top: 8px; } .design .sw2 i { width: 16px; height: 16px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+  .steps { margin: 0 0 16px; padding-left: 20px; color: var(--muted); line-height: 1.65; }
+  .lookpick { display: grid; gap: 14px; } .lookpick figure { margin: 0; background: var(--soft); border-radius: 12px; padding: 10px; }
+  .lookpick img { width: 100%; border-radius: 8px; display: block; } .lookpick figcaption { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 4px 2px; flex-wrap: wrap; }
+
+  /* ---- prompts + resources ---- */
+  .prompts h3 { margin: 30px 0 12px; font-size: 15px; } .pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
+  .pcard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); }
+  .pcard b { font-size: 14px; } .pcard p { margin: 0; color: var(--muted); font-size: 13px; } .pcard button, .pcard a { align-self: flex-start; margin-top: auto; }
+  .pcard .chip { margin: 0; background: var(--soft); color: var(--muted); backdrop-filter: none; } .pcard .chip.ok { background: #E7F6EE; color: var(--ok); }
+
+  /* ---- fonts / sounds ---- */
+  .fontcard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; background: var(--surface); border-radius: var(--r); padding: 22px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .fontcard select { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; }
+  .fprev { font-size: 36px; color: var(--accent); margin-top: 12px; line-height: 1.2; min-height: 50px; }
+  .sndform { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0; } .sndform input[type=text] { flex: 1; min-width: 200px; }
+  .snd { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px; background: var(--surface); margin-bottom: 8px; border: 1px solid var(--line); }
+  .snd .x { margin-left: auto; } .snd .chip { margin: 0; }
+  #tab-sounds a.cta, #tab-sounds a.ghost { text-decoration: none; } #tab-sounds ol { padding-left: 20px; line-height: 1.7; }
+
+  /* ---- dialogs ---- */
+  dialog { border: 0; padding: 0; border-radius: 18px; width: min(840px, 95vw); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-lg); }
+  dialog::backdrop { background: rgba(11, 21, 51, .45); backdrop-filter: blur(3px); }
+  .wz-head { padding: 20px 24px 0; display: flex; align-items: center; gap: 12px; }
+  .dots { display: flex; gap: 5px; flex: 1; } .dots i { height: 4px; flex: 1; border-radius: 9px; background: var(--line); } .dots i.on { background: var(--accent); }
+  .x { border: 0; background: var(--soft); width: 32px; height: 32px; border-radius: 50%; color: var(--muted); }
+  .wz-body { padding: 18px 24px; max-height: 68vh; overflow: auto; }
+  .wz-body h3 { font-size: 21px; margin: 6px 0 4px; } .wz-body p.sub { margin: 0 0 18px; }
+  .wz-foot { display: flex; justify-content: space-between; padding: 14px 24px 20px; border-top: 1px solid var(--line); }
+  .opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+  .opt { border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px; padding: 14px; text-align: left; }
+  .opt:hover { border-color: var(--faint); } .opt b { display: block; font-weight: 600; } .opt span { color: var(--muted); font-size: 12.5px; }
+  .opt.on, .pill.on { border-color: var(--accent); background: var(--accent-soft); }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .pill { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 13px; font-weight: 550; font-size: 13.5px; }
+  label.f { display: block; font-weight: 600; font-size: 13px; margin: 16px 0 6px; }
+  input[type=text], textarea { width: 100%; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .drop { border: 1.5px dashed var(--line); border-radius: 14px; padding: 34px; text-align: center; color: var(--muted); background: var(--soft); }
+  .drop.hover { border-color: var(--accent); background: var(--accent-soft); }
+  .note { font-size: 13px; color: var(--muted); background: var(--soft); border-radius: 10px; padding: 10px 12px; margin-top: 12px; }
+  .toggle { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-weight: 550; }
+  .bar { height: 6px; background: var(--soft); border-radius: 9px; overflow: hidden; margin-top: 10px; } .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  .seg { display: inline-flex; background: var(--soft); border-radius: 10px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+  .seg button { border: 0; background: none; padding: 6px 13px; border-radius: 8px; font-weight: 550; color: var(--muted); } .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+  audio { width: 100%; margin-top: 10px; }
+  .hidden { display: none !important; }
+  .toast { position: fixed; bottom: 22px; left: calc(50% + 118px); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; opacity: 0; transition: .2s; z-index: 50; pointer-events: none; }
   .toast.on { opacity: 1; }
-  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-  @media (max-width: 820px) { .formats { grid-template-columns: 1fr 1fr; } .brandcard { grid-template-columns: 1fr; }
-    .top { flex-wrap: wrap; padding: 10px 16px; gap: 10px; } .logo small { display: none; }
-    nav { order: 5; width: 100%; margin: 0; overflow-x: auto; scrollbar-width: none; }
-    .brandsw { padding: 6px 10px; font-size: 13px; } .top .cta { padding: 8px 14px; font-size: 13px; }
-    .menu { right: 16px; top: 52px; } main { padding: 20px 16px 60px; } }
+  footer { margin-left: 236px; text-align: center; color: var(--faint); font-size: 12px; padding: 20px; }
+
+  /* ---- phones and small screens: top bar + scrolling tabs ---- */
+  @media (max-width: 900px) {
+    .top { position: sticky; inset: 0 auto auto 0; width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 14px; border-right: 0; border-bottom: 1px solid var(--line); gap: 8px; }
+    .logo { padding: 0; } .logo small { display: none; }
+    .grow { display: none; } .brandsw { order: 2; width: auto; margin-left: auto; padding: 6px 10px; } .brandsw small, .brandsw .chev { display: none; }
+    .top .cta { order: 3; margin: 0; padding: 7px 11px; font-size: 13px; }
+    .brandsw { max-width: 150px; } #brandName { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 90px; }
+    .logo b { font-size: 14px; } .logo > div:last-child { display: none; }
+    nav { order: 5; width: 100%; flex-direction: row; overflow-x: auto; scrollbar-width: none; } nav .sep { display: none; }
+    .menu { left: auto; right: 14px; top: 56px; bottom: auto; }
+    main { margin: 0; padding: 22px 16px 60px; } footer { margin: 0; } .toast { left: 50%; }
+    .formats { grid-template-columns: 1fr 1fr; } .brandcard { grid-template-columns: 1fr; } .fontcard { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 <div class="top">
   <div class="logo"><div class="mark">S</div><div><b>Reel Studio</b><small>by Systems Pilot</small></div></div>
+  <button class="cta" id="newBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New reel</button>
   <nav>
-    <button data-tab="home" class="on">Home</button>
-    <button data-tab="templates">Templates</button>
-    <button data-tab="looks">Looks</button>
-    <button data-tab="sounds">Sounds</button>
-    <button data-tab="brand">Brands</button>
-    <button data-tab="prompts">What to say</button>
-    <button data-tab="free">Free resources</button>
-    <button onclick="window.open('/library','_blank')">Effects ↗</button>
+    <button data-tab="home" class="on"><svg class="ico" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg> Home</button>
+    <button data-tab="templates"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Templates</button>
+    <button data-tab="looks"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" opacity=".35"/><circle cx="12" cy="12" r="4"/></svg> Looks</button>
+    <button data-tab="sounds"><svg class="ico" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 8.5a5 5 0 0 1 0 7M19.5 6a8.5 8.5 0 0 1 0 12"/></svg> Sounds</button>
+    <button data-tab="brand"><svg class="ico" viewBox="0 0 24 24"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg> Brands</button>
+    <div class="sep"></div>
+    <button data-tab="prompts"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg> What to say</button>
+    <button data-tab="free"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg> Free resources</button>
+    <button onclick="window.open('/library','_blank')"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l2.2 5.3L20 9l-4.4 3.8L17 18.5 12 15.6 7 18.5l1.4-5.7L4 9l5.8-.7z"/></svg> Effects library</button>
   </nav>
   <span class="grow"></span>
-  <button class="brandsw" id="brandSw" title="Which brand you're making reels for"><span id="brandDots"></span><span id="brandName">Brand</span> ▾</button>
+  <button class="brandsw" id="brandSw" title="Which brand you're making reels for"><span id="brandDots"></span><span><small>Brand</small><span id="brandName">Brand</span></span><span class="chev">⌃</span></button>
   <div class="menu hidden" id="brandMenu"></div>
-  <button class="cta" id="newBtn">＋ New reel</button>
 </div>
 
 <main>
   <section id="tab-home">
     <div class="hero">
-      <h1>What are we <em>making</em> today?</h1>
-      <p>Pick a format, or start from a template. A few quick questions, then Claude edits it in your brand.</p>
+      <h1>What are we making today?</h1>
+      <p>Pick a kind of reel. A few quick taps, then Claude edits it in your brand.</p>
       <div class="formats">
-        <button class="fmt" data-fmt="talking-head"><div class="ic">🎙️</div><b>Talk to camera</b><span>Pauses cut, styled in your brand.</span></button>
-        <button class="fmt" data-fmt="voiceover"><div class="ic">🎬</div><b>Clips + voice</b><span>Your b-roll, cut to your words.</span></button>
-        <button class="fmt" data-fmt="faceless"><div class="ic">✍️</div><b>Text & photos</b><span>No camera needed.</span></button>
-        <button class="fmt" data-nav="templates"><div class="ic">✨</div><b>From a template</b><span>Copy a proven idea.</span></button>
+        <button class="fmt" data-fmt="talking-head"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><b>Talk to camera</b><span>Pauses cut, styled in your brand.</span></button>
+        <button class="fmt" data-fmt="voiceover"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></div><b>Clips + voice</b><span>Your b-roll, cut to your words.</span></button>
+        <button class="fmt" data-fmt="faceless"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 6V4h16v2M12 4v16M9 20h6"/></svg></div><b>Text &amp; photos</b><span>No camera needed.</span></button>
+        <button class="fmt" data-nav="templates"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><b>From a template</b><span>Start from a proven idea.</span></button>
       </div>
     </div>
     <h2>Your reels</h2>
@@ -193,13 +229,13 @@
   </section>
 
   <section id="tab-looks" class="hidden">
-    <h2>Looks <small>everything is shown in your brand</small></h2>
+    <h2>Looks <small>Shown on your own video when you have one, otherwise on a sample photo.</small></h2>
     <h3 class="sub">Title styles</h3>
     <div class="pills"><input type="text" id="tText" value="A Day With Me" style="max-width:320px"></div>
     <div class="titles" id="titleGallery"></div>
     <h3 class="sub">Caption styles</h3>
     <div class="caps" id="capGallery"></div>
-    <h3 class="sub">Filters</h3>
+    <h3 class="sub">Filters</h3><p class="sub" style="margin-top:-6px">Filters change the colour and mood of your footage.</p>
     <div id="gradeGallery"></div>
     <h3 class="sub">Stickers</h3>
     <p class="sub">1,500+ stickers in 12 styles, glossy 3D and animated emoji, stamps and badges, all in your colours.
@@ -399,12 +435,13 @@ function fromTemplate(id) {
 const SAMPLE = { "with-me": { kicker: "mini vlog", sub: "January 2026" }, diary: { kicker: "visual diary" }, episode: { kicker: "mini vlog", tag: "Eps #1", location: "your location" },
   sparkle: { tag: "new chapter" }, headline: { script: "vlog" }, location: { sub: "September 2026" }, chapter: { kicker: "part one", number: "01" }, typed: {} };
 const titleImg = (t, text) => `/api/title-preview?${q(Object.assign({ template: t, title: t === "location" ? "Cape Town" : t === "typed" ? "POV: " + text : text }, SAMPLE[t] || {}))}`;
+const niceName = k => k.endsWith(".cube") ? k.replace(/\.cube$/i, "").replace(/[-_]+/g, " ") : (k.charAt(0).toUpperCase() + k.slice(1)).replace(/-/g, " ").replace(/\bbw\b/i, "Black & white");
 function drawLooks() {
   const text = $("#tText").value || "A Day With Me";
   $("#titleGallery").innerHTML = Object.keys(O.titles).map(t => `<div class="tcard"><img loading="lazy" src="${titleImg(t, text)}"><span><b>${t}</b></span></div>`).join("");
   $("#capGallery").innerHTML = Object.entries(O.captions).map(([k, d]) => `<div class="cap"><img loading="lazy" src="/api/caption-preview?style=${k}"><span><b>${k}</b> · ${esc(d)}</span></div>`).join("");
   $("#gradeGallery").innerHTML = Object.entries(O.grades).map(([g, list]) => `<h3 class="sub" style="margin-top:14px">${g}</h3><div class="filters">${list.map(k =>
-    `<div class="look"><img loading="lazy" src="/api/grade-preview?grade=${k}"><span>${k}</span></div>`).join("")}</div>`).join("");
+    `<div class="look"><img loading="lazy" src="/api/grade-preview?grade=${encodeURIComponent(k)}" alt=""><span>${esc(niceName(k))}</span><em>${esc((O.grade_desc || {})[k] || (k.endsWith(".cube") ? "Your own filter" : ""))}</em></div>`).join("")}</div>`).join("");
 }
 let tt; $("#tText").oninput = () => { clearTimeout(tt); tt = setTimeout(drawLooks, 400); };
 function drawBrand() {
@@ -576,9 +613,9 @@ const STEPS = [
       <div class="pills" style="margin-top:12px">${VIBES.map(v => `<button class="pill ${(B.vibe || []).includes(v) ? "on" : ""}" data-multi="vibe" data-v="${v}">${v}</button>`).join("")}</div>
       <label class="f">Love a reel's style? Paste its link (optional)</label><input type="text" id="insp" placeholder="https://www.instagram.com/reel/…" value="${esc(B.inspiration || "")}">
       <p class="note">I'll study its pacing, colours and text style and use them with <b>your</b> brand.</p>` },
-  { id: "look", show: () => true, ok: () => !!B.grade, html: () => `<h3>Pick a filter</h3><p class="sub">${vidFile() ? "Shown on your own video." : "Shown on a sample; it adapts to your footage."}</p>
+  { id: "look", show: () => true, ok: () => !!B.grade, html: () => `<h3>Pick a filter</h3><p class="sub">${vidFile() ? "Shown on your own video." : "Shown on a sample photo; it adapts to your footage."}</p>
       ${Object.entries(O.grades).map(([g, list]) => `<label class="f">${g}</label><div class="filters">${list.map(k =>
-        `<button class="look ${B.grade === k ? "on" : ""}" data-set="grade" data-v="${k}"><img loading="lazy" src="/api/grade-preview?${q({ grade: k, file: vidFile() })}"><span>${k}</span></button>`).join("")}</div>`).join("")}` },
+        `<button class="look ${B.grade === k ? "on" : ""}" data-set="grade" data-v="${k}"><img loading="lazy" src="/api/grade-preview?${q({ grade: k, file: vidFile() })}" alt=""><span>${esc(niceName(k))}</span><em>${esc((O.grade_desc || {})[k] || "")}</em></button>`).join("")}</div>`).join("")}` },
   { id: "title", show: () => true, ok: () => !!B.title, html: () => {
       const text = B.titleText || (B.topic ? B.topic.split(" ").slice(0, 4).join(" ") : "A Day With Me");
       return `<h3>Pick a title style</h3><p class="sub">Shown in your brand. Change the words any time.</p><input type="text" id="titleText" value="${esc(text)}" style="margin-bottom:12px">
