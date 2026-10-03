@@ -33,7 +33,11 @@ def _sounds():
                      + os.path.splitext(os.path.basename(f))[0], "src": f})
     out_dir = os.path.dirname(OUT)
     for r in rows:
-        r["src"] = os.path.relpath(r["src"], out_dir).replace(os.sep, "/")
+        try:
+            r["src"] = os.path.relpath(r["src"], out_dir).replace(os.sep, "/")
+        except ValueError:                       # Windows: page and sounds on different drives
+            import pathlib
+            r["src"] = pathlib.Path(r["src"]).resolve().as_uri()
     return rows
 
 
