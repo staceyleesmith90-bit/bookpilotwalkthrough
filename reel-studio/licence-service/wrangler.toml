@@ -8,6 +8,11 @@ compatibility_date = "2026-09-01"
 binding = "LICENCES"
 id = "PASTE_KV_NAMESPACE_ID"
 
+# Release zips for automatic updates (free R2 bucket): npx wrangler r2 bucket create reel-releases
+[[r2_buckets]]
+binding = "RELEASES"
+bucket_name = "reel-releases"
+
 [vars]
 PRICE_ZAR = "449.00"                 # monthly price in rand (PayFast)
 PRODUCT = "Reel Studio monthly"

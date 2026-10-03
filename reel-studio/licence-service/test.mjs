@@ -18,5 +18,15 @@ v = await (await call("/api/licence/validate", { key, machine: "m3" })).json(); 
 v = await (await call("/api/licence/validate", { key: "RS-NOPE", machine: "m1" })).json(); ok(!v.valid, "unknown key rejected");
 await call("/api/admin/revoke", { key }, "t0k");
 v = await (await call("/api/licence/validate", { key, machine: "m1" })).json(); ok(!v.valid, "revoked key rejected");
+// automatic updates: only active keys get the zip
+const k2 = (await (await call("/api/admin/issue", { email: "u@b.c", days: 31 }, "t0k")).json()).key;
+await call("/api/licence/validate", { key: k2, machine: "m9" });
+env.RELEASES = { get: async p => p === "releases/1.13.0.zip" ? { body: "ZIPDATA" } : null };
+ok((await call("/api/admin/release", { version: "1.13.0", sha256: "a".repeat(64), notes: "New effects" })).status === 401, "release needs token");
+await call("/api/admin/release", { version: "1.13.0", sha256: "a".repeat(64), notes: "New effects" }, "t0k");
+const latest = await (await call("/api/update/latest")).json(); ok(latest.version === "1.13.0" && latest.notes === "New effects", "latest release");
+ok((await call("/api/update/download", { key: k2, machine: "m9" })).status === 200, "active key downloads update");
+ok((await call("/api/update/download", { key: key, machine: "m1" })).status === 403, "revoked key gets no update");
+ok((await call("/api/update/download", { key: k2, machine: "other" })).status === 403, "unknown machine gets no update");
 const page = await (await call("/buy")).text(); ok(page.includes("sandbox.payfast.co.za/eng/process") && page.includes('name="signature"'), "checkout form");
 console.log("all good");

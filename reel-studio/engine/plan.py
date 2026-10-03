@@ -533,7 +533,13 @@ def to_timeline(plan, rc=None, source=None):
                 # broll:<file>[|<look>]  look = any filter name (bw-classic, warm-film…) or plan["broll_look"]
                 bfile, _, blook = arg.partition("|")
                 blook = (blook.strip() or plan.get("broll_look") or "").strip()
-                broll.append({"file": bfile.strip(), "start": a, "dur": round(b_end - a, 3),
+                from .hdr import ensure_sdr
+                bf = bfile.strip()
+                bf_abs = bf if os.path.isabs(bf) else os.path.join(ROOT_DIR, bf)
+                sdr = ensure_sdr(bf_abs)
+                if sdr != bf_abs:
+                    bf = os.path.relpath(sdr, ROOT_DIR)
+                broll.append({"file": bf, "start": a, "dur": round(b_end - a, 3),
                               **({"look": BROLL_LOOKS.get(blook, blook)} if blook else {})})
                 ttype = pack.get("transition", "whip")
                 transitions.append({"t": round(a, 3), "type": ttype, "dur": 0.3})

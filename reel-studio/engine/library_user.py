@@ -185,6 +185,14 @@ def notifications(jobs=None):
                         "when": time.time(), "action": None})
         elif j.get("state") in ("roughcut", "rendering", "music"):
             out.append({"id": f"busy-{slug}-{j['state']}", "text": f"Working on “{slug}”…", "when": time.time(), "action": None})
+    try:
+        from .update import whats_new
+        w = whats_new()
+        if w:
+            out.append({"id": f"new-{w['version']}", "text": f"✨ Updated to {w['version']}. {w.get('notes', '')}".strip(),
+                        "when": w["when"], "action": None})
+    except Exception:
+        pass
     if time.time() - _update_note["t"] > 6 * 3600:
         _update_note["t"] = time.time()
         try:

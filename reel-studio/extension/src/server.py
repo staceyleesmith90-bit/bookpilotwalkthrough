@@ -49,8 +49,10 @@ def ensure_home():
     os.makedirs(HOME, exist_ok=True)
     for d in ("inbox", "projects", "brand", "brands", "out"):
         os.makedirs(os.path.join(HOME, d), exist_ok=True)
-    if os.path.abspath(APP) == HOME or _version(HOME) == _version(APP) and os.path.isdir(os.path.join(HOME, "engine")):
-        return
+    vkey = lambda v: [int(x) for x in str(v).split(".") if x.isdigit()]
+    if os.path.abspath(APP) == HOME or (os.path.isdir(os.path.join(HOME, "engine"))
+                                        and vkey(_version(HOME)) >= vkey(_version(APP))):
+        return                    # already current, or newer thanks to an automatic update — never go backwards
     for name in COPY:
         src = os.path.join(APP, name)
         dst = os.path.join(HOME, name)
@@ -310,8 +312,20 @@ def reel_licence() -> str:
     return ("✓ " if ok else "✗ ") + msg
 
 
+def _auto_update():
+    """Once a day: if a newer Reel Studio is out and the subscription is active, install it quietly.
+    Their brands, reels and uploads are never touched (engine/update.py keeps them)."""
+    try:
+        env = dict(ENV, REEL_EXTENSION_VERSION=_version(APP))
+        subprocess.run([sys.executable, "-m", "engine", "auto-update"], cwd=HOME, env=env,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=900)
+    except Exception:
+        pass
+
+
 def main():
     ensure_home()
+    threading.Thread(target=_auto_update, daemon=True).start()
     threading.Thread(target=_tools_on_path, daemon=True).start()
     threading.Thread(target=_browser_ready, daemon=True).start()
     mcp.run()

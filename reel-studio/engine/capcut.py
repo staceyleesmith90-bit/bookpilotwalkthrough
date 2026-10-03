@@ -95,7 +95,10 @@ def export(project_dir, tl, name=None, captions=True, dest=None, mode="editable"
     root = dest or capcut_projects_folder() or os.path.join(project_dir, "renders", "capcut")
     os.makedirs(root, exist_ok=True)
     folder = cc.DraftFolder(root)
-    script = folder.create_draft(name, W, H, 30, allow_replace=True)
+    base_name, n = name, 2
+    while os.path.exists(os.path.join(root, name)):     # never overwrite a CapCut project: make "Name 2", "Name 3"…
+        name, n = f"{base_name} {n}", n + 1
+    script = folder.create_draft(name, W, H, 30, allow_replace=False)
     media = os.path.join(root, name, "reel-studio-media")      # media lives inside the draft folder
     os.makedirs(media, exist_ok=True)
     SEC = cc.SEC

@@ -47,7 +47,17 @@ def new(source=None, name=None):
     meta = {"slug": slug, "created": time.strftime("%Y-%m-%d %H:%M"), "source": None, "brand": active()}
     if source:
         dst = path(slug, "source", os.path.basename(source))
-        shutil.copy2(source, dst)
+        from . import hdr
+        if hdr.is_hdr(source):              # iPhone HDR: convert once so colours and text look right
+            dst = os.path.splitext(dst)[0] + "-sdr.mp4"
+            try:
+                hdr.to_sdr(source, dst)
+                meta["hdr_converted"] = True
+            except Exception:
+                dst = path(slug, "source", os.path.basename(source))
+                shutil.copy2(source, dst)
+        else:
+            shutil.copy2(source, dst)
         meta["source"] = os.path.relpath(dst, ROOT)
     save(slug, "project.json", meta)
     return slug

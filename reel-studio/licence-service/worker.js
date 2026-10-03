@@ -6,8 +6,13 @@
 //   GET  /welcome?ref=…            -> after paying: shows their licence key + how to install
 //   POST /api/licence/validate     -> the extension checks a key {key, machine} -> {valid, renews, message}
 //   POST /api/admin/issue|revoke   -> manual keys (PayPal customers, testers), Bearer ADMIN_TOKEN
+//   GET  /api/update/latest        -> the newest release {version, notes, sha256, size, min_extension}
+//   POST /api/update/download      -> the release zip, only for an active subscription {key, machine}
+//   POST /api/admin/release        -> publish a release (after uploading its zip to R2), Bearer ADMIN_TOKEN
 //
-// Storage (Workers KV): "key:<KEY>" -> {email, status, renews, machines[], token, ref}; "ref:<REF>" -> KEY
+// Storage (Workers KV): "key:<KEY>" -> {email, status, renews, machines[], token, ref}; "ref:<REF>" -> KEY;
+//   "release:latest" -> {version, notes, sha256, size, min_extension}. Release zips live in R2 (binding RELEASES)
+//   at "releases/<version>.zip" — the app only, never anyone's files.
 
 export default {
   async fetch(req, env) {
@@ -17,6 +22,8 @@ export default {
       if (url.pathname === "/api/payfast/itn" && req.method === "POST") return await itn(req, env);
       if (url.pathname === "/welcome") return await welcome(url, env);
       if (url.pathname === "/api/licence/validate" && req.method === "POST") return await validate(req, env);
+      if (url.pathname === "/api/update/latest") return json(JSON.parse(await env.LICENCES.get("release:latest") || "{}"));
+      if (url.pathname === "/api/update/download" && req.method === "POST") return await download(req, env);
       if (url.pathname.startsWith("/api/admin/") && req.method === "POST") return await admin(req, env, url);
       return new Response("Reel Studio licence service", { status: 200 });
     } catch (e) {
@@ -122,9 +129,32 @@ async function validate(req, env) {
                 message: rec.status === "cancelled" ? "Subscription cancelled — works until the paid month ends." : "Subscription active." });
 }
 
+async function activeKey(key, machine, env) {
+  const raw = await env.LICENCES.get(`key:${String(key).trim().toUpperCase()}`);
+  if (!raw) return false;
+  const rec = JSON.parse(raw);
+  return rec.status !== "revoked" && rec.renews > Date.now() && (!machine || (rec.machines || []).includes(machine));
+}
+
+async function download(req, env) {
+  const { key = "", machine = "" } = await req.json().catch(() => ({}));
+  if (!(await activeKey(key, machine, env))) return json({ error: "Updates are included while your subscription is active." }, 403);
+  const rel = JSON.parse(await env.LICENCES.get("release:latest") || "{}");
+  if (!rel.version || !env.RELEASES) return json({ error: "No release published yet." }, 404);
+  const obj = await env.RELEASES.get(`releases/${rel.version}.zip`);
+  if (!obj) return json({ error: "Release file missing." }, 404);
+  return new Response(obj.body, { headers: { "content-type": "application/zip", "x-version": rel.version } });
+}
+
 async function admin(req, env, url) {
   if ((req.headers.get("authorization") || "") !== `Bearer ${env.ADMIN_TOKEN}` || !env.ADMIN_TOKEN) return json({ error: "unauthorised" }, 401);
   const b = await req.json().catch(() => ({}));
+  if (url.pathname === "/api/admin/release") {          // after: npx wrangler r2 object put reel-releases/releases/<v>.zip
+    if (!/^\d+(\.\d+)*$/.test(b.version || "") || !/^[0-9a-f]{64}$/.test(b.sha256 || "")) return json({ error: "need version + sha256" }, 400);
+    await env.LICENCES.put("release:latest", JSON.stringify({ version: b.version, notes: b.notes || "", sha256: b.sha256,
+      size: b.size || 0, min_extension: b.min_extension || "0", published: new Date().toISOString().slice(0, 10) }));
+    return json({ ok: true });
+  }
   if (url.pathname === "/api/admin/issue") {             // e.g. PayPal customers, testers, founders
     const key = newKey();
     await env.LICENCES.put(`key:${key}`, JSON.stringify({ email: b.email || "", status: "active", machines: [],

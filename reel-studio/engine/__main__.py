@@ -311,6 +311,10 @@ def main(argv=None):
         for r in res:
             if "error" in r:
                 print("  skipped:", r["url"], r["error"][-80:])
+    elif c == "auto-update":
+        from .update import auto_update
+        msg = auto_update(force=bool(a.options == "now"))
+        print(msg or "Up to date.")
     elif c == "update":
         from .update import update
         print(update())
