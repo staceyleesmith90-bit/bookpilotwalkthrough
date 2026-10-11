@@ -1,35 +1,53 @@
 {
-  "full-screen takeover": {
-    "do": [
-      "takeover"
-    ],
-    "about": "the words fill the whole screen, top to bottom"
-  },
-  "spotlight": {
-    "do": [
-      "punch-in",
-      "label:{text}"
-    ],
-    "about": "quick push in on your face with a small label"
-  },
-  "product moment": {
-    "do": [
-      "popup:auto|{text}",
-      "callout:{text}"
-    ],
-    "about": "a snapshot of the product pops up with a pointer"
-  },
-  "big reveal": {
-    "do": [
-      "reveal",
-      "takeover"
-    ],
-    "about": "a sparkle, then the words take over"
-  },
-  "quiet": {
-    "do": [
-      "keep-footage"
-    ],
-    "about": "just you talking, nothing on top"
-  }
+ "full-screen takeover": {
+  "do": [
+   "takeover"
+  ],
+  "about": "the words fill the whole screen, top to bottom"
+ },
+ "spotlight": {
+  "do": [
+   "punch-in",
+   "label:{text}"
+  ],
+  "about": "quick push in on your face with a small label"
+ },
+ "product moment": {
+  "do": [
+   "popup:auto|{text}",
+   "callout:{text}"
+  ],
+  "about": "a snapshot of the product pops up with a pointer"
+ },
+ "big reveal": {
+  "do": [
+   "reveal",
+   "takeover"
+  ],
+  "about": "a sparkle, then the words take over"
+ },
+ "quiet": {
+  "do": [
+   "keep-footage"
+  ],
+  "about": "just you talking, nothing on top"
+ },
+ "scrapbook orbit": {
+  "do": [
+   "scrapbook:orbit"
+  ],
+  "about": "polaroid prints with washi tape circling on a ring; the front one big and sharp — every setting adjustable"
+ },
+ "scrapbook page": {
+  "do": [
+   "scrapbook:page"
+  ],
+  "about": "polaroid prints drop onto a paper page one by one, with optional handwritten captions"
+ },
+ "scrapbook stack": {
+  "do": [
+   "scrapbook:stack"
+  ],
+  "about": "polaroid prints land on top of each other like a pile of photos being dealt"
+ }
 }

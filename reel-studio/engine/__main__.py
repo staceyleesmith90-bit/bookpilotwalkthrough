@@ -12,6 +12,9 @@
   python -m engine titles                       list title templates
   python -m engine templates                    list reel templates (ideas to copy)
   python -m engine template <id> [--clips DIR] [--name N]  start a text/photo/clip reel from a template
+  python -m engine scrapbook <out.mp4> --photos A B.mp4@2.5 [--style orbit|page|stack] [--set key=value ...]
+                                                polaroid scrapbook clip (orbit / page / stack), every setting adjustable
+  python -m engine scrapbook-options            every scrapbook setting with its default
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
   python -m engine brand-image <file>           colours from a logo/photo/mood board
@@ -114,6 +117,9 @@ def main(argv=None):
     ap.add_argument("--language")
     ap.add_argument("--options")
     ap.add_argument("--clips")
+    ap.add_argument("--style", help="scrapbook: orbit | page | stack")
+    ap.add_argument("--photos", nargs="+", help="scrapbook: images or videos (clip.mp4@2.5 = that moment)")
+    ap.add_argument("--set", nargs="+", default=[], help="scrapbook: any setting, e.g. speed=1.5 tape=#F4B6C6,#CFE3D2")
     ap.add_argument("--eleven", action="store_true", help="use Eleven Music (paid) instead of the free composer")
     ap.add_argument("--mood", help="comma-separated moods for sounds-add, e.g. cosy,calm")
     ap.add_argument("--tempo", help="slow / medium / fast (sounds-add)")
@@ -213,6 +219,21 @@ def main(argv=None):
         from .templates import all_templates
         for k, t in all_templates().items():
             print(f"{k:24} {t['category']:14} {t['format']:13} {t['name']} — {t['why']}")
+    elif c == "scrapbook":
+        from . import scrapbook, packs as _packs
+        spec = {"photos": a.photos or []}
+        if a.style:
+            spec["style"] = a.style
+        for kv in a.set:
+            k, _, v = kv.partition("=")
+            try:
+                spec[k] = json.loads(v)
+            except ValueError:
+                spec[k] = v
+        print(scrapbook.render(spec, a.arg or "scrapbook.mp4", _packs.load(a.pack)))
+    elif c == "scrapbook-options":
+        from .scrapbook import options_help
+        print(options_help())
     elif c == "template":
         from . import templates as tpl
         from .plan import summary, to_timeline

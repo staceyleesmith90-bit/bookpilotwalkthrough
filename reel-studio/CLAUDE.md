@@ -38,5 +38,5 @@ engine/ — `project` (folders), `transcribe`, `roughcut`, `plan` (plan → time
 `mysounds` (their own sounds), `rules` ("remember that"), `stylesheet` (design file → brand), `library_page`, `inspire`, `titles` (layered titles), `captions` (14 styles),
 `fx` (zooms + transitions), `iconstickers` (icon/3D/animated/stamp stickers), `musicgen` (free
 composer), `templates` (reel template library), `segment` (person
-cut-out), `music` (AI music), `editor/` (Studio app, questionnaire, review page, timeline editor).
+cut-out), `scrapbook` (polaroid orbit / page / stack, every setting adjustable), `music` (AI music), `editor/` (Studio app, questionnaire, review page, timeline editor).
 CLI: `python -m engine --help`. Tests: `python -m pytest tests -q`.

@@ -72,6 +72,17 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _png(self, im, fmt="PNG"):
+        import io
+        buf = io.BytesIO()
+        im.convert("RGB").save(buf, fmt, quality=88) if fmt == "JPEG" else im.save(buf, fmt)
+        body = buf.getvalue()
+        self.send_response(200)
+        self.send_header("Content-Type", "image/jpeg" if fmt == "JPEG" else "image/png")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def _body(self):
         n = int(self.headers.get("Content-Length", 0))
         return json.loads(self.rfile.read(n) or b"{}")
@@ -206,6 +217,8 @@ class Handler(SimpleHTTPRequestHandler):
                 if not rel.startswith(("library", "brand")) or ".." in rel or not full.endswith(".wav"):
                     return self.send_error(404)
                 return self._file(full, "audio/wav")
+            if u.path == "/scrapbook":                   # Scrapbook maker: every setting, live preview
+                return self._file(os.path.join(STATIC, "scrapbook.html"), "text/html")
             if u.path == "/review":
                 return self._file(os.path.join(STATIC, "review.html"), "text/html")
             if u.path == "/api/projects":
@@ -219,6 +232,17 @@ class Handler(SimpleHTTPRequestHandler):
                 if not _slug_ok(slug):
                     return self.send_error(404)
                 what = parts[3] if len(parts) > 3 else ""
+                if what == "scrapbooks":
+                    return self._json(scrapbooks(slug))
+                if what == "thumb":                     # small preview of a photo / video moment in this project
+                    f = _media_ok(slug, (q.get("f") or [""])[0])
+                    if not f:
+                        return self.send_error(404)
+                    at = (q.get("at") or [None])[0]
+                    from ..scrapbook import _photo
+                    im, _ = _photo(f + (f"@{at}" if at else ""))
+                    im.thumbnail((240, 320))
+                    return self._png(im, "JPEG")
                 if what in ("timeline", "roughcut", "review", "plan"):
                     return self._json(project.load(slug, what + ".json") or {})
                 if what == "proxy.mp4":
@@ -451,6 +475,15 @@ class Handler(SimpleHTTPRequestHandler):
                             JOBS[slug + ":posts"] = {"state": "error", "error": str(e)[-300:]}
                     threading.Thread(target=pjob, daemon=True).start()
                     return self._json({"ok": True})
+                if what == "scrapbook-preview":
+                    from ..scrapbook import preview
+                    spec = _clean_spec(slug, data.get("spec") or {})
+                    plan = project.load(slug, "plan.json") or {}
+                    im = preview(spec, packs.load(plan.get("pack")), data.get("t"))
+                    im.thumbnail((540, 960))
+                    return self._png(im, "JPEG")
+                if what == "scrapbook-save":
+                    return self._json(save_scrapbook(slug, int(data.get("beat", 0)), _clean_spec(slug, data.get("spec") or {})))
                 if what == "brief":
                     project.save(slug, "brief.json", data)
                     return self._json({"ok": True})
@@ -472,6 +505,84 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json({"error": str(e)}, 500)
 
 
+MEDIA_EXT = (".jpg", ".jpeg", ".png", ".webp", ".heic", ".mp4", ".mov", ".m4v")
+
+
+def _media_ok(slug, rel):
+    """A project media path (relative to the app root) if it really is inside this project, else None."""
+    if not rel:
+        return None
+    full = os.path.realpath(os.path.join(project.ROOT, rel.partition("@")[0]))
+    base = os.path.realpath(project.path(slug))
+    if not full.startswith(base + os.sep) or not full.lower().endswith(MEDIA_EXT) or not os.path.exists(full):
+        return None
+    return full
+
+
+def _clean_spec(slug, spec):
+    """Only known settings; photos only from this project."""
+    from ..scrapbook import OPTIONS
+    out = {k: v for k, v in spec.items() if k in OPTIONS}
+    photos = []
+    for ph in out.get("photos", []):
+        f = ph["file"] if isinstance(ph, dict) else str(ph)
+        if _media_ok(slug, f):
+            photos.append(ph)
+    out["photos"] = photos
+    return out
+
+
+def scrapbooks(slug):
+    """The reel's scrapbook moments (with every setting filled in) + the photos and clips it can use."""
+    from ..scrapbook import OPTIONS, settings
+    plan = project.load(slug, "plan.json") or {}
+    pack = packs.load(plan.get("pack"))
+    found = []
+    for i, b in enumerate(plan.get("beats", [])):
+        d = next((x for x in b.get("do", []) if x.split(":")[0] == "scrapbook"), None)
+        if d is None:
+            continue
+        spec = dict(b.get("scrapbook") or {})
+        if ":" in d and d.split(":", 1)[1]:
+            spec["style"] = d.split(":", 1)[1]
+        spec.setdefault("photos", plan.get("broll_pool", []))
+        spec["duration"] = b.get("dur", spec.get("duration", 6))
+        full = settings(spec, pack)
+        found.append({"beat": i, "spec": dict(full, photos=spec["photos"]), "text": b.get("text", "")})
+    media = []
+    for root, _, files in os.walk(project.path(slug, "source")):
+        for f in sorted(files):
+            if f.lower().endswith(MEDIA_EXT) and not f.startswith("."):
+                media.append(os.path.relpath(os.path.join(root, f), project.ROOT))
+    return {"scrapbooks": found, "media": media, "pack": plan.get("pack"),
+            "options": {k: {"default": v[0], "about": v[1]} for k, v in OPTIONS.items()}}
+
+
+def save_scrapbook(slug, beat, spec):
+    """Save the settings into the plan and swap just that clip in the timeline (other hand tweaks stay)."""
+    from .. import scrapbook
+    plan = project.load(slug, "plan.json") or {}
+    beats = plan.get("beats", [])
+    if not (0 <= beat < len(beats)):
+        raise ValueError("no such moment in this reel")
+    b = beats[beat]
+    order = [i for i, x in enumerate(beats) if any(d.split(":")[0] == "scrapbook" for d in x.get("do", []))].index(beat)
+    style = spec.get("style", "orbit")
+    b["do"] = [f"scrapbook:{style}" if d.split(":")[0] == "scrapbook" else d for d in b.get("do", [])]
+    b["scrapbook"] = {k: v for k, v in spec.items() if k not in ("duration", "style")}
+    project.save(slug, "plan.json", plan)
+    tl = project.load(slug, "timeline.json") or {}
+    sb = [x for x in tl.get("broll", []) if x.get("scrapbook")]
+    if order < len(sb):
+        entry = sb[order]
+        clip = scrapbook.render(dict(spec, duration=entry["dur"]), pack=packs.load(plan.get("pack")))
+        entry["file"], entry["scrapbook"] = os.path.relpath(clip, project.ROOT), style
+        project.save(slug, "timeline.json", tl)
+    else:
+        project.build_timeline(slug)
+    return {"ok": True}
+
+
 def overview():
     items = []
     for slug in reversed(project.list_projects()):
@@ -480,6 +591,7 @@ def overview():
         items.append({"slug": slug, "created": meta.get("created"), "faceless": not meta.get("source"),
                       "has_timeline": bool(tl), "duration": (tl or {}).get("duration"),
                       "has_cover": os.path.exists(project.path(slug, "renders", "cover.jpg")),
+                      "has_scrapbook": any(b.get("scrapbook") for b in (tl or {}).get("broll", [])),
                       "has_final": os.path.exists(project.path(slug, "renders", "final.mp4")),
                       "has_nomusic": os.path.exists(project.path(slug, "renders", "final-for-trending-sound.mp4")),
                       "brief": project.load(slug, "brief.json") or {}, "job": JOBS.get(slug),

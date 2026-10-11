@@ -501,7 +501,7 @@ async function load() {
     const st = p.job?.state === "roughcut" ? "Cutting…" : p.job?.state === "rendering" ? "Rendering…" : p.has_final ? "" : p.has_timeline ? "Styled" : p.job?.state === "ready-for-review" ? "Ready to review" : "Draft";
     const cover = p.has_cover ? `style="background-image:url(/api/p/${p.slug}/cover.jpg)"` : "";
     const d = p.duration ? `${Math.floor(p.duration / 60)}:${String(Math.round(p.duration % 60)).padStart(2, "0")}` : "";
-    const acts = [!p.faceless ? `<a href="/review?p=${p.slug}">Review the cut</a>` : "", p.has_timeline ? `<a href="/editor?p=${p.slug}">Edit (drag &amp; drop)</a>` : "",
+    const acts = [!p.faceless ? `<a href="/review?p=${p.slug}">Review the cut</a>` : "", p.has_timeline ? `<a href="/editor?p=${p.slug}">Edit (drag &amp; drop)</a>` : "", p.has_scrapbook ? `<a href="/scrapbook?p=${p.slug}">Scrapbook</a>` : "",
       p.has_final ? `<a href="/api/p/${p.slug}/render/final.mp4" download>Download video</a>` : "",
       p.has_nomusic ? `<a href="/api/p/${p.slug}/render/final-for-trending-sound.mp4" download>Version for a TikTok sound</a>` : ""].join("")
       + `<a href="#" data-posts="${p.slug}">Carousel &amp; stories</a><a href="#" data-favreel="${p.slug}">${isFav("reel", p.slug) ? "Remove from favourites" : "Add to favourites"}</a><a href="#" data-trashreel="${p.slug}" style="color:#C2374F">Move to trash</a>`;
@@ -554,6 +554,7 @@ async function searchIndex() {
     ...Object.entries(O.captions).map(([k, d]) => ({ t: k + " captions", s: "Caption style · " + d, go: () => tab("looks") })),
     ...rs.groups.flatMap(g => g.items.map(it => ({ t: it.name, s: "Free resource · " + g.group, go: () => window.open(it.url, "_blank") }))),
     { t: "Effects library", s: "400+ premium effects, every sound", go: () => window.open("/library", "_blank") },
+    { t: "Scrapbook maker", s: "Polaroid orbit, page or stack — change anything", go: () => window.open("/scrapbook", "_blank") },
     { t: "Brands", s: "Add or switch brands", go: () => tab("brand") }];
   return QI;
 }

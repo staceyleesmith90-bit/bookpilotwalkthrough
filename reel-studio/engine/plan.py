@@ -312,7 +312,7 @@ def to_timeline(plan, rc=None, source=None):
     for bi, (a, b_end, beat, text, ws) in enumerate(windows):
         from .styleplan import expand
         do = expand(list(beat.get("do", [])), text)       # named effects (fx:<name>) -> treatments
-        on_video = base_on_video or any(d.startswith("broll:") for d in do)
+        on_video = base_on_video or any(d.startswith(("broll:", "scrapbook")) for d in do)
         taken = list(fixed) + ([FACE, CAPTION_BOX] if on_video else [])
         if base_on_video and source and not beat.get("broll"):
             mid = _source_time(tl["cuts"], (a + b_end) / 2)
@@ -321,7 +321,7 @@ def to_timeline(plan, rc=None, source=None):
                 taken = [t for t in taken if t != FACE] + faces
         big_text = None
         if not on_video and not any(d.split(":")[0] in ("takeover", "card", "bubble", "cta", "title", "keep-footage",
-                                                           "broll", "label") for d in do):
+                                                           "broll", "label", "scrapbook") for d in do):
             do.insert(0, "takeover")               # faceless: every beat shows its words
         if auto and not any(d.startswith(("sticker", "emoji", "badge", "icon", "3d", "anim", "stamp", "callout"))
                             for d in do) and len(used_stickers) < sticker_budget:
@@ -683,6 +683,21 @@ def to_timeline(plan, rc=None, source=None):
                 taken.append(r)
                 items.append(it)
                 cues.append((it["start"], pack["sfx"]["sticker_in"], 0.5))
+            elif kind == "scrapbook":             # scrapbook[:orbit|page|stack] + beat["scrapbook"] = {any setting}
+                from . import scrapbook
+                opts = dict(beat.get("scrapbook") or {})
+                if arg.strip():
+                    opts["style"] = arg.strip()
+                opts.setdefault("photos", plan.get("broll_pool", []))
+                opts["duration"] = round(b_end - a, 3)
+                try:
+                    clip = scrapbook.render(opts, pack=pack)
+                except Exception as e:
+                    print(f"[reel] scrapbook skipped: {e}")
+                    continue
+                broll.append({"file": os.path.relpath(clip, ROOT_DIR), "start": a, "dur": round(b_end - a, 3),
+                              "scrapbook": opts.get("style", "orbit")})
+                transitions.append({"t": round(a, 3), "type": pack.get("transition", "whip"), "dur": 0.3})
             elif kind == "broll-here":            # they said "cue b-roll": next clip from their b-roll, or flag it
                 pool = [f for f in plan.get("broll_pool", []) if f not in {x["file"] for x in broll}]
                 if pool:

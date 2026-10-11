@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/brand-sp/favicon.png"><title>Scrapbook maker · Reel Studio</title>
+<style>
+  @font-face { font-family: "Inter"; src: url("/fonts/Inter-Variable.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "Poppins"; src: url("/fonts/Poppins-Bold.ttf"); font-weight: 700; }
+  :root { --bg: #F3F5FB; --surface: #FFFFFF; --ink: #0E1638; --muted: #5F6889; --line: #E3E7F2; --soft: #EEF1F9;
+          --accent: #2E5BFF; --accent-soft: #E8EEFF; --ok: #13865A; --r: 16px;
+          --grad: linear-gradient(100deg, #18A9F5 0%, #3D5CFF 42%, #8A3BF0 75%, #E64BC8 100%); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14.5px/1.5 "Inter", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  h1, h2 { font-family: "Poppins", "Inter", sans-serif; letter-spacing: -.015em; margin: 0; }
+  button, input, select { font: inherit; color: inherit; }
+  header { display: flex; align-items: center; gap: 14px; padding: 18px 24px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  header h1 { font-size: 20px; } header small { color: var(--muted); }
+  header select { margin-left: auto; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); }
+  main { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: 22px; padding: 22px 24px; max-width: 1200px; margin: 0 auto; }
+  @media (max-width: 820px) { main { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
+  .phone { position: sticky; top: 16px; align-self: start; }
+  .phone .screen { aspect-ratio: 9/16; border-radius: 26px; overflow: hidden; background: var(--soft); border: 8px solid #0E1638; position: relative; }
+  .phone img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .phone .busy { position: absolute; inset: auto 0 0 0; padding: 8px; text-align: center; font-size: 12.5px; background: rgba(14,22,56,.7); color: #fff; display: none; }
+  .scrub { width: 100%; margin-top: 10px; }
+  .row { margin-bottom: 18px; }
+  .row > label { display: block; font-weight: 600; margin-bottom: 6px; }
+  .row .about { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg button { border: 1px solid var(--line); background: var(--surface); padding: 7px 13px; border-radius: 999px; cursor: pointer; }
+  .seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .val { float: right; color: var(--muted); font-weight: 500; }
+  .swatches { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .swatches input[type=color] { width: 40px; height: 34px; border: 1px solid var(--line); border-radius: 8px; padding: 2px; background: var(--surface); }
+  .swatches button, .minor { border: 1px dashed var(--line); background: none; border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--muted); }
+  .media { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
+  .m { position: relative; border-radius: 10px; overflow: hidden; border: 2px solid transparent; cursor: pointer; background: var(--soft); aspect-ratio: 3/4; }
+  .m img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .m.on { border-color: var(--accent); }
+  .m .n { position: absolute; top: 4px; left: 4px; background: var(--accent); color: #fff; border-radius: 999px; font-size: 11px; padding: 0 7px; display: none; }
+  .m.on .n { display: block; }
+  .m .vid { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,.6); color: #fff; font-size: 10.5px; border-radius: 6px; padding: 0 5px; }
+  .picked { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .picked .p { display: grid; grid-template-columns: 44px 1fr auto; gap: 8px; align-items: center; }
+  .picked img { width: 44px; height: 58px; object-fit: cover; border-radius: 6px; }
+  .picked input[type=text] { width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; }
+  .picked input[type=number] { width: 70px; padding: 6px; border: 1px solid var(--line); border-radius: 8px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .go { border: 0; border-radius: 12px; padding: 12px 18px; background: var(--grad); color: #fff; font-weight: 600; cursor: pointer; }
+  .ghost { border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px; background: var(--surface); cursor: pointer; font-weight: 600; }
+  .msg { color: var(--ok); font-weight: 600; margin-top: 10px; min-height: 1.4em; }
+  .empty { color: var(--muted); padding: 30px; text-align: center; }
+  details summary { cursor: pointer; font-weight: 600; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Scrapbook maker</h1><small>Polaroid orbit, page or stack — change anything, see it straight away</small>
+  <select id="proj" aria-label="Reel"></select>
+  <select id="which" aria-label="Scrapbook moment"></select>
+</header>
+<main>
+  <div class="phone">
+    <div class="screen"><img id="pv" alt="Preview of the scrapbook"><div class="busy" id="busy">Updating preview…</div></div>
+    <input class="scrub" id="scrub" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Preview moment">
+    <div class="actions">
+      <button class="go" id="save">Save to my reel</button>
+      <button class="ghost" id="saveRender">Save and render</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+  <div class="card" id="controls"><div class="empty">Loading…</div></div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const P = new URLSearchParams(location.search);
+let DATA = null, SPEC = null, BEAT = null, slug = P.get("p");
+const STYLE = [["orbit", "Orbit"], ["page", "Page"], ["stack", "Stack"]];
+const FRAME = [["polaroid", "Polaroid"], ["border", "Even border"], ["none", "No frame"]];
+const SLIDERS = [
+  ["speed", "Speed", 0.2, 3, 0.05, v => v + "×"],
+  ["size", "Print size", 200, 700, 10, v => v + " px"],
+  ["tilt", "Crooked", 0, 20, 1, v => v + "°"],
+  ["shadow", "Shadow", 0, 1, 0.05, v => Math.round(v * 100) + "%"],
+];
+const isVid = f => /\.(mp4|mov|m4v)$/i.test(f);
+const fileOf = p => typeof p === "object" ? p.file : String(p).split("@")[0];
+const atOf = p => typeof p === "object" ? (p.at ?? "") : (String(p).split("@")[1] || "");
+const thumb = (f, at) => `/api/p/${slug}/thumb?f=${encodeURIComponent(f)}${at !== "" && at != null ? "&at=" + at : ""}`;
+
+async function loadProjects() {
+  const ps = await (await fetch("/api/projects")).json();
+  $("#proj").innerHTML = ps.map(p => `<option ${p === slug ? "selected" : ""}>${p}</option>`).join("");
+  slug = slug || ps[ps.length - 1];
+  $("#proj").value = slug;
+  await loadProject();
+}
+async function loadProject() {
+  DATA = await (await fetch(`/api/p/${slug}/scrapbooks`)).json();
+  const sbs = DATA.scrapbooks;
+  $("#which").innerHTML = sbs.length
+    ? sbs.map((s, i) => `<option value="${i}">Scrapbook ${i + 1} · ${s.spec.style}${s.text ? " · " + s.text : ""}</option>`).join("")
+    : `<option>No scrapbook in this reel yet</option>`;
+  if (!sbs.length) { $("#controls").innerHTML = `<div class="empty">This reel has no scrapbook moment yet. Ask Claude: “add a scrapbook orbit at the end”.</div>`; return; }
+  pick(+($("#which").value || 0));
+}
+function pick(i) {
+  const s = DATA.scrapbooks[i];
+  BEAT = s.beat;
+  SPEC = JSON.parse(JSON.stringify(s.spec));
+  SPEC.captions = SPEC.captions || [];
+  draw(); refresh();
+}
+function seg(key, opts) {
+  return `<div class="seg">${opts.map(([v, l]) => `<button data-k="${key}" data-v="${v}" class="${String(SPEC[key]) === String(v) ? "on" : ""}">${l}</button>`).join("")}</div>`;
+}
+function draw() {
+  const o = DATA.options;
+  const tape = Array.isArray(SPEC.tape) ? SPEC.tape : [];
+  const bg = SPEC.background;
+  const bgKind = bg === "paper" ? "paper" : String(bg).startsWith("#") ? "colour" : "photo";
+  $("#controls").innerHTML = `
+    <div class="row"><label>Style</label>${seg("style", STYLE)}<div class="about">${{orbit: "Prints circle on a ring — the one at the front is big and sharp.", page: "Prints drop onto the page one by one — lovely with captions.", stack: "Prints land on top of each other, like photos being dealt."}[SPEC.style]}</div></div>
+    <div class="row"><label>Photos and video moments</label>
+      <div class="media">${DATA.media.map(f => {
+        const k = SPEC.photos.findIndex(p => fileOf(p) === f);
+        return `<div class="m ${k >= 0 ? "on" : ""}" data-f="${f}" title="${f.split("/").pop()}"><img loading="lazy" src="${thumb(f, "")}" alt=""><span class="n">${k + 1}</span>${isVid(f) ? '<span class="vid">video</span>' : ""}</div>`;
+      }).join("")}</div>
+      <div class="about">Tap to add or remove. 4–8 works best. Order = the order you tap.</div>
+      <div class="picked">${SPEC.photos.map((p, k) => `
+        <div class="p"><img src="${thumb(fileOf(p), atOf(p))}" alt="">
+          <input type="text" data-cap="${k}" placeholder="Handwritten caption (optional)" value="${(typeof p === "object" && p.caption) || SPEC.captions[k] || ""}">
+          ${isVid(fileOf(p)) ? `<input type="number" step="0.1" min="0" data-at="${k}" value="${atOf(p)}" placeholder="sec" title="Which second of the video">` : "<span></span>"}
+        </div>`).join("")}</div>
+    </div>
+    ${SLIDERS.map(([k, l, mn, mx, st, f]) => `<div class="row"><label>${l} <span class="val" id="v-${k}">${f(SPEC[k])}</span></label>
+      <input type="range" data-r="${k}" min="${mn}" max="${mx}" step="${st}" value="${SPEC[k]}"><div class="about">${o[k].about}</div></div>`).join("")}
+    ${SPEC.style === "orbit" ? `<div class="row"><label>Direction</label>${seg("direction", [[1, "Clockwise"], [-1, "Anticlockwise"]])}</div>` : ""}
+    <div class="row"><label>Frame</label>${seg("frame", FRAME)}
+      <div class="swatches" style="margin-top:8px"><input type="color" data-c="frame_color" value="${SPEC.frame_color}"><span class="about">Frame colour</span></div></div>
+    <div class="row"><label>Washi tape</label>
+      <div class="swatches">${tape.map((c, i) => `<input type="color" data-tape="${i}" value="${c.slice(0, 7)}">`).join("")}
+        <button id="tapeAdd">+ colour</button>${tape.length ? '<button id="tapeOff">No tape</button>' : ""}</div></div>
+    <div class="row"><label>Background</label>${seg("bgKind", [["paper", "Paper"], ["colour", "Plain colour"], ["photo", "Blurred photo"]]).replaceAll(`data-k="bgKind"`, `data-bg="1" data-k="bgKind"`).replace(`data-v="${bgKind}" class=""`, `data-v="${bgKind}" class="on"`)}
+      ${bgKind === "colour" ? `<div class="swatches" style="margin-top:8px"><input type="color" data-c="background" value="${bg}"></div>` : ""}
+      ${bgKind === "photo" ? `<select id="bgPhoto" style="margin-top:8px;padding:7px;border-radius:8px;border:1px solid var(--line)">${DATA.media.map(f => `<option ${f === fileOf(bg) ? "selected" : ""}>${f}</option>`).join("")}</select>` : ""}</div>
+    <div class="row"><label>Caption colour</label><div class="swatches"><input type="color" data-c="ink" value="${SPEC.ink}"></div></div>
+    <details><summary>More</summary>
+      ${SPEC.style === "orbit" ? `<div class="row"><label>Ring width <span class="val">${SPEC.radius[0]}</span></label><input type="range" data-rad="0" min="120" max="460" step="10" value="${SPEC.radius[0]}"></div>
+      <div class="row"><label>Ring depth <span class="val">${SPEC.radius[1]}</span></label><input type="range" data-rad="1" min="60" max="400" step="10" value="${SPEC.radius[1]}"></div>` : ""}
+      <div class="row"><label>Height on screen <span class="val">${SPEC.center[1]}</span></label><input type="range" data-cy="1" min="400" max="1300" step="10" value="${SPEC.center[1]}"><div class="about">Leave room for your words above or below.</div></div>
+      <div class="row"><label>Shuffle</label><button class="minor" id="shuffle">New random tilt and layout</button></div>
+    </details>`;
+}
+let timer = null, seq = 0;
+function refresh() {
+  clearTimeout(timer);
+  timer = setTimeout(async () => {
+    if (!SPEC.photos.length) { $("#pv").removeAttribute("src"); return; }
+    const mine = ++seq;                       // only the newest preview may land (older, slower ones are dropped)
+    $("#busy").style.display = "block";
+    const t = +$("#scrub").value * SPEC.duration;
+    const r = await fetch(`/api/p/${slug}/scrapbook-preview`, { method: "POST", body: JSON.stringify({ spec: specOut(), t }) });
+    if (mine !== seq) return;
+    if (r.ok) $("#pv").src = URL.createObjectURL(await r.blob());
+    $("#busy").style.display = "none";
+  }, 250);
+}
+function specOut() {
+  const s = JSON.parse(JSON.stringify(SPEC));
+  s.photos = s.photos.map((p, k) => {
+    const f = fileOf(p), at = atOf(p), cap = (typeof p === "object" && p.caption) || s.captions[k] || "";
+    return (at !== "" || cap) ? Object.assign({ file: f }, at !== "" ? { at: +at } : {}, cap ? { caption: cap } : {}) : f;
+  });
+  s.captions = [];
+  return s;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("button, .m");
+  if (!b) return;
+  if (b.classList.contains("m")) {
+    const f = b.dataset.f, k = SPEC.photos.findIndex(p => fileOf(p) === f);
+    if (k >= 0) { SPEC.photos.splice(k, 1); SPEC.captions.splice(k, 1); } else SPEC.photos.push(f);
+  } else if (b.dataset.bg) {
+    SPEC.background = b.dataset.v === "paper" ? "paper" : b.dataset.v === "colour" ? "#FBEFF1" : (DATA.media.find(f => !isVid(f)) || DATA.media[0]);
+  } else if (b.dataset.k) {
+    SPEC[b.dataset.k] = b.dataset.k === "direction" ? +b.dataset.v : b.dataset.v;
+  } else if (b.id === "tapeAdd") { SPEC.tape = (Array.isArray(SPEC.tape) ? SPEC.tape : []).concat(["#F4B6C6"]); }
+  else if (b.id === "tapeOff") { SPEC.tape = []; }
+  else if (b.id === "shuffle") { SPEC.seed = Math.floor(Math.random() * 9999); }
+  else return;
+  draw(); refresh();
+});
+document.addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset.r) { SPEC[el.dataset.r] = +el.value; const f = SLIDERS.find(s => s[0] === el.dataset.r)[5]; $("#v-" + el.dataset.r).textContent = f(+el.value); }
+  else if (el.dataset.c) SPEC[el.dataset.c] = el.value.toUpperCase();
+  else if (el.dataset.tape) SPEC.tape[+el.dataset.tape] = el.value.toUpperCase();
+  else if (el.dataset.rad) { SPEC.radius[+el.dataset.rad] = +el.value; el.previousElementSibling.querySelector(".val").textContent = el.value; }
+  else if (el.dataset.cy) { SPEC.center = [SPEC.center[0], +el.value]; el.previousElementSibling.querySelector(".val").textContent = el.value; }
+  else if (el.dataset.cap) { const k = +el.dataset.cap, p = SPEC.photos[k]; SPEC.photos[k] = Object.assign({ file: fileOf(p) }, atOf(p) !== "" ? { at: +atOf(p) } : {}, { caption: el.value }); }
+  else if (el.dataset.at) { const k = +el.dataset.at, p = SPEC.photos[k]; SPEC.photos[k] = Object.assign({}, typeof p === "object" ? p : {}, { file: fileOf(p), at: +el.value }); }
+  else if (el.id === "bgPhoto") SPEC.background = el.value;
+  else if (el.id === "scrub") {}
+  else return;
+  refresh();
+});
+$("#proj").onchange = e => { slug = e.target.value; history.replaceState(null, "", "?p=" + slug); loadProject(); };
+$("#which").onchange = e => pick(+e.target.value);
+async function save(render) {
+  $("#msg").textContent = "Saving…";
+  const r = await fetch(`/api/p/${slug}/scrapbook-save`, { method: "POST", body: JSON.stringify({ beat: BEAT, spec: specOut() }) });
+  if (!r.ok) { $("#msg").textContent = "Couldn't save — try again."; return; }
+  if (render) {
+    await fetch(`/api/p/${slug}/render`, { method: "POST", body: JSON.stringify({ preview: false }) });
+    $("#msg").textContent = "Saved. Your reel is rendering — it shows up in the Studio when it's done.";
+  } else $("#msg").textContent = "Saved to your reel.";
+}
+$("#save").onclick = () => save(false);
+$("#saveRender").onclick = () => save(true);
+loadProjects();
+</script>
+</body>
+</html>

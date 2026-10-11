@@ -140,6 +140,21 @@ e.g. "it's on my face" → move it there and press Save.
   `hf:<effect>[|top|center|bottom]`. Vertical effects (follow cards) keep their place, lifted out of the
   app's UI bands. One effect per moment.
 
+## Scrapbook effects (our own, every setting adjustable)
+Polaroid prints with washi tape on a paper page — great for babies, families, milestones, trips, recaps.
+- **orbit**: prints circle on a tilted ring, the front one big and sharp (a lovely ending).
+- **page**: prints drop onto the page one by one, optional handwritten caption under each.
+- **stack**: prints land on top of each other like photos being dealt.
+In a plan: `"do": ["scrapbook:orbit"]` (or `fx:scrapbook orbit`) with `"scrapbook": {...}` on the beat.
+Photos can be images or video moments (`clip.mp4@2.5`). Pick their nicest shots (smiles, eyes open, sharp) —
+never odd faces, blur or squints. Defaults come from the style pack; `python -m engine scrapbook-options`
+lists every setting: style, photos, captions, duration, speed, direction, size, tilt, frame (polaroid / border /
+none), frame_color, tape (pack / none / colours), background (paper / colour / photo or video), center, radius,
+shadow, ink, seed.
+**Always customisable:** whenever you use one, tell them in one line what they can change and offer 2-4 tap
+answers (e.g. "Spin slower" · "Add captions under the photos" · "Different tape colours" · "Straighter prints").
+Change only that setting and re-render — never rebuild the reel to change a scrapbook.
+
 ## Teach it once (their taste sticks)
 - **Rules**: before every style plan run `python -m engine rules` and follow them (they beat defaults).
   When they say "remember that" / "always…" / "never…": `python -m engine remember "<the rule, in
