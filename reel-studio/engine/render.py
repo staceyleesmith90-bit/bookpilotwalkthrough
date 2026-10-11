@@ -638,6 +638,7 @@ def build_base_cached(tl, pack, out_dir, scale):
     keys = {k: tl.get(k) for k in ("cuts", "broll", "finish", "fps", "grade", "picture", "source", "duration",
                                     "size", "background")}
     keys["src"] = _file_sig(_abs(tl["source"])) if tl.get("source") else None
+    keys["broll_files"] = [_file_sig(_abs(b["file"])) for b in tl.get("broll", [])]   # a photo/clip replaced in place
     keys["pack_bg"] = pack["colors"].get("bg")
     keys["scale"] = scale
     path = os.path.join(out_dir, f"base-{_sig(keys)}.mp4")

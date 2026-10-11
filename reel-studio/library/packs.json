@@ -1,7 +1,7 @@
 {
   "bold": {
     "label": "Bold",
-    "vibe": "loud, modern, punchy \u2014 for tips, hot takes, business",
+    "vibe": "loud, modern, punchy — for tips, hot takes, business",
     "fonts": {
       "main": {
         "file": "library/fonts/Poppins-ExtraBold.ttf",
@@ -66,7 +66,7 @@
   },
   "editorial": {
     "label": "Editorial",
-    "vibe": "calm, classic, elegant \u2014 for stories, reflection, premium brands",
+    "vibe": "calm, classic, elegant — for stories, reflection, premium brands",
     "fonts": {
       "main": {
         "file": "library/fonts/PlayfairDisplay-Variable.ttf",
@@ -136,7 +136,7 @@
   },
   "sunny": {
     "label": "Sunny",
-    "vibe": "soft, warm, friendly \u2014 lifestyle, family, wellness",
+    "vibe": "soft, warm, friendly — lifestyle, family, wellness",
     "fonts": {
       "main": {
         "file": "library/fonts/Nunito-Variable.ttf",
@@ -201,7 +201,7 @@
   },
   "playful": {
     "label": "Playful",
-    "vibe": "bouncy, colourful, fun \u2014 kids, humour, creators",
+    "vibe": "bouncy, colourful, fun — kids, humour, creators",
     "fonts": {
       "main": {
         "file": "library/fonts/Baloo2-Variable.ttf",
@@ -268,7 +268,7 @@
   },
   "minimal": {
     "label": "Minimal",
-    "vibe": "clean, quiet, confident \u2014 tech, coaching, B2B",
+    "vibe": "clean, quiet, confident — tech, coaching, B2B",
     "fonts": {
       "main": {
         "file": "library/fonts/Inter-Variable.ttf",
@@ -337,7 +337,7 @@
   },
   "luxe": {
     "label": "Luxe",
-    "vibe": "rich, moody, high-end \u2014 beauty, fashion, interiors",
+    "vibe": "rich, moody, high-end — beauty, fashion, interiors",
     "fonts": {
       "main": {
         "file": "library/fonts/CormorantGaramond-Variable.ttf",
@@ -406,7 +406,7 @@
   },
   "systems-pilot": {
     "label": "Systems Pilot",
-    "vibe": "smart, modern, confident \u2014 tech and small business",
+    "vibe": "smart, modern, confident — tech and small business",
     "fonts": {
       "main": {
         "file": "library/fonts/Poppins-ExtraBold.ttf",
@@ -471,5 +471,74 @@
         "weight": 600
       }
     }
+  },
+  "blush": {
+    "label": "Blush",
+    "vibe": "soft, girly, tender — babies, milestones, family moments, birthdays",
+    "fonts": {
+      "main": {
+        "file": "library/fonts/PlayfairDisplay-Variable.ttf",
+        "weight": 600,
+        "case": "sentence"
+      },
+      "accent": {
+        "file": "library/fonts/GreatVibes-Regular.ttf"
+      },
+      "caption": {
+        "file": "library/fonts/Nunito-Variable.ttf",
+        "weight": 700
+      }
+    },
+    "colors": {
+      "bg": "#FBEFF1",
+      "ink": "#6B3F4C",
+      "pop": "#E58FA6",
+      "accent": "#FFFFFF",
+      "paper": "#FFF7F8",
+      "bubble_text": "#6B3F4C"
+    },
+    "sticker": {
+      "style": "doodle",
+      "stroke": 6,
+      "wobble": 2,
+      "fill": "none",
+      "die_cut": false
+    },
+    "sfx": {
+      "text_in": "swish",
+      "sticker_in": "swish",
+      "transition": "swish",
+      "reveal": "swish",
+      "hook": "swish",
+      "cta": "swish",
+      "title": "swish"
+    },
+    "captions": {
+      "style": "line",
+      "words_per_line": 4
+    },
+    "grade": "creamy-pastel",
+    "title_fonts": {
+      "serif": {
+        "file": "library/fonts/BodoniModa-Variable.ttf",
+        "weight": 500
+      },
+      "serif_bold": {
+        "file": "library/fonts/PlayfairDisplay-Variable.ttf",
+        "weight": 800
+      },
+      "script": {
+        "file": "library/fonts/GreatVibes-Regular.ttf"
+      },
+      "brush": {
+        "file": "library/fonts/Allura-Regular.ttf"
+      },
+      "sans": {
+        "file": "library/fonts/Montserrat-Variable.ttf",
+        "weight": 500
+      }
+    },
+    "transition": "dip-white",
+    "zoom": "push"
   }
 }
