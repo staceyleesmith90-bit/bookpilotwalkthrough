@@ -206,7 +206,7 @@ def _item(name):
 def fetch(name, project_dir):
     """Download one catalog effect (its page + assets) into projects/<p>/hf/<name>/ from HeyGen's GitHub,
     ready for Claude to swap in the reel's own words. Returns the page path. Already there = kept (edits stay)."""
-    import urllib.request
+    import urllib.error, urllib.request
     it, commit = _item(name)
     folder = os.path.join(project_dir, "hf", name)
     main = os.path.join(folder, it["files"][0])
@@ -216,8 +216,13 @@ def fetch(name, project_dir):
         url = f"https://raw.githubusercontent.com/heygen-com/hyperframes/{commit}/registry/{it['kind']}/{name}/{rel}"
         dst = os.path.join(folder, rel)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
-        with urllib.request.urlopen(url, timeout=60) as r:
-            open(dst, "wb").write(r.read())
+        try:
+            with urllib.request.urlopen(url, timeout=60) as r:
+                open(dst, "wb").write(r.read())
+        except urllib.error.HTTPError:
+            if rel == it["files"][0]:
+                raise
+            print(f"[reel] {name}: sample asset {rel} is gone upstream; swap in your own")   # e.g. demo images
     return main
 
 
@@ -230,7 +235,9 @@ def component_frames(html_path, duration=None, fps=FPS):
         m = re.search(r'data-duration="([0-9.]+)"', html)
         duration = float(m.group(1)) if m else 4.0
     gsap = pathlib.Path(os.path.join(ROOT, "library", "hyperframes", "gsap.min.js")).resolve().as_uri()
-    html2 = re.sub(r'<script src="https://[^"]*gsap[^"]*"></script>', f'<script src="{gsap}"></script>', html)
+    html2 = re.sub(r'<script src="https://[^"]*gsap[^"]*"></script>',
+                   # pages register on window.__timelines, which the HyperFrames runtime normally creates
+                   f'<script>window.__timelines = window.__timelines || {{}};</script><script src="{gsap}"></script>', html)
     key = hashlib.md5((html2 + str(duration) + str(fps)).encode()).hexdigest()[:16]
     folder = os.path.join(CACHE, key)
     done = os.path.join(folder, "frames.json")
