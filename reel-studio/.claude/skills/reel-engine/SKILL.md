@@ -155,6 +155,13 @@ shadow, ink, seed.
 answers (e.g. "Spin slower" · "Add captions under the photos" · "Different tape colours" · "Straighter prints").
 Change only that setting and re-render — never rebuild the reel to change a scrapbook.
 
+## Posts from a reel (Post Kit)
+`python -m engine posts <project>` → a carousel (1080x1350) + story frames (1080x1920) + caption, in the reel's own
+look. Write `projects/<p>/posts.json` first. Business reels: tips layout (cover, numbered slides, CTA). Personal reels
+(babies, family, milestones, trips): `"style": "memory"` — big real photos, polaroids with washi tape and script
+words, no logos / page numbers / buttons. Each slide picks its own `photo` (image or `clip.mp4@2.5`) and `layout`
+(photo · polaroid · collage). Use their nicest shots only, in their language.
+
 ## Teach it once (their taste sticks)
 - **Rules**: before every style plan run `python -m engine rules` and follow them (they beat defaults).
   When they say "remember that" / "always…" / "never…": `python -m engine remember "<the rule, in

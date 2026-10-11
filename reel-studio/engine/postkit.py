@@ -6,6 +6,12 @@ The words: projects/<p>/posts.json if Claude (or the person) wrote it —
     {"carousel": [{"title": "...", "body": "..."}, ...],   first = cover, last = call to action
      "stories":  [{"title": "...", "body": "...", "kind": "teaser|question|cta"}, ...],
      "caption": "post caption + hashtags", "handle": "@name"}
+For personal posts (babies, family, milestones, trips) add "style": "memory": big real photos, polaroids with
+washi tape and script writing, no logos / page numbers / call-to-action buttons. Each slide or story can name its
+own "photo" (an image, or a video moment "clip.mp4@2.5") and a "layout":
+    carousel: "photo" (full-bleed, title or a small handwritten note) | "polaroid" (one print on paper)
+              | "collage" (2-4 prints on paper, give "photos": [...])
+    stories:  "polaroid" | "collage" | "photo"
 otherwise a first draft is made from the reel's own script (hook = first line, points = the clearest lines).
 The pictures: real frames from the reel. Fonts and colours: the brand the reel was made for.
 """
@@ -280,11 +286,138 @@ def story_frame(s, pack, photo, handle):
     return im
 
 
+# ------------------------------------------------------------------ memory style (personal posts)
+def _photo_img(ref, slug):
+    from .scrapbook import _photo
+    f = ref["file"] if isinstance(ref, dict) else str(ref).partition("@")[0]
+    if not os.path.isabs(f) and not os.path.exists(os.path.join(project.ROOT, f)):
+        ref = project.path(slug, "source", f) + ("@" + str(ref).partition("@")[2] if "@" in str(ref) else "")
+    return _photo(ref)[0]
+
+
+def _paper(w, h, pack):
+    import numpy as np
+    rgb = np.array(_rgb(pack["colors"].get("bg", "#FBEFF1")))
+    rng = np.random.default_rng(3)
+    y = np.linspace(-1, 1, h)[:, None, None]; x = np.linspace(-1, 1, w)[None, :, None]
+    arr = np.ones((h, w, 3)) * rgb * (1 - 0.05 * (x ** 2 + y ** 2)) + rng.normal(0, 3.0, (h, w, 1))
+    return Image.fromarray(np.clip(arr, 0, 255).astype("uint8")).convert("RGBA")
+
+
+def _print(img, pack, width, caption="", k=0, tilt=6):
+    from .scrapbook import make_print, settings
+    st = settings({"size": width, "tilt": tilt, "seed": 11 + k}, pack)
+    return make_print(img, st, k, pack, caption)
+
+
+def _script(d, text, pack, box_w, size, max_h=400):
+    return _wrap(d, text, pack["fonts"].get("accent", pack["fonts"]["main"]), box_w, max_h, size, 40, 1.05)
+
+
+def _soft_fade(im, colour, start=0.55, strength=0.85):
+    """A soft fade into the pack colour at the bottom (gentler than the dark shade, for personal posts)."""
+    w, h = im.size
+    g = Image.new("L", (1, h))
+    for y in range(h):
+        g.putpixel((0, y), int(255 * strength * max(0.0, (y / h - start) / (1 - start)) ** 1.6))
+    return Image.composite(Image.new("RGB", (w, h), colour), im.convert("RGB"), g.resize((w, h)))
+
+
+def memory_slide(i, n, s, pack, slug, fallback):
+    c = pack["colors"]
+    ink = c.get("bubble_text") or c["ink"]
+    lay = s.get("layout") or ("photo" if i == 0 else "collage" if i == n - 1 else "photo")
+    photo = _photo_img(s["photo"], slug) if s.get("photo") else (Image.open(fallback).convert("RGB") if fallback else None)
+    if lay == "photo" and photo is not None:
+        from PIL import ImageOps
+        im = ImageOps.fit(photo, (CW, CH), Image.LANCZOS, centering=(0.5, 0.4))
+        if s.get("title"):
+            im = _soft_fade(im, c.get("bg", "#FBEFF1"), 0.5, 0.92)
+            d = ImageDraw.Draw(im)
+            if s.get("kicker"):
+                kf = _font(pack["fonts"]["main"], 40)
+                d.text(((CW - d.textlength(s["kicker"].upper(), font=kf)) / 2, CH - 330), s["kicker"].upper(), font=kf, fill=ink)
+            font, lines, lh = _script(d, s["title"], pack, CW - 160, 150, 260)
+            y = CH - 270
+            for ln in lines:
+                d.text(((CW - d.textlength(ln, font=font)) / 2, y), ln, font=font, fill=ink)
+                y += lh
+        elif s.get("body"):                                   # a small handwritten note on a white tag
+            d = ImageDraw.Draw(im)
+            f = _font(pack["fonts"].get("accent", pack["fonts"]["main"]), 78)
+            tw = d.textlength(s["body"], font=f)
+            d.rounded_rectangle((60, CH - 190, 60 + tw + 80, CH - 66), 36, fill="#FFFDFA")
+            d.text((100, CH - 186), s["body"], font=f, fill=ink)
+        return im.convert("RGB")
+    im = _paper(CW, CH, pack)
+    d = ImageDraw.Draw(im)
+    if lay == "polaroid" and photo is not None:
+        pr = _print(photo, pack, 640, s.get("body", ""), i, 4)
+        im.alpha_composite(pr, ((CW - pr.width) // 2, (CH - pr.height) // 2 - (40 if s.get("title") else 0)))
+    else:                                                     # collage of prints
+        refs = s.get("photos") or ([s["photo"]] if s.get("photo") else [])
+        imgs = [_photo_img(r, slug) for r in refs][:4] or ([photo] if photo else [])
+        spots = [(300, 430), (780, 470), (330, 900), (770, 940)][:len(imgs)]
+        for k, (img, (x, y)) in enumerate(zip(imgs, spots)):
+            pr = _print(img, pack, 380, "", k, 7)
+            im.alpha_composite(pr, (int(x - pr.width / 2), int(y - pr.height / 2) - (60 if s.get("title") else 0)))
+    if s.get("title"):
+        font, lines, lh = _script(d, s["title"], pack, CW - 160, 120, 240)
+        y = CH - 60 - lh * len(lines)
+        for ln in lines:
+            d.text(((CW - d.textlength(ln, font=font)) / 2, y), ln, font=font, fill=ink)
+            y += lh
+    return im.convert("RGB")
+
+
+def memory_story(s, pack, slug, fallback):
+    c = pack["colors"]
+    ink = c.get("bubble_text") or c["ink"]
+    lay = s.get("layout", "collage")
+    photo = _photo_img(s["photo"], slug) if s.get("photo") else (Image.open(fallback).convert("RGB") if fallback else None)
+    if lay == "photo" and photo is not None:
+        from PIL import ImageOps
+        im = _soft_fade(ImageOps.fit(photo, (SW, SH), Image.LANCZOS, centering=(0.5, 0.4)), c.get("bg", "#FBEFF1"), 0.55, 0.95)
+    else:
+        im = _paper(SW, SH, pack)
+        if lay == "polaroid" and photo is not None:
+            pr = _print(photo, pack, 620, s.get("body", ""), 0, 4)
+            im.alpha_composite(pr, ((SW - pr.width) // 2, 250))
+        else:
+            refs = s.get("photos") or ([s["photo"]] if s.get("photo") else [])
+            imgs = [_photo_img(r, slug) for r in refs][:3] or ([photo] if photo else [])
+            spots = [(330, 560), (750, 680), (520, 980)][:len(imgs)]
+            for k, (img, (x, y)) in enumerate(zip(imgs, spots)):
+                pr = _print(img, pack, 400, "", k, 8)
+                im.alpha_composite(pr, (int(x - pr.width / 2), int(y - pr.height / 2)))
+    d = ImageDraw.Draw(im)
+    if s.get("kicker"):
+        kf = _font(pack["fonts"]["main"], 44)
+        d.text(((SW - d.textlength(s["kicker"].upper(), font=kf)) / 2, SH - 560), s["kicker"].upper(), font=kf, fill=ink)
+    if s.get("title"):
+        font, lines, lh = _script(d, s["title"], pack, SW - 100, 150, 330)
+        y = SH - 490
+        for ln in lines:
+            d.text(((SW - d.textlength(ln, font=font)) / 2, y), ln, font=font, fill=ink)
+            y += lh
+    if s.get("tag"):                                          # a soft pill, e.g. "nuwe reel"
+        tf = _font(pack["fonts"].get("caption", pack["fonts"]["main"]), 40)
+        tw = d.textlength(s["tag"], font=tf)
+        d.rounded_rectangle(((SW - tw) / 2 - 36, SH - 250, (SW + tw) / 2 + 36, SH - 170), 40, fill=c.get("pop", "#E58FA6"))
+        d.text(((SW - tw) / 2, SH - 239), s["tag"], font=tf, fill="#FFFFFF")
+    return im.convert("RGB")
+
+
 # ------------------------------------------------------------------ the kit
 def make(slug):
     meta = project.load(slug, "project.json") or {}
     words = project.load(slug, "posts.json") or draft(slug)
-    pack = packs.load("brand:" + meta["brand"]) if meta.get("brand") else packs.load("brand")
+    plan = project.load(slug, "plan.json") or {}
+    if plan.get("pack") and plan["pack"] != "brand":          # the reel's own look (e.g. a family reel in Blush)
+        pack = packs.load(plan["pack"])
+    else:
+        pack = packs.load("brand:" + meta["brand"]) if meta.get("brand") else packs.load("brand")
+    memory = words.get("style") == "memory"
     out = project.path(slug, "posts")
     os.makedirs(out, exist_ok=True)
     for f in os.listdir(out):
@@ -300,11 +433,13 @@ def make(slug):
     n = len(words["carousel"])
     for i, s in enumerate(words["carousel"]):
         p = os.path.join(out, f"carousel-{i + 1:02d}.png")
-        carousel_slide(i, n, s, pack, pick(i), logo, handle).save(p, optimize=True)
+        (memory_slide(i, n, s, pack, slug, pick(i)) if memory else
+         carousel_slide(i, n, s, pack, pick(i), logo, handle)).save(p, optimize=True)
         files.append(p)
     for i, s in enumerate(words.get("stories", [])):
         p = os.path.join(out, f"story-{i + 1:02d}.png")
-        story_frame(s, pack, pick(i + 1), handle).save(p, optimize=True)
+        (memory_story(s, pack, slug, pick(i + 1)) if memory else
+         story_frame(s, pack, pick(i + 1), handle)).save(p, optimize=True)
         files.append(p)
     cap = os.path.join(out, "caption.txt")
     open(cap, "w", encoding="utf-8").write(words.get("caption", ""))
