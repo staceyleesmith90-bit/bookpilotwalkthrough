@@ -86,6 +86,9 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._file(os.path.join(STATIC, "studio.html"), "text/html")
             if u.path == "/editor":
                 return self._file(os.path.join(STATIC, "editor.html"), "text/html")
+            if u.path.startswith("/brand-sp/"):          # Systems Pilot logo files
+                name = os.path.basename(u.path)
+                return self._file(os.path.join(project.ROOT, "library", "brand-sp", name), "image/png")
             if u.path.startswith("/fonts/"):
                 name = os.path.basename(u.path)
                 return self._file(os.path.join(project.ROOT, "library", "fonts", name), "font/ttf")
@@ -248,6 +251,18 @@ class Handler(SimpleHTTPRequestHandler):
                     self.send_header("Cache-Control", "no-store")
                     self.end_headers()
                     return self.wfile.write(body)
+                if what == "posts":
+                    d = project.path(slug, "posts")
+                    if len(parts) > 4:
+                        fn = os.path.basename(parts[4])
+                        ct = "application/zip" if fn.endswith(".zip") else "text/plain; charset=utf-8" if fn.endswith(".txt") else "image/png"
+                        return self._file(os.path.join(d, fn), ct)
+                    files = sorted(os.listdir(d)) if os.path.isdir(d) else []
+                    cap = os.path.join(d, "caption.txt")
+                    return self._json({"carousel": [f for f in files if f.startswith("carousel-")],
+                                       "stories": [f for f in files if f.startswith("story-")],
+                                       "caption": open(cap, encoding="utf-8").read() if os.path.exists(cap) else "",
+                                       "job": JOBS.get(slug + ":posts")})
                 if what == "job":
                     return self._json(JOBS.get(slug, {"state": "idle"}))
                 if what == "cover.jpg":
@@ -424,6 +439,17 @@ class Handler(SimpleHTTPRequestHandler):
                         except Exception as e:
                             JOBS[slug] = {"state": "error", "error": str(e)[-500:]}
                     threading.Thread(target=mjob, daemon=True).start()
+                    return self._json({"ok": True})
+                if what == "posts":
+                    def pjob():
+                        JOBS[slug + ":posts"] = {"state": "working"}
+                        try:
+                            from ..postkit import make
+                            make(slug)
+                            JOBS[slug + ":posts"] = {"state": "done"}
+                        except Exception as e:
+                            JOBS[slug + ":posts"] = {"state": "error", "error": str(e)[-300:]}
+                    threading.Thread(target=pjob, daemon=True).start()
                     return self._json({"ok": True})
                 if what == "brief":
                     project.save(slug, "brief.json", data)

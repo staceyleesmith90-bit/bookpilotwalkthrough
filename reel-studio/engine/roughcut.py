@@ -116,6 +116,8 @@ def rough_cut(transcript, retake_threshold=0.72):
     words = [dict(w, i=k) for k, w in enumerate(transcript["words"])
              if _norm(w["w"]) and _norm(w["w"])[0] not in FILLERS]
     words = trim_long_words(words)
+    from . import sayit
+    words, cues = sayit.extract(words)          # "cue zoom", "scratch that"… directions said while filming
     groups = [g for g in (drop_soft_fillers(remove_stutters(g)) for g in split_lines(words)) if g]
     lines = []
     for i, g in enumerate(groups):
@@ -129,6 +131,7 @@ def rough_cut(transcript, retake_threshold=0.72):
                 ln["keep"] = False
                 ln["reason"] = f"retake (kept line {lines[j]['id']})"
                 break
+    sayit.attach(lines, cues)
     for ln in lines:
         ln["ranges"] = _ranges(ln["words"])
         ln["duration"] = round(sum(b - a for a, b in ln["ranges"]), 2)

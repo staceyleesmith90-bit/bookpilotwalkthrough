@@ -44,6 +44,12 @@
   python -m engine designs                      the ready-made designs (HyperFrames presets) to pick from
   python -m engine look-from-video <project|video>  3 looks made from the colours in the video
   python -m engine look-use <1|2|3> [--name "<brand>"]  use one of those looks as the brand
+  python -m engine harvest <long video> [--options N]   Clip Harvest: the best moments for short reels
+  python -m engine harvest-make <long video> --options "1,3"  one reel project per chosen moment
+  python -m engine handback <project> [--name "<CapCut project>"]  take the person's CapCut edits back into the reel
+  python -m engine posts <project>              Post Kit: carousel + story frames from the reel (posts.json = the words)
+  python -m engine gif-make <video> --clips "3.2-5" [--name wave] [--cutout]  a GIF from your footage (cut-out = just you)
+  python -m engine gifs                         the brand's GIFs (use in a plan: "gif:auto" or "gif:brand/gifs/x.webp")
   python -m engine library                      the effects library page (see, hear, copy what to say)
   python -m engine sounds-learn [<folder>] [--options capcut --name "<CapCut project>"] [--role EVENT]
                                                 learn the user's own sounds (inbox/sound-effects by default)
@@ -53,7 +59,7 @@
   python -m engine report                       a private problem report (no footage, no keys)
   python -m engine sticker-requests             stickers made on the fly (Claude can draw illustrated versions)
 """
-import argparse, json, os, shutil, subprocess, sys
+import argparse, json, os, re, shutil, subprocess, sys
 from . import brand, packs, project, roughcut
 
 ROOT = project.ROOT
@@ -113,6 +119,7 @@ def main(argv=None):
     ap.add_argument("--tempo", help="slow / medium / fast (sounds-add)")
     ap.add_argument("--link", help="TikTok sound link (sounds-add)")
     ap.add_argument("--role", help="font role: headline, accent, caption, script, serif, sans, sticker, sticker_label")
+    ap.add_argument("--cutout", action="store_true", help="gif-make: lift the person out of the background")
     ap.add_argument("--business", action="store_true", help="sound is approved for business accounts")
     a = ap.parse_args(argv)
     c = a.cmd
@@ -360,6 +367,33 @@ def main(argv=None):
         from . import autolook
         pack = autolook.use(a.arg or 1, a.name)
         print(f"Saved '{pack['label']}' as your brand look.")
+    elif c == "harvest":
+        from .harvest import moments
+        ms = moments(a.arg, int(a.options or 6))
+        for m in ms:
+            print(f"  {m['n']}. {m['seconds']:>4}s  from {m['start']:.0f}s  “{m['first'][:90]}”  (score {m['score']})")
+        print(f"{len(ms)} moments. Make reels with: python -m engine harvest-make <video> --options \"1,3,4\"")
+    elif c == "harvest-make":
+        from .harvest import make
+        nums = [int(x) for x in re.findall(r"\d+", a.options or "")]
+        for sl in make(a.arg, nums):
+            print("  new reel:", sl)
+        print("Each goes through the normal edit next: roughcut, style plan, build.")
+    elif c == "handback":
+        from .handback import hand_back
+        print(hand_back(a.arg, a.name))
+    elif c == "gif-make":
+        from .gifs import make
+        a0, _, b0 = (a.clips or "0-2").partition("-")
+        print("GIF saved:", make(a.arg, float(a0), float(b0 or float(a0) + 2), a.name, cutout=a.cutout))
+    elif c == "gifs":
+        from .gifs import library
+        for g in library():
+            print(f"  {g['name']:<24} {g['file']}  ({'yours' if g['kind'] == 'mine' else 'from your uploads'})")
+    elif c == "posts":
+        from .postkit import make
+        r = make(a.arg)
+        print(f"Post Kit: {len(r['carousel'])} carousel slides, {len(r['stories'])} stories -> projects/{a.arg}/posts/ (posts.zip)")
     elif c == "library":
         from .library_page import build
         print("Effects library:", build(open_it=not a.no_browser))

@@ -6,7 +6,7 @@ Pass 3 (ffmpeg): audio — voice + sound effects + music (ducked under the voice
 
 All of this runs locally. Claude never has to look at frames to render.
 """
-import hashlib, re, json, os, subprocess, tempfile
+import hashlib, re, json, os, shutil, subprocess, tempfile
 import numpy as np
 from PIL import Image, ImageChops, ImageFilter
 from . import captions, fx, grades, layout, packs, sfx, stickers, textfit, titles
@@ -191,6 +191,10 @@ def item_image(it, pack):
     if t == "window":                            # animation window: its settled frame (editor, cover, CapCut)
         fr = _window_frames(it, pack)
         return fr[int(len(fr) * 0.8)][0] if fr else None
+    if t == "gif":                               # GIF drop-in: its first frame (editor, cover)
+        from .gifs import frames as _gf
+        fr = _gf(it["file"], it.get("size", 360))
+        return fr[0][0] if fr else None
     if t == "photo":
         from .premium import photo_card
         if it.get("file"):
@@ -401,6 +405,9 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
             anim[it["id"]] = _window_frames(it, pack)
         elif it.get("type") == "hf":
             anim[it["id"]] = _hf_frames(it)
+        elif it.get("type") == "gif":
+            from .gifs import frames as _gf
+            anim[it["id"]] = _gf(it["file"], it.get("size", 360))
     cap = tl.get("captions") or {}
     groups = caption_groups(cap) if cap.get("style", "off") != "off" else []
     hfcap = None
@@ -527,7 +534,8 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
                         y0 = min(max(cy - im.height / 2, 200 * scale), H - 420 * scale - im.height)
                         frame.alpha_composite(im, (int(x0), int(y0)))
                     else:
-                        y = cap.get("y", 1240) * scale
+                        ys = cap.get("y_by_group")          # chin follow: each group's own height
+                        y = (ys[gi] if ys and gi < len(ys) else cap.get("y", 1240)) * scale
                         frame.alpha_composite(im, (int(W / 2 - im.width / 2), int(y - im.height / 2)))
                     break
         enc.stdin.write(frame.tobytes())
@@ -646,10 +654,13 @@ def _piece_sig(tl, pack, base, scale, f0, f1, fps):
     near = lambda a, b: a < t1 + 0.6 and b > t0 - 0.6
     cap = dict(tl.get("captions") or {})
     words = cap.pop("words", []) or []
+    items = [i for i in tl.get("items", []) if near(i["start"], i["end"])]
+    from .gifs import _abs
     return _sig({
         "salt": ENGINE_SALT, "base": _file_sig(base), "scale": scale, "f": [f0, f1],
         "pack": {"colors": pack.get("colors"), "fonts": pack.get("fonts")},
-        "items": [i for i in tl.get("items", []) if near(i["start"], i["end"])],
+        "items": items,                      # + the files they show (a GIF or picture added/replaced later)
+        "files": [_file_sig(_abs(i["file"])) for i in items if isinstance(i.get("file"), str)],
         "zooms": [z for z in tl.get("zooms", []) if near(z["start"], z["end"])],
         "trans": [t for t in tl.get("transitions", []) if near(t["t"] - 1, t["t"] + 1)],
         "layouts": [l for l in tl.get("layouts", []) if near(l["start"], l["end"])],
@@ -685,10 +696,17 @@ def build_graphics_cached(tl, pack, base, out, scale, cache_dir):
 def render(timeline, out, preview=False, no_music_out=None):
     """no_music_out: also write a copy with voice + sound effects only (no background music),
     so a trending sound can be added inside TikTok/Instagram. Costs one extra audio mix only."""
+    tmp = tempfile.mkdtemp(prefix="reel-")
+    try:
+        return _render(timeline, out, preview, no_music_out, tmp)
+    finally:                                             # working files are big: never leave them behind
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _render(timeline, out, preview, no_music_out, tmp):
     tl = json.load(open(timeline)) if isinstance(timeline, str) else timeline
     pack = packs.load(tl.get("pack"))
     scale = 0.5 if preview else 1.0
-    tmp = tempfile.mkdtemp()
     cache_dir = (os.path.join(os.path.dirname(os.path.abspath(timeline)), "renders", "cache")
                  if isinstance(timeline, str) else None)
     gfx = os.path.join(tmp, "gfx.mp4")
@@ -709,7 +727,7 @@ def render(timeline, out, preview=False, no_music_out=None):
           "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", raw])
     # finish: fade in/out, optional speed-up, brand end screen (engine/endcard.py)
     from .endcard import finish
-    spec = dict({"enabled": not preview}, **(tl.get("end_card") or {}))
+    spec = dict(tl.get("end_card") or {}, **({"enabled": False} if preview else {}))
     kit, speed = tl.get("sound_kit", "clean"), float(tl.get("speed", 1.0))
     finish(raw, out, pack, spec, kit, speed)
     if no_music_out:

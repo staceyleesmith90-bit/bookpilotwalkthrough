@@ -99,6 +99,13 @@ def export(project_dir, tl, name=None, captions=True, dest=None, mode="editable"
     while os.path.exists(os.path.join(root, name)):     # never overwrite a CapCut project: make "Name 2", "Name 3"…
         name, n = f"{base_name} {n}", n + 1
     script = folder.create_draft(name, W, H, 30, allow_replace=False)
+    try:                                               # remember it, so "take it back" can find it later
+        mp = os.path.join(project_dir, "project.json")
+        meta = json.load(open(mp, encoding="utf-8"))
+        meta["capcut_drafts"] = [n_ for n_ in meta.get("capcut_drafts", []) if n_ != name] + [name]
+        json.dump(meta, open(mp, "w", encoding="utf-8"), indent=1)
+    except Exception:
+        pass
     media = os.path.join(root, name, "reel-studio-media")      # media lives inside the draft folder
     os.makedirs(media, exist_ok=True)
     SEC = cc.SEC
@@ -144,9 +151,13 @@ def export(project_dir, tl, name=None, captions=True, dest=None, mode="editable"
         if p["graphics"]:
             script.add_track(cc.TrackType.video, "Graphics", relative_index=1)
             for i, it in enumerate(sorted(p["graphics"], key=lambda x: x["start"])):
-                if it["type"] in ("window", "hf"):    # animation window / HyperFrames effect: a real moving clip
+                if it["type"] in ("window", "hf", "gif"):    # animation window / HyperFrames effect / GIF: a real moving clip
                     from .render import _window_frames, _hf_frames
-                    frs = _window_frames(it, pack) if it["type"] == "window" else _hf_frames(it)
+                    if it["type"] == "gif":
+                        from .gifs import clip_frames
+                        frs = [(f, 1 / 30) for f in clip_frames(it)]
+                    else:
+                        frs = _window_frames(it, pack) if it["type"] == "window" else _hf_frames(it)
                     if not frs:
                         continue
                     fdir = tempfile.mkdtemp()

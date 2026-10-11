@@ -9,7 +9,8 @@ Zoom types (timeline "zooms": [{start, end, type, scale, cx, cy}]):
 
 Transition types (timeline "transitions": [{t, type, dur}]):
   flash · dip-black · dip-white · whip · zoom-blur · glitch · light-leak · pixelate ·
-  spin · blur · shape-wipe (brand colour) · rgb-split · film-burn
+  spin · blur · shape-wipe (brand colour) · rgb-split · film-burn ·
+  zoom-through (dive into the old shot, land in the new one) · pull-back (old shot shrinks away, new one settles)
 """
 import math, random
 import numpy as np
@@ -17,7 +18,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 ZOOMS = ("punch", "push", "pull", "whip", "shake", "pulse", "focus", "drift")
 TRANSITIONS = ("flash", "dip-black", "dip-white", "whip", "zoom-blur", "glitch", "light-leak", "pixelate",
-               "spin", "blur", "shape-wipe", "rgb-split", "film-burn")
+               "spin", "blur", "shape-wipe", "rgb-split", "film-burn", "zoom-through", "pull-back")
 
 
 def _ease(p):
@@ -142,6 +143,19 @@ def transition(frame, tr, t, pack_colour="#FFFFFF"):
         return frame.rotate(12 * x * k, resample=Image.BILINEAR).filter(ImageFilter.GaussianBlur(6 * k))
     if kind == "blur":
         return frame.filter(ImageFilter.GaussianBlur(18 * k * W / 1080))
+    if kind == "zoom-through":  # dive into the centre of the old shot, come out of the new one still settling
+        e = _ease(k)
+        out = apply_zoom(frame, 1 + 1.4 * e, W / 2, H / 2)
+        return out.filter(ImageFilter.GaussianBlur(10 * e * W / 1080)) if e > 0.15 else out
+    if kind == "pull-back":     # old shot shrinks away into the brand colour; new shot starts close and eases back
+        e = _ease(k)
+        if x < 0:
+            s = 1 - 0.38 * e
+            out = Image.new("RGBA", frame.size, pack_colour)
+            small = frame.resize((max(1, int(W * s)), max(1, int(H * s))), Image.BILINEAR)
+            out.paste(small, (int(W * (1 - s) / 2), int(H * (1 - s) / 2)))
+            return out
+        return apply_zoom(frame, 1 + 0.5 * e, W / 2, H / 2)
     if kind == "shape-wipe":  # brand-colour circle grows to cover the cut, then opens
         out = frame.copy()
         r = math.hypot(W, H) / 2 * _ease(k)

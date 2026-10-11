@@ -96,6 +96,17 @@ def _source_time(cuts, out_t):
     return cuts[-1][1] if cuts else out_t
 
 
+def _clip_len(path):
+    """Seconds of a video file (0 for a still or if unknown)."""
+    import subprocess
+    try:
+        out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
+                             capture_output=True, text=True, timeout=30).stdout.strip()
+        return float(out) if not path.lower().endswith((".jpg", ".jpeg", ".png", ".webp")) else 0.0
+    except Exception:
+        return 0.0
+
+
 def _box(cx, cy, w, h):
     return (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
 
@@ -254,6 +265,10 @@ def to_timeline(plan, rc=None, source=None):
             if not ws:
                 continue
             b = by_line.get(lid, {"line": lid, "do": []})
+            if l.get("cues"):                       # Say-it cues: what they asked for out loud while filming
+                from .sayit import dos as _said
+                extra = [d for d in _said(l) if d.split(":")[0] not in {x.split(":")[0] for x in b.get("do", [])}]
+                b = dict(b, do=list(b.get("do", [])) + extra)
             windows.append((ws[0]["start"], ws[-1]["end"] + 0.12, b, l["text"], ws))
         # the "clean" look (default): quiet single words, small — the footage and ONE treatment
         # per moment do the talking. Any caption style the user/plan names wins.
@@ -646,6 +661,35 @@ def to_timeline(plan, rc=None, source=None):
                       "end": a + 0.1 + min(max(b_end - a, need, 2.4), 5.0), "x": 540, "y": 1180,
                       "scale": 0.92, "z": 36, "anim": "none", "hide_captions": True}
                 items.append(it)
+            elif kind == "gif":                   # gif:<file or auto>[|top|bottom|left|right]
+                from . import gifs
+                what, _, where = arg.partition("|")
+                what = what.strip()
+                if what in ("", "auto"):
+                    lib = gifs.library()
+                    if not lib:
+                        continue
+                    what = lib[sum(1 for i in items if i["type"] == "gif") % len(lib)]["file"]
+                try:
+                    im = gifs.frames(what, 360)[0][0]
+                except Exception as e:
+                    print(f"[reel] GIF '{what}' skipped: {e}")
+                    continue
+                near = {"top": (W / 2, 420), "bottom": (W / 2, 1150), "left": (280, 700), "right": (800, 700)}.get(
+                    where.strip(), (W * 0.72, 560))
+                it = {"id": _id("gif"), "type": "gif", "file": what, "size": 360, "start": a + 0.1,
+                      "end": min(b_end, a + 3.5), "anim": "pop", "z": 33}
+                it["x"], it["y"], r, it["scale"] = _spot(im.size, taken, near)
+                taken.append(r)
+                items.append(it)
+                cues.append((it["start"], pack["sfx"]["sticker_in"], 0.5))
+            elif kind == "broll-here":            # they said "cue b-roll": next clip from their b-roll, or flag it
+                pool = [f for f in plan.get("broll_pool", []) if f not in {x["file"] for x in broll}]
+                if pool:
+                    broll.append({"file": pool[0], "start": a, "dur": round(b_end - a, 3)})
+                    transitions.append({"t": round(a, 3), "type": pack.get("transition", "whip"), "dur": 0.3})
+                else:
+                    tl.setdefault("qa", {}).setdefault("needs_broll", []).append(round(a, 2))
             elif kind == "reveal":
                 cues.append((max(a - 1.2, 0), "riser", 0.5))
                 cues.append((a, "hit", 0.8))
@@ -664,6 +708,30 @@ def to_timeline(plan, rc=None, source=None):
                 transitions.append({"t": round(a, 3), "type": ttype, "dur": 0.36})
     # auto director: framing on the real face, push-ins on product shots, emphasis bumps,
     # transitions only where the angle changes
+    # Quick Hook: the first ~3 seconds become a fast burst of b-roll over their voice (the hook is said,
+    # the eyes get 3-4 quick shots), then the reel lands on them. plan["quick_hook"] = [files] or True
+    qh = plan.get("quick_hook")
+    if qh and base_on_video:
+        files = [f for f in (qh if isinstance(qh, list) else plan.get("broll_pool", [])) if f][:4]
+        if files:
+            span = round(min(3.2, tl["duration"] * 0.2), 3)
+            step = span / len(files)
+            broll = [b for b in broll if b["start"] >= span]
+            transitions = [t_ for t_ in transitions if t_["t"] > span + 0.2]
+            zooms = [z for z in zooms if z["start"] >= span]
+            from .hdr import ensure_sdr
+            for k, f in enumerate(files):
+                f_abs = f if os.path.isabs(f) else os.path.join(ROOT_DIR, f)
+                sdr = ensure_sdr(f_abs)
+                clip_len = _clip_len(sdr)
+                src_in = round(max(0.0, min(clip_len * 0.35, clip_len - step - 0.1)), 2) if clip_len else 0
+                broll.append({"file": os.path.relpath(sdr, ROOT_DIR) if sdr != f_abs else f, "start": round(k * step, 3),
+                              "dur": round(step + (0.02 if k < len(files) - 1 else 0), 3), "src_in": src_in, "hook": True})
+                if k:
+                    transitions.append({"t": round(k * step, 3), "type": "flash", "dur": 0.16})
+                cues.append((round(k * step, 3), "whoosh" if k else "hit", 0.4))
+            transitions.append({"t": span, "type": "zoom-through", "dur": 0.3})
+            broll.sort(key=lambda b: b["start"])
     if base_on_video and source and plan.get("auto_camera", True):
         from . import director
         z, tr = director.plan_camera(tl, tl.get("captions", {}).get("words", []),
@@ -776,6 +844,28 @@ def to_timeline(plan, rc=None, source=None):
             last = pick[:2]
             plan_l.append({"layout": KIN_LAYOUTS[gi % len(KIN_LAYOUTS)], "x": pick[0], "y": pick[1], "align": pick[2]})
         tl["captions"]["layout_plan"] = plan_l
+    if base_on_video and source and tl.get("cuts"):     # face-aware: captions under the chin, graphics off the face
+        from . import faceaware
+        from .render import caption_groups, item_image
+        head = lambda st: _head_at(source, st)
+        stime = lambda t: _source_time(tl["cuts"], t)
+        cap = tl.get("captions") or {}
+        if cap.get("words") and cap.get("style") not in ("off", "kinetic") and not str(cap.get("style", "")).startswith("hf:") \
+                and plan.get("chin_follow", True):
+            try:
+                cap["y_by_group"] = faceaware.chin_follow(tl, head, stime, caption_groups(cap), cap.get("y", 1245))
+            except Exception:
+                pass
+        def _size(it):
+            try:
+                im = item_image(it, pack)
+                return im.size if im is not None else None
+            except Exception:
+                return None
+        try:
+            tl.setdefault("qa", {})["moved_off_face"] = faceaware.guard(tl, head, stime, _size)
+        except Exception:
+            pass
     if base_on_video and source:                  # measured picture correction (colour cast, exposure)
         from . import picture
         try:

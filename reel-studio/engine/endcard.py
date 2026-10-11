@@ -104,9 +104,12 @@ def finish(main, out, pack, spec, kit="clean", speed=1.0):
     fc = f"[0:v]{vf}[v0];[0:a]{af}[a0]"
     inputs = ["-i", main]
     if spec.get("enabled", True):
+        wh = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+                             "-of", "csv=p=0", main], capture_output=True, text=True).stdout.strip().split(",")
+        W, H = (int(wh[0]), int(wh[1])) if len(wh) == 2 and all(v.isdigit() for v in wh) else (1080, 1920)
         card = make_card(pack, spec, os.path.join(tmp, "card.mp4"), kit=kit)
         inputs += ["-i", card]
-        fc += ";[v0][a0][1:v][1:a]concat=n=2:v=1:a=1[v][a]"
+        fc += f";[1:v]scale={W}:{H},setsar=1[cv];[v0][a0][cv][1:a]concat=n=2:v=1:a=1[v][a]"
         maps = ["-map", "[v]", "-map", "[a]"]
     else:
         maps = ["-map", "[v0]", "-map", "[a0]"]
