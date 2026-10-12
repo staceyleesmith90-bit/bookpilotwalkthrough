@@ -283,6 +283,8 @@ def to_timeline(plan, rc=None, source=None):
                           "words": all_words, "y": 1245}
         if clean and not plan.get("captions"):
             tl["captions"].update(size=62, case="lower")
+        if cap_style == "tiered":                 # editorial captions sit at chest height, like the reference
+            tl["captions"].update(y=1080, words_per_line=4)
     else:
         t = 0.0
         for b in beats:
@@ -321,7 +323,7 @@ def to_timeline(plan, rc=None, source=None):
                 taken = [t for t in taken if t != FACE] + faces
         big_text = None
         if not on_video and not any(d.split(":")[0] in ("takeover", "card", "bubble", "cta", "title", "keep-footage",
-                                                           "broll", "label", "scrapbook") for d in do):
+                                                           "broll", "label", "scrapbook", "gridcard") for d in do):
             do.insert(0, "takeover")               # faceless: every beat shows its words
         if auto and not any(d.startswith(("sticker", "emoji", "badge", "icon", "3d", "anim", "stamp", "callout"))
                             for d in do) and len(used_stickers) < sticker_budget:
@@ -683,6 +685,16 @@ def to_timeline(plan, rc=None, source=None):
                 taken.append(r)
                 items.append(it)
                 cues.append((it["start"], pack["sfx"]["sticker_in"], 0.5))
+            elif kind == "gridcard":              # gridcard:<lead>|<big word>  full-screen colour card, words blur in
+                lead, _, bigw = arg.partition("|")
+                if not bigw:
+                    ws = (lead or text).split()
+                    lead, bigw = " ".join(ws[:-1]), (ws[-1] if ws else "")
+                gc = dict(beat.get("gridcard") or {})
+                items.append({"id": _id("grid"), "type": "gridcard", "lead": lead.strip(), "big": bigw.strip(),
+                              "color": gc.get("color"), "font": gc.get("font", "serif"), "start": a,
+                              "end": b_end, "x": W / 2, "y": H / 2, "z": 40, "anim": "none", "hide_captions": True})
+                cues.append((a, "whoosh", 0.35))
             elif kind == "scrapbook":             # scrapbook[:orbit|page|stack] + beat["scrapbook"] = {any setting}
                 from . import scrapbook
                 opts = dict(beat.get("scrapbook") or {})

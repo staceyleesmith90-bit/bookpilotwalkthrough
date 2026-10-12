@@ -191,6 +191,9 @@ def item_image(it, pack):
     if t == "window":                            # animation window: its settled frame (editor, cover, CapCut)
         fr = _window_frames(it, pack)
         return fr[int(len(fr) * 0.8)][0] if fr else None
+    if t == "gridcard":                          # grid card: its settled frame (editor, cover)
+        from .gridcard import frames as _gc
+        return _gc(it, pack)[-1][0]
     if t == "gif":                               # GIF drop-in: its first frame (editor, cover)
         from .gifs import frames as _gf
         fr = _gf(it["file"], it.get("size", 360))
@@ -337,7 +340,9 @@ def caption_groups(cap):
     groups, cur = [], []
     if style == "kinetic":
         n = max(n, 5)
-    max_chars = 17 if style == "pop" else 24 if style in ("duo", "rainbow", "boxed", "popin", "stack") else \
+    if style == "tiered":
+        n = max(n, 4)
+    max_chars = 17 if style == "pop" else 24 if style in ("duo", "rainbow", "boxed", "popin", "stack", "tiered") else \
         30 if style == "kinetic" else 10 ** 6    # big caps: keep each line short so it stays big
     for w in words:
         if cur and (len(cur) >= n or w["start"] - cur[-1]["end"] > 0.5
@@ -405,6 +410,9 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
             anim[it["id"]] = _window_frames(it, pack)
         elif it.get("type") == "hf":
             anim[it["id"]] = _hf_frames(it)
+        elif it.get("type") == "gridcard":
+            from .gridcard import frames as _gc
+            anim[it["id"]] = _gc(it, pack)
         elif it.get("type") == "gif":
             from .gifs import frames as _gf
             anim[it["id"]] = _gf(it["file"], it.get("size", 360))
@@ -488,7 +496,7 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
                 elif it["id"] in anim and anim[it["id"]]:
                     frs = anim[it["id"]]
                     total = sum(d for _, d in frs)
-                    lt = (t - it["start"]) % total if it["type"] not in ("window", "hf") else min(t - it["start"], total - 1e-6)
+                    lt = (t - it["start"]) % total if it["type"] not in ("window", "hf", "gridcard") else min(t - it["start"], total - 1e-6)
                     for img_f, dd in frs:
                         if lt < dd:
                             break
@@ -516,6 +524,10 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
                         if cap.get("style") == "kinetic":
                             ccap["_layout"] = lp.get("layout", captions.KIN_LAYOUTS[gi % len(captions.KIN_LAYOUTS)])
                             cap_cache[key] = captions.render_kinetic_layout(g, active, phase, pack, ccap)
+                        elif cap.get("style") == "tiered":
+                            ccap.update(_gi=sum(1 for x in range(gi) if any(g_off[x] <= k < g_off[x] + len(groups[x]) for k in kw)),
+                                        _hook=gi == 0)
+                            cap_cache[key] = captions.render_tiered(g, active, phase, pack, ccap)
                         else:
                             cap_cache[key] = (captions.render_kinetic(g, active, phase, pack, ccap) if kinetic
                                               else captions.render(g, active, pack, ccap))

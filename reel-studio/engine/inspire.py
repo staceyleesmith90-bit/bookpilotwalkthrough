@@ -114,13 +114,15 @@ def plan_settings(profile):
                 "grade": profile.get("look", {}).get("suggested_grade"), "title_template": "tag",
                 "sound_kit": "playful", "framed": "off",
                 "beat_seconds": max(0.5, min(1.2, profile.get("pacing", {}).get("avg_shot_s", 0.8)))}
-    return {
+    out = {
         "speed": 1.12 if (feel == "fast" or wps > 3.2) else 1.0,
         "captions": notes.get("caption_style") or ("kinetic" if feel != "slow" else "duo"),
         "grade": profile.get("look", {}).get("suggested_grade"),
         "sound_kit": "digital" if dens > 2.2 else "playful" if dens > 1.4 else "luxe",
         "framed": "auto" if feel != "slow" else "off",
     }
+    out.update(notes.get("plan") or {})          # settings Claude saw that the numbers can't measure
+    return out
 
 
 def analyse(source, name=None, transcribe_audio=True):

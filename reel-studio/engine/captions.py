@@ -498,3 +498,87 @@ def render_kinetic_layout(group, active, phase, pack, cap):
     out.alpha_composite(sh, (0, stroke))
     out.alpha_composite(im)
     return out
+
+
+# ---------------------------------------------------------------- tiered (editorial talking-head captions)
+# Studied from editorial talking-head reels: lowercase, no outline, a soft shadow; a small sans lead-in
+# with the key phrase big underneath, alternating a bold italic serif and a heavy sans; every word blurs
+# into focus as it's said; the hook's key word can sit on a colour block.
+KINETIC |= {"tiered"}
+ACTIVE |= {"tiered"}
+STYLES["tiered"] = "editorial: small lead-in words, the key phrase big below (italic serif / heavy sans), words blur in"
+FONT_SANS = os.path.join(ROOT, "library", "fonts", "Montserrat-Variable.ttf")
+
+
+def _spoken_case(w):
+    """As said: keep the transcript's capitals (names, sentence starts), but no shouting all-caps words."""
+    t = w.strip()
+    return t.lower() if t.isupper() and len(t) > 1 and t not in ("I", "I'M", "OK") else t
+
+
+def tiered_split(group, keyset):
+    """(lead words, big words): the big phrase starts at the first key word; no key word = all lead."""
+    if not keyset:
+        return group, []
+    k = min(keyset)
+    if k == 0 and len(group) > 1:            # keep at least one small lead-in word when the key word comes first
+        return group[:1], group[1:]
+    return group[:k], group[k:]
+
+
+def render_tiered(group, active, phase, pack, cap):
+    c = pack["colors"]
+    keyset = set(cap.get("_keys_in_group", []))
+    lead, big = tiered_split(group, keyset)
+    lead_px = int(cap.get("size", 54))
+    big_px = int(lead_px * 2.15)
+    serif = (cap.get("_gi", 0) % 2 == 0)
+    white = c.get("caption", "#FFFFFF")
+    hl = cap.get("highlight") or c.get("pop", "#D9715B")
+    f_lead = load_font(FONT_SANS, lead_px, 600)
+    big_font = lambda px: (load_font(FONT_ITALIC, px, 800) if serif else load_font(FONT_SANS, px, 800))
+    words = [(_spoken_case(w["w"]).strip(",.!?;:"), i) for i, w in enumerate(group)]
+    lead_w = [(t, i) for t, i in words[:len(lead)]]
+    big_w = [(t, i) for t, i in words[len(lead):]]
+    fb = big_font(big_px)
+    while big_w and fb.getlength(" ".join(t for t, _ in big_w)) > 940 and big_px > 60:
+        big_px -= 6
+        fb = big_font(big_px)
+    if not big_w:                              # one tier only: a little bigger
+        f_lead = load_font(FONT_SANS, int(lead_px * 1.15), 600)
+    Wc, Hc = 1000, int(lead_px * 1.4 + big_px * 1.45 + 60)
+    im = Image.new("RGBA", (Wc, Hc))
+
+    def place(line, font, y, hl_on=False):
+        gap = font.getlength(" ")
+        total = sum(font.getlength(t) for t, _ in line) + gap * (len(line) - 1)
+        x = (Wc - total) / 2
+        for t, i in line:
+            ww = font.getlength(t)
+            if i <= active:
+                p = 1.0 if i < active else min(phase / PHASES, 1.0)
+                asc_, desc_ = font.getmetrics()
+                layer = Image.new("RGBA", (int(ww + 80), int(asc_ + desc_ + 80)))
+                d = ImageDraw.Draw(layer)
+                if hl_on:
+                    asc = font.getmetrics()[0]
+                    d.rectangle((24, 40 + asc * 0.28, ww + 56, 40 + asc * 1.02), fill=hl)
+                d.text((40, 40), t, font=font, fill=white, anchor="la")
+                if p < 1:                       # blur into focus, fade up, rise a little
+                    layer = layer.filter(ImageFilter.GaussianBlur(10 * (1 - p)))
+                    layer.putalpha(layer.split()[3].point(lambda v, a=0.25 + 0.75 * p: int(v * a)))
+                im.alpha_composite(layer, (int(x - 40), int(y - 40 + (1 - p) * font.size * 0.25)))
+            x += ww + gap
+
+    y_lead = 20
+    if big_w:
+        place(lead_w, f_lead, y_lead)
+        place(big_w, fb, y_lead + lead_px * 0.62, hl_on=bool(cap.get("_hook")))
+    else:
+        place(lead_w, f_lead, y_lead + big_px * 0.35)
+    sh = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    sh.putalpha(im.split()[3].filter(ImageFilter.GaussianBlur(9)).point(lambda v: int(v * 0.45)))
+    out = Image.new("RGBA", im.size)
+    out.alpha_composite(sh, (0, 4))
+    out.alpha_composite(im)
+    return out
