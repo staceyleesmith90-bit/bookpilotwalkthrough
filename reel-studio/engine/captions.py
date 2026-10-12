@@ -560,42 +560,61 @@ def render_tiered(group, active, phase, pack, cap):
     hl_words = {re.sub(r"[^a-z0-9']", "", h.lower()) for h in cap.get("highlights", [])}
     underline = bool(big_w) and not cap.get("_hook") and any(re.sub(r"[^a-z0-9']", "", t.lower()) in hl_words for t, _ in words)
 
-    def place(line, font, y, hl_on=False):
+    def lead_line(line, font, y):
+        """Small words fade in one by one; the line re-centres as it grows (like the reference)."""
+        vis = [(t, i) for t, i in line if i <= active]
+        if not vis:
+            return
+        gap = font.getlength(" ")
+        total = sum(font.getlength(t) for t, _ in vis) + gap * (len(vis) - 1)
+        x = (Wc - total) / 2
+        d = ImageDraw.Draw(im)
+        r, g, b = ImageColor.getrgb(white)[:3]
+        for t, i in vis:
+            p = 1.0 if i < active else min(phase / PHASES * 1.6, 1.0)
+            d.text((x, y), t, font=font, fill=(r, g, b, int(255 * (0.15 + 0.85 * p))), anchor="la")
+            x += font.getlength(t) + gap
+
+    def big_line(line, font, y, hl_on=False):
+        """The big phrase rises as one piece from behind an invisible line, blurred while it moves."""
+        first = line[0][1]
+        if active < first:
+            return 0.0
+        p = 1.0 if active > first else min(phase / PHASES, 1.0)
+        e = 1 - (1 - p) ** 3
         gap = font.getlength(" ")
         total = sum(font.getlength(t) for t, _ in line) + gap * (len(line) - 1)
+        asc, desc = font.getmetrics()
+        layer = Image.new("RGBA", (Wc, int(asc + desc + 40)))
+        d = ImageDraw.Draw(layer)
         x = (Wc - total) / 2
-        for t, i in line:
-            ww = font.getlength(t)
-            if i <= active:
-                p = 1.0 if i < active else min(phase / PHASES, 1.0)
-                asc_, desc_ = font.getmetrics()
-                layer = Image.new("RGBA", (int(ww + 80), int(asc_ + desc_ + 80)))
-                d = ImageDraw.Draw(layer)
-                if hl_on:
-                    asc = font.getmetrics()[0]
-                    d.rectangle((24, 40 + asc * 0.28, ww + 56, 40 + asc * 1.02), fill=hl)
-                d.text((40, 40), t, font=font, fill=white, anchor="la")
-                if p < 1:                       # blur into focus, fade up, rise a little
-                    layer = layer.filter(ImageFilter.GaussianBlur(10 * (1 - p)))
-                    layer.putalpha(layer.split()[3].point(lambda v, a=0.25 + 0.75 * p: int(v * a)))
-                im.alpha_composite(layer, (int(x - 40), int(y - 40 + (1 - p) * font.size * 0.25)))
-            x += ww + gap
+        if hl_on:
+            d.rectangle((x - 18, 20 + asc * 0.28, x + total + 18, 20 + asc * 1.02), fill=hl)
+        d.text((x, 20), " ".join(t for t, _ in line), font=font, fill=white, anchor="la")
+        if p < 1:
+            layer = layer.filter(ImageFilter.GaussianBlur(7 * (1 - e)))
+            layer.putalpha(layer.split()[3].point(lambda v, a=0.35 + 0.65 * e: int(v * a)))
+        off = int((1 - e) * font.size * 0.6)            # rises from below...
+        mask_bottom = int(20 + asc + desc)               # ...clipped at the line it rises from
+        shown = layer.crop((0, 0, Wc, max(1, mask_bottom - off)))
+        im.alpha_composite(shown, (0, int(y - 20 + off)))
+        return e
 
     y_lead = 20
     if big_w:
-        place(lead_w, f_lead, y_lead)
-        place(big_w, fb, y_lead + lead_px * 0.62, hl_on=bool(cap.get("_hook")))
-        if underline and big_w[0][1] <= active:  # a copper line draws under the phrase, left to right
+        lead_line(lead_w, f_lead, y_lead)
+        e = big_line(big_w, fb, y_lead + lead_px * 0.62, hl_on=bool(cap.get("_hook")))
+        if underline and e > 0.6:                # a copper line draws under the phrase once it has landed
             gap = fb.getlength(" ")
             total = sum(fb.getlength(t) for t, _ in big_w) + gap * (len(big_w) - 1)
             x0 = (Wc - total) / 2
-            p = 1.0 if active > big_w[0][1] else min(phase / PHASES, 1.0)
             asc, desc = fb.getmetrics()
             yl = y_lead + lead_px * 0.62 + asc + desc * 0.15
-            ImageDraw.Draw(im).rounded_rectangle((x0, yl, x0 + total * p, yl + max(6, big_px * 0.07)),
+            k = min(1.0, (e - 0.6) / 0.4)
+            ImageDraw.Draw(im).rounded_rectangle((x0, yl, x0 + total * k, yl + max(6, big_px * 0.07)),
                                                  radius=4, fill=hl)
     else:
-        place(lead_w, f_lead, y_lead + big_px * 0.35)
+        lead_line(lead_w, f_lead, y_lead + big_px * 0.35)
     sh = Image.new("RGBA", im.size, (0, 0, 0, 0))
     sh.putalpha(im.split()[3].filter(ImageFilter.GaussianBlur(9)).point(lambda v: int(v * 0.45)))
     out = Image.new("RGBA", im.size)

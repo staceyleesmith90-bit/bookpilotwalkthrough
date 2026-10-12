@@ -816,6 +816,8 @@ def to_timeline(plan, rc=None, source=None):
         cues.append((0.0, "swish", 0.35))
     # outro: brand end screen (logo, name, handle, call to action)
     cta_text = next((d.split(":", 1)[1] for b in plan.get("beats", []) for d in b.get("do", []) if d.startswith("cta:")), None)
+    if plan.get("sound") in ("music", "none", "typewriter"):
+        plan = dict(plan, end_card=dict({"sound": False}, **(plan.get("end_card") or {})))
     tl["end_card"] = dict({"title": pack.get("label", ""), "handle": pack.get("handle", ""),
                            "cta": cta_text or "Follow for more", "enabled": True}, **(plan.get("end_card") or {}))
     if plan.get("speed"):
@@ -825,6 +827,8 @@ def to_timeline(plan, rc=None, source=None):
     kit = plan.get("sound_kit") or sounddesign.KIT_FOR_LOOK.get(look, sounddesign.DEFAULT_KIT)
     sounddesign.vary_entrances(tl["items"])
     cues = sounddesign.design(tl, cues, kit)
+    if plan.get("sound") in ("music", "none"):   # like editorial reels: voice + music bed (+ b-roll's own sound), no effects
+        cues = []
     if plan.get("sound") == "typewriter":        # no whooshes or effects: one soft key as each word appears
         hide = [(i["start"], i["end"]) for i in tl["items"] if i.get("hide_captions")]
         words = [w for w in tl.get("captions", {}).get("words", []) if not any(a <= w["start"] < b for a, b in hide)]
@@ -836,6 +840,7 @@ def to_timeline(plan, rc=None, source=None):
     tl["sound_kit"] = kit
     tl["audio"] = {"sfx": [{"t": round(t, 3), "name": n, "gain": g} for t, n, g in sorted(cues)],
                    "music": plan.get("music"), "sfx_gain": 0.6,
+                   "broll_sound": float(plan.get("broll_sound", 0) or 0),   # b-roll clips' own sound, softly under the voice
                    "denoise": plan.get("denoise", "auto")}      # auto (AI cleaner) · light · elevenlabs
     # quality check + auto-fix (static stretches, hook, clutter, faces, captions)
     from . import qa

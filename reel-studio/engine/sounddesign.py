@@ -43,7 +43,7 @@ KITS = {
                   "playful": ["f:pop", "f:softpop"], "digital": ["f:click", "k:interface-select_*"]},
     "word_pop":  {"soft": ["u:hover", "f:softpop"], "clean": ["u:hover", "f:tick"], "luxe": ["u:hover", "f:tick"],
                   "playful": ["f:pop"], "digital": ["f:click"]},
-    "type_key":  {"*": ["u:typing", "f:key"]},
+    "type_key":  {"*": ["f:key"]},             # real keyboard recordings only (the UI "typing" blips sound digital)
     "typing":    {"*": ["f:typing"]},
     "type_end":  {"soft": ["u:check"], "clean": ["u:check"], "luxe": ["u:check", "f:ding"],
                   "playful": ["f:softpop"], "digital": ["k:digital-twoTone*"]},

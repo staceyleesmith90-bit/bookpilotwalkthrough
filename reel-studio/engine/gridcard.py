@@ -82,7 +82,8 @@ def frames(it, pack):
             fr.alpha_composite(L, (int(W / 2 - L.width / 2), int(cy - (big and px * 0.55 or 0) - L.height / 2 + (1 - p1) * 14)))
         if big and p2 > 0:
             B = _word(big, f_big, p2)
-            fr.alpha_composite(B, (int(W / 2 - B.width / 2), int(cy + px * 0.12 - B.height / 2 + (1 - p2) * 20)))
+            rise = (1 - (1 - p2) ** 3)                      # rises from below into focus, like the reference
+            fr.alpha_composite(B, (int(W / 2 - B.width / 2), int(cy + px * 0.12 - B.height / 2 + (1 - rise) * px * 0.45)))
         out.append((fr, 1 / FPS if i < n else 999.0))
     if len(_CACHE) > 12:
         _CACHE.clear()

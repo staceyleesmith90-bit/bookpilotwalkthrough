@@ -16,6 +16,10 @@ description: Make the user's reel feel like a reel they love. Use when the user 
    Anything the numbers can't measure goes in `claude_notes.plan` (e.g. {"captions": "tiered", "framed": "off"}).
    Full-screen colour punchline cards: `gridcard:<lead>|<big word>` on a beat. Underlined key words:
    `"caption_highlights": [words]`. Quiet editorial sound (no whooshes, a soft key per word): `"sound": "typewriter"`.
+   Editorial reels usually have NO effects at all — voice + a soft music bed + the b-roll's own sound:
+   `"sound": "music"`, `"broll_sound": 0.2`, music from `musicgen` (lo-fi, slow) at gain ~0.16.
+   Before copying a reference's sound, separate it (`python -m demucs --two-stems vocals`) and measure:
+   music bed level, beat, and whether events line up with words (typing) or cuts (whooshes / b-roll sound).
 3. In plan.json set `"inspiration": "<name>"` — its settings (speed, captions, grade, sound kit,
    framed layouts) fill anything the plan doesn't set. Override freely.
 4. Tell the user in 2 lines what you borrowed ("fast pace, key words big in script, framed

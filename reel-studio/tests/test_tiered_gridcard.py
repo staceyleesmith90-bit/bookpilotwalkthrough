@@ -12,10 +12,12 @@ def test_tiered_splits_lead_and_big_and_animates():
     assert captions.tiered_split(W("and we don't"), set())[1] == []              # filler only: one small line
     assert captions.tiered_split(W("care about your business"), set())[1] == W("business")   # strongest word goes big
     pack = packs.load("minimal")
-    done = captions.render_tiered(W("feels like to China"), 3, captions.PHASES, pack, {"_keys_in_group": [2]})
-    mid = captions.render_tiered(W("feels like to China"), 3, 1, pack, {"_keys_in_group": [2]})
+    done = captions.render_tiered(W("feels like to China"), 2, captions.PHASES, pack, {"_keys_in_group": [2]})
+    mid = captions.render_tiered(W("feels like to China"), 2, 1, pack, {"_keys_in_group": [2]})
     assert done.size == mid.size and done.getbbox()
-    assert done.tobytes() != mid.tobytes()          # the newest word is still blurring in
+    assert done.tobytes() != mid.tobytes()          # the big phrase is still rising into place
+    before = captions.render_tiered(W("feels like to China"), 1, captions.PHASES, pack, {"_keys_in_group": [2]})
+    assert before.getbbox()[3] < done.getbbox()[3]  # it isn't shown before its first word is said
     assert captions._spoken_case("China") == "China" and captions._spoken_case("WOW") == "wow"
 
 

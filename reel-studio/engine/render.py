@@ -579,6 +579,14 @@ VOICE_CHAIN = ("highpass=f=85,"
 MASTER = "alimiter=limit=0.95,loudnorm=I=-14:TP=-1.5:LRA=11,aformat=sample_rates=48000:channel_layouts=stereo"
 
 
+def _has_audio(path):
+    try:
+        return "audio" in subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type", "-of", "csv=p=0",
+                                          path], capture_output=True, text=True).stdout
+    except Exception:
+        return False
+
+
 def build_audio(tl, base_has_voice, base, out_wav):
     dur = tl["duration"]
     a = tl.get("audio", {})
@@ -618,6 +626,18 @@ def build_audio(tl, base_has_voice, base, out_wav):
             labels.append("[v0]")
         else:
             labels.append("[1:a]")
+    if a.get("broll_sound"):                     # each b-roll clip's own sound, softly, only while it's on screen
+        for br in tl.get("broll", []):
+            f = _abs(br["file"])
+            if br.get("scrapbook") or f.lower().endswith((".jpg", ".jpeg", ".png", ".webp")) or not _has_audio(f):
+                continue
+            inputs += ["-ss", str(br.get("src_in", 0)), "-t", str(br["dur"]), "-i", f]
+            bi = len([x for x in inputs if x == "-i"]) - 1
+            d_ms = int(br["start"] * 1000)
+            fc.append(f"[{bi}:a]aformat=channel_layouts=mono,highpass=f=120,volume={a['broll_sound']},"
+                      f"afade=t=in:d=0.12,afade=t=out:st={max(br['dur'] - 0.2, 0):.2f}:d=0.2,"
+                      f"adelay={d_ms}|{d_ms}[b{bi}]")
+            labels.append(f"[b{bi}]")
     music = a.get("music")
     if music:
         inputs += ["-stream_loop", "-1", "-i", _abs(music["file"])]

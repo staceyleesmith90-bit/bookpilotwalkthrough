@@ -76,7 +76,8 @@ def make_card(pack, spec, out, W=1080, H=1920, fps=30, dur=2.6, kit="clean"):
     from . import sfx, sounddesign
     tmp = tempfile.mkdtemp()
     wav = os.path.join(tmp, "card.wav")
-    cues = [sounddesign.cue("reveal", 0.2, 7, kit, 0.45), sounddesign.cue("cta", 0.55, 8, kit, 0.35)]
+    cues = [sounddesign.cue("reveal", 0.2, 7, kit, 0.45), sounddesign.cue("cta", 0.55, 8, kit, 0.35)] \
+        if spec.get("sound", True) else []                       # a quiet end screen when the reel has no effects
     x = sfx.mix_cues(cues, dur)
     sfx.write_wav(wav, x * 0.5, peak=None)
     enc = subprocess.Popen(["ffmpeg", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{W}x{H}",
