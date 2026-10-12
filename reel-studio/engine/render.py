@@ -579,6 +579,14 @@ VOICE_CHAIN = ("highpass=f=85,"
 MASTER = "alimiter=limit=0.95,loudnorm=I=-14:TP=-1.5:LRA=11,aformat=sample_rates=48000:channel_layouts=stereo"
 
 
+def _mean_db(path, af="anull"):
+    """Mean loudness (dB) of a file's audio after an optional filter chain."""
+    out = subprocess.run(["ffmpeg", "-v", "info", "-i", path, "-af", f"{af},volumedetect", "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    m = re.search(r"mean_volume: (-?[0-9.]+) dB", out)
+    return float(m.group(1)) if m else None
+
+
 def _has_audio(path):
     try:
         return "audio" in subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type", "-of", "csv=p=0",
@@ -643,6 +651,12 @@ def build_audio(tl, base_has_voice, base, out_wav):
         inputs += ["-stream_loop", "-1", "-i", _abs(music["file"])]
         mi = len([x for x in inputs if x == "-i"]) - 1
         g = music.get("gain", 0.18)
+        if music.get("under_voice_db") and base_has_voice:   # sit the bed a set distance under the finished voice
+            vf = fc[0].split("]", 1)[1].rsplit("[", 1)[0] if fc and fc[0].startswith("[1:a]") else "anull"
+            v_db = _mean_db(voice_src, vf)
+            m_db = _mean_db(_abs(music["file"]))
+            if v_db is not None and m_db is not None:
+                g = 10 ** ((v_db - float(music["under_voice_db"]) - m_db) / 20)
         if base_has_voice and music.get("duck", True):
             fc.append(f"{labels[1]}asplit[vo][sc]")
             labels[1] = "[vo]"
