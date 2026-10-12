@@ -38,7 +38,7 @@ def card_frames(pack, spec, W=1080, H=1920, fps=30, dur=2.6):
     script = tf.get("brush") or tf["script"]
     cta_font = load_font(script["file"], 70, script.get("weight"))
     small = load_font(pack["fonts"].get("caption", pack["fonts"]["main"])["file"], 44, 600)
-    title = spec.get("title") or pack.get("label") or ""
+    title = spec["title"] if "title" in spec else (pack.get("label") or "")   # "" = the logo already says it
     handle = spec.get("handle") or pack.get("handle") or ""
     cta = spec.get("cta") or "Follow for more"
     n = int(dur * fps)
