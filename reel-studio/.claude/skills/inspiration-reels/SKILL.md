@@ -14,7 +14,8 @@ description: Make the user's reel feel like a reel they love. Use when the user 
    sits, how big, mixed fonts?), `format` (talking · framed · vlog · photo dump · motion-design — "vlog" switches on vlog mode: captions off, a held `tag` label, short clips), `energy`,
    `what_to_borrow` (3 bullets). Numbers miss animated text — trust your eyes over "cuts/min".
    Anything the numbers can't measure goes in `claude_notes.plan` (e.g. {"captions": "tiered", "framed": "off"}).
-   Full-screen colour punchline cards: `gridcard:<lead>|<big word>` on a beat.
+   Full-screen colour punchline cards: `gridcard:<lead>|<big word>` on a beat. Underlined key words:
+   `"caption_highlights": [words]`. Quiet editorial sound (no whooshes, a soft key per word): `"sound": "typewriter"`.
 3. In plan.json set `"inspiration": "<name>"` — its settings (speed, captions, grade, sound kit,
    framed layouts) fill anything the plan doesn't set. Override freely.
 4. Tell the user in 2 lines what you borrowed ("fast pace, key words big in script, framed

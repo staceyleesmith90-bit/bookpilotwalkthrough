@@ -241,6 +241,14 @@ def to_timeline(plan, rc=None, source=None):
     windows = []
     if rc is not None:
         ranges = roughcut.kept_ranges(rc)
+        if ranges and source:                     # let the last word land before the fade / end screen
+            from .transcribe import probe_duration
+            try:
+                src_dur = probe_duration(os.path.join(ROOT_DIR, source))
+                a0, b0 = ranges[-1]
+                ranges[-1] = (a0, round(min(b0 + 0.7, src_dur), 3))
+            except Exception:
+                pass
         tmap, dur = roughcut.time_map(ranges)
         tl.update(source=source, cuts=[list(r) for r in ranges])
         if source and plan.get("auto_camera", True):
@@ -285,6 +293,9 @@ def to_timeline(plan, rc=None, source=None):
             tl["captions"].update(size=62, case="lower")
         if cap_style == "tiered":                 # editorial captions sit at chest height, like the reference
             tl["captions"].update(y=1080, words_per_line=4)
+            if plan.get("caption_highlights"):     # these words go big with a drawn underline
+                tl["captions"].update(highlights=list(plan["caption_highlights"]),
+                                      keywords=list(plan["caption_highlights"]))
     else:
         t = 0.0
         for b in beats:
@@ -814,6 +825,14 @@ def to_timeline(plan, rc=None, source=None):
     kit = plan.get("sound_kit") or sounddesign.KIT_FOR_LOOK.get(look, sounddesign.DEFAULT_KIT)
     sounddesign.vary_entrances(tl["items"])
     cues = sounddesign.design(tl, cues, kit)
+    if plan.get("sound") == "typewriter":        # no whooshes or effects: one soft key as each word appears
+        hide = [(i["start"], i["end"]) for i in tl["items"] if i.get("hide_captions")]
+        words = [w for w in tl.get("captions", {}).get("words", []) if not any(a <= w["start"] < b for a, b in hide)]
+        cues = [sounddesign.cue("type_key", w["start"], k, kit, 0.2 if k % 3 else 0.26) for k, w in enumerate(words)]
+        for k, it in enumerate(i for i in tl["items"] if i["type"] == "gridcard"):
+            n_lead = len(it.get("lead", "").split())
+            cues += [sounddesign.cue("type_key", it["start"] + 0.08 * j, 900 + 10 * k + j, kit, 0.22) for j in range(n_lead)]
+            cues.append(sounddesign.cue("type_key", it["start"] + 0.4, 950 + k, kit, 0.3))
     tl["sound_kit"] = kit
     tl["audio"] = {"sfx": [{"t": round(t, 3), "name": n, "gain": g} for t, n, g in sorted(cues)],
                    "music": plan.get("music"), "sfx_gain": 0.6,

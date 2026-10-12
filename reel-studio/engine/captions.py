@@ -554,8 +554,11 @@ def render_tiered(group, active, phase, pack, cap):
         fb = big_font(big_px)
     if not big_w:                              # one tier only: a little bigger
         f_lead = load_font(FONT_SANS, int(lead_px * 1.15), 600)
-    Wc, Hc = 1000, int(lead_px * 1.4 + big_px * 1.45 + 60)
+    Wc, Hc = 1000, int(lead_px * 1.4 + big_px * 1.8 + 80)
     im = Image.new("RGBA", (Wc, Hc))
+
+    hl_words = {re.sub(r"[^a-z0-9']", "", h.lower()) for h in cap.get("highlights", [])}
+    underline = bool(big_w) and not cap.get("_hook") and any(re.sub(r"[^a-z0-9']", "", t.lower()) in hl_words for t, _ in words)
 
     def place(line, font, y, hl_on=False):
         gap = font.getlength(" ")
@@ -582,6 +585,15 @@ def render_tiered(group, active, phase, pack, cap):
     if big_w:
         place(lead_w, f_lead, y_lead)
         place(big_w, fb, y_lead + lead_px * 0.62, hl_on=bool(cap.get("_hook")))
+        if underline and big_w[0][1] <= active:  # a copper line draws under the phrase, left to right
+            gap = fb.getlength(" ")
+            total = sum(fb.getlength(t) for t, _ in big_w) + gap * (len(big_w) - 1)
+            x0 = (Wc - total) / 2
+            p = 1.0 if active > big_w[0][1] else min(phase / PHASES, 1.0)
+            asc, desc = fb.getmetrics()
+            yl = y_lead + lead_px * 0.62 + asc + desc * 0.15
+            ImageDraw.Draw(im).rounded_rectangle((x0, yl, x0 + total * p, yl + max(6, big_px * 0.07)),
+                                                 radius=4, fill=hl)
     else:
         place(lead_w, f_lead, y_lead + big_px * 0.35)
     sh = Image.new("RGBA", im.size, (0, 0, 0, 0))

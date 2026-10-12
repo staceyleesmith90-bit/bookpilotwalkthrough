@@ -42,3 +42,20 @@ def test_renders_with_tiered_captions_and_gridcard(tmp_path):
     dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(out)],
                                capture_output=True, text=True).stdout)
     assert 1.8 < dur < 2.6
+
+
+def test_typewriter_sound_replaces_all_effects():
+    plan = {"format": "faceless", "pack": "minimal", "sound": "typewriter",
+            "beats": [{"text": "here's your driver", "dur": 1.5, "do": ["gridcard"]},
+                      {"text": "next", "dur": 1.0, "do": ["title"]}]}
+    tl = to_timeline(plan)
+    names = {s["name"].split(":")[2] for s in tl["audio"]["sfx"]}
+    assert names == {"type_key"}                    # no whooshes, swishes or hits
+
+
+def test_highlight_underlines_the_big_phrase():
+    pack = packs.load("minimal")
+    plain = captions.render_tiered(W("we start with three checks"), 4, captions.PHASES, pack, {"_keys_in_group": [3]})
+    lined = captions.render_tiered(W("we start with three checks"), 4, captions.PHASES, pack,
+                                   {"_keys_in_group": [3], "highlights": ["checks"]})
+    assert plain.tobytes() != lined.tobytes()

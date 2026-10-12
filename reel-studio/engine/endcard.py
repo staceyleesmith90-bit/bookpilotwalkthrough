@@ -97,7 +97,8 @@ def finish(main, out, pack, spec, kit="clean", speed=1.0):
     tmp = tempfile.mkdtemp()
     parts = []
     vf = f"fade=t=in:st=0:d=0.35,fade=t=out:st={max(dur / speed - 0.45, 0):.2f}:d=0.45"
-    af = f"afade=t=in:st=0:d=0.15,afade=t=out:st={max(dur / speed - 0.9, 0):.2f}:d=0.9"
+    fade_a = 0.3 if spec.get("enabled", True) else 0.9           # an end screen follows: don't fade the last word
+    af = f"afade=t=in:st=0:d=0.15,afade=t=out:st={max(dur / speed - fade_a, 0):.2f}:d={fade_a}"
     if speed != 1.0:
         vf = f"setpts=PTS/{speed}," + vf
         af = f"atempo={speed}," + af
