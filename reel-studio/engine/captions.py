@@ -517,9 +517,17 @@ def _spoken_case(w):
 
 
 def tiered_split(group, keyset):
-    """(lead words, big words): the big phrase starts at the first key word; no key word = all lead."""
+    """(lead words, big words): the big phrase starts at the first key word. With no chosen key word the
+    strongest word (longest non-filler) leads the big phrase; only filler-only lines stay small."""
     if not keyset:
-        return group, []
+        meaty = [i for i, w in enumerate(group) if re.sub(r"[^a-z']", "", w["w"].lower()) not in STOP
+                 and "'" not in w["w"] and len(re.sub(r"[^A-Za-z]", "", w["w"])) >= 4]
+        if not meaty or len(group) < 2:
+            return group, []
+        key = max(meaty, key=lambda i: (len(re.sub(r"[^A-Za-z]", "", group[i]["w"])), i))
+        if key == 0:                         # the strong word opens the line: keep it one calm small line
+            return group, []
+        keyset = {key}
     k = min(keyset)
     if k == 0 and len(group) > 1:            # keep at least one small lead-in word when the key word comes first
         return group[:1], group[1:]

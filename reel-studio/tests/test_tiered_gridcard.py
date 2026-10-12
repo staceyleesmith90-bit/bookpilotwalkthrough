@@ -9,7 +9,8 @@ def W(s):
 
 def test_tiered_splits_lead_and_big_and_animates():
     assert captions.tiered_split(W("feels like to China"), {2}) == (W("feels like"), W("to China"))
-    assert captions.tiered_split(W("doing business"), set())[1] == []
+    assert captions.tiered_split(W("and we don't"), set())[1] == []              # filler only: one small line
+    assert captions.tiered_split(W("care about your business"), set())[1] == W("business")   # strongest word goes big
     pack = packs.load("minimal")
     done = captions.render_tiered(W("feels like to China"), 3, captions.PHASES, pack, {"_keys_in_group": [2]})
     mid = captions.render_tiered(W("feels like to China"), 3, 1, pack, {"_keys_in_group": [2]})

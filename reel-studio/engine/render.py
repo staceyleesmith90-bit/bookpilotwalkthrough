@@ -340,9 +340,19 @@ def caption_groups(cap):
     groups, cur = [], []
     if style == "kinetic":
         n = max(n, 5)
-    if style == "tiered":
-        n = max(n, 4)
-    max_chars = 17 if style == "pop" else 24 if style in ("duo", "rainbow", "boxed", "popin", "stack", "tiered") else \
+    if style == "tiered":                      # phrases of 3-5 words that end on a meaningful word
+        from .captions import STOP
+        stop = lambda x: re.sub(r"[^a-z']", "", x["w"].lower()) in STOP
+        out, cur = [], []
+        for i, w in enumerate(words):
+            if cur and (len(cur) >= 5 or w["start"] - cur[-1]["end"] > 0.5
+                        or cur[-1]["w"].rstrip()[-1:] in ".,?!;:"
+                        or (len(cur) >= 3 and not stop(cur[-1]) and stop(w) and w["w"].rstrip()[-1:] not in ".,?!;:")):
+                out.append(cur)
+                cur = []
+            cur.append(w)
+        return out + ([cur] if cur else [])
+    max_chars = 17 if style == "pop" else 24 if style in ("duo", "rainbow", "boxed", "popin", "stack") else \
         30 if style == "kinetic" else 10 ** 6    # big caps: keep each line short so it stays big
     for w in words:
         if cur and (len(cur) >= n or w["start"] - cur[-1]["end"] > 0.5
@@ -630,7 +640,20 @@ def build_audio(tl, base_has_voice, base, out_wav):
 
 
 CHUNK = 60          # frames per cached graphics piece (2 s at 30 fps)
-ENGINE_SALT = "gfx-v1"
+def _code_salt():
+    """Fingerprint of the drawing code: an engine update redraws cached pieces instead of reusing old looks."""
+    h = hashlib.md5(b"gfx-v2")
+    here = os.path.dirname(os.path.abspath(__file__))
+    for name in sorted(os.listdir(here)):
+        if name.endswith(".py"):
+            try:
+                h.update(open(os.path.join(here, name), "rb").read())
+            except OSError:
+                pass
+    return h.hexdigest()[:12]
+
+
+ENGINE_SALT = _code_salt()
 
 
 def _sig(obj):
