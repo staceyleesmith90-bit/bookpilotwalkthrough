@@ -191,6 +191,9 @@ def item_image(it, pack):
     if t == "window":                            # animation window: its settled frame (editor, cover, CapCut)
         fr = _window_frames(it, pack)
         return fr[int(len(fr) * 0.8)][0] if fr else None
+    if t == "mg":                                # motion graphic: its settled frame (editor, cover)
+        from .motiongfx import render as _mg
+        return _mg(it["kind"], it.get("spec", {}), pack)["frames"][-1][0]
     if t == "gridcard":                          # grid card: its settled frame (editor, cover)
         from .gridcard import frames as _gc
         return _gc(it, pack)[-1][0]
@@ -423,6 +426,9 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
         elif it.get("type") == "gridcard":
             from .gridcard import frames as _gc
             anim[it["id"]] = _gc(it, pack)
+        elif it.get("type") == "mg":
+            from .motiongfx import render as _mg
+            anim[it["id"]] = _mg(it["kind"], it.get("spec", {}), pack)["frames"]
         elif it.get("type") == "gif":
             from .gifs import frames as _gf
             anim[it["id"]] = _gf(it["file"], it.get("size", 360))
@@ -506,7 +512,7 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
                 elif it["id"] in anim and anim[it["id"]]:
                     frs = anim[it["id"]]
                     total = sum(d for _, d in frs)
-                    lt = (t - it["start"]) % total if it["type"] not in ("window", "hf", "gridcard") else min(t - it["start"], total - 1e-6)
+                    lt = (t - it["start"]) % total if it["type"] not in ("window", "hf", "gridcard", "mg") else min(t - it["start"], total - 1e-6)
                     for img_f, dd in frs:
                         if lt < dd:
                             break

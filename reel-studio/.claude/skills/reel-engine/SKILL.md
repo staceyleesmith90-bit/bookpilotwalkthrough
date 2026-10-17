@@ -162,6 +162,25 @@ look. Write `projects/<p>/posts.json` first. Business reels: tips layout (cover,
 words, no logos / page numbers / buttons. Each slide picks its own `photo` (image or `clip.mp4@2.5`) and `layout`
 (photo · polaroid · collage). Use their nicest shots only, in their language.
 
+## App-style motion graphics + their sounds (studied from creators who edit with their own AI app)
+- On any beat: `"do": ["mg:<kind>"]`, `"mg": {...}`. Kinds: **pills** (labels pop in, tilted), **window** (an
+  app window drops in with a photo / video moment inside, optional status pill like "agent is editing"),
+  **timeline** (multi-track timeline growing, playhead sweeping), **bars** (bars grow with counting values —
+  only real numbers, never invented ones), **dial** (ticks draw on, needle sweeps, big word lands), **toggle**
+  (a switch flips, with a label), **button** (a button with a cursor click — great for the call to action).
+  Brand colours and fonts are automatic. `"y"` moves it; `"hide_captions": true` when it carries the words.
+  Preview one: `python -m engine mg-preview <kind> --set labels='["a","b"]'`.
+- Sound: `"sound": "motion"` = every graphic gets its own soft interface sound (pills pop, windows snap,
+  toggles click, bars swipe, buttons click), a soft air whoosh on scene changes, a tiny tick per caption
+  phrase, no whooshes or dings anywhere else. Keep a music bed under it (`"under_voice_db": 14`).
+- Use 3–6 graphics per minute, each on a line that names a thing or a step. Never cover the face.
+
+## The chat box (Studio)
+The timeline editor and Scrapbook maker have an **Ask Claude** box. A message runs Claude Code on that one
+reel (`engine/chat.py`): it edits the plan / timeline, renders a preview and replies in a sentence. One
+conversation per reel. Without Claude Code it saves the request — run `python -m engine chat-inbox` at the
+start of a session and do those first.
+
 ## Teach it once (their taste sticks)
 - **Rules**: before every style plan run `python -m engine rules` and follow them (they beat defaults).
   When they say "remember that" / "always…" / "never…": `python -m engine remember "<the rule, in

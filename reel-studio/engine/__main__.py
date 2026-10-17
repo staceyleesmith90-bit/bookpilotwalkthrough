@@ -15,6 +15,8 @@
   python -m engine scrapbook <out.mp4> --photos A B.mp4@2.5 [--style orbit|page|stack] [--set key=value ...]
                                                 polaroid scrapbook clip (orbit / page / stack), every setting adjustable
   python -m engine scrapbook-options            every scrapbook setting with its default
+  python -m engine chat-inbox                   requests typed in the Studio chat box while Claude wasn't running
+  python -m engine mg-preview <kind> [--set k=v] motion graphic preview strip (pills|window|timeline|bars|dial|toggle|button)
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
   python -m engine brand-image <file>           colours from a logo/photo/mood board
@@ -231,6 +233,22 @@ def main(argv=None):
             except ValueError:
                 spec[k] = v
         print(scrapbook.render(spec, a.arg or "scrapbook.mp4", _packs.load(a.pack)))
+    elif c == "chat-inbox":
+        from .chat import inbox
+        todo = inbox(a.arg)
+        print("\n".join(f"{s}: {m}" for s, m in todo) or "No saved chat requests.")
+    elif c == "mg-preview":
+        from . import motiongfx, packs as _packs
+        spec = {}
+        for kv in a.set:
+            k, _, v = kv.partition("=")
+            try:
+                spec[k] = json.loads(v)
+            except ValueError:
+                spec[k] = v
+        out = a.name or f"mg-{a.arg}.jpg"
+        motiongfx.preview(a.arg, spec, _packs.load(a.pack)).save(out)
+        print(out)
     elif c == "scrapbook-options":
         from .scrapbook import options_help
         print(options_help())

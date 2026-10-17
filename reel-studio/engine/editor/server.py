@@ -100,6 +100,8 @@ class Handler(SimpleHTTPRequestHandler):
             if u.path.startswith("/brand-sp/"):          # Systems Pilot logo files
                 name = os.path.basename(u.path)
                 return self._file(os.path.join(project.ROOT, "library", "brand-sp", name), "image/png")
+            if u.path == "/chat.js":                     # the chat box, shared by the Studio pages
+                return self._file(os.path.join(STATIC, "chat.js"), "application/javascript")
             if u.path.startswith("/fonts/"):
                 name = os.path.basename(u.path)
                 return self._file(os.path.join(project.ROOT, "library", "fonts", name), "font/ttf")
@@ -232,6 +234,10 @@ class Handler(SimpleHTTPRequestHandler):
                 if not _slug_ok(slug):
                     return self.send_error(404)
                 what = parts[3] if len(parts) > 3 else ""
+                if what == "chat":                      # the chat box: history + what Claude is doing now
+                    from .. import chat
+                    return self._json({"history": chat.history(slug)["messages"], "status": chat.status(slug),
+                                       "available": chat.available()})
                 if what == "scrapbooks":
                     return self._json(scrapbooks(slug))
                 if what == "thumb":                     # small preview of a photo / video moment in this project
@@ -475,6 +481,14 @@ class Handler(SimpleHTTPRequestHandler):
                             JOBS[slug + ":posts"] = {"state": "error", "error": str(e)[-300:]}
                     threading.Thread(target=pjob, daemon=True).start()
                     return self._json({"ok": True})
+                if what == "chat":
+                    from .. import chat
+                    msg = str(data.get("message", "")).strip()[:2000]
+                    if not msg:
+                        return self._json({"error": "empty"}, 400)
+                    if chat.status(slug).get("state") == "working":
+                        return self._json({"error": "busy"}, 409)
+                    return self._json(chat.send(slug, msg))
                 if what == "scrapbook-preview":
                     from ..scrapbook import preview
                     spec = _clean_spec(slug, data.get("spec") or {})

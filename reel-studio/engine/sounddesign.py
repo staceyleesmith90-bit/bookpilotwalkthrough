@@ -27,13 +27,17 @@ UISFX = os.path.join(ROOT, "library", "sfx", "uisfx")      # CC0 interface sound
 CC0PACK = os.path.join(ROOT, "library", "sfx", "cc0pack")  # CC0 "100 SFX #2" by rubberduck: air, glass, taps
 # which uisfx feels each kit uses (one is picked per sound, so a reel stays coherent but never repetitive)
 KIT_FEEL = {"soft": ["soft", "minimal"], "clean": ["studio", "minimal"], "luxe": ["glass", "dreamy"],
-            "playful": ["rubber", "organic"], "digital": ["scifi", "mechanical"]}
+            "playful": ["rubber", "organic"], "digital": ["scifi", "mechanical"],
+            "motion": ["soft", "studio"]}     # app-style motion graphics: soft interface sounds, one per on-screen event
 # one place decides how loud each kind of sound sits under the voice (relative; cue gains multiply this)
 EVENT_LEVEL = {"type_key": 0.55, "typing": 0.8, "type_end": 0.6, "word_pop": 0.5, "text_in": 0.75,
                "sticker_in": 0.75, "select": 0.7, "slide": 0.7, "highlight": 0.7, "glass": 0.7,
                "whoosh": 0.65, "swish": 0.6, "transition": 0.7, "shutter": 0.75, "page": 0.7,
                "reveal": 0.8, "cta": 0.85, "impact": 0.9, "riser": 0.7, "zoom_in": 0.6,
-               "sparkle": 0.7, "money": 0.8, "writing": 0.65, "wrong": 0.75}
+               "sparkle": 0.7, "money": 0.8, "writing": 0.65, "wrong": 0.75,
+               # motion-graphics events (each graphic that moves gets its own sound)
+               "pill_in": 0.6, "window_in": 0.75, "toggle": 0.7, "chart_grow": 0.6, "tick": 0.45,
+               "click": 0.7, "air": 0.5, "notify": 0.6, "thump": 0.7}
 
 # event -> kit -> candidate sources ("k:<glob>" = Kenney sample glob, "s:<synth>" = synth)
 KITS = {
@@ -73,9 +77,20 @@ KITS = {
     "writing":   {"*": ["f:marker", "f:paper"]},
     "wrong":     {"*": ["k:interface-glitch_*", "u:close"]},
 }
+KITS.update({
+    "pill_in":    {"*": ["u:drop", "f:softpop", "o:wood_hit_*"]},     # a pill / sticker lands
+    "window_in":  {"*": ["u:open", "u:snap"]},                         # an app window drops in
+    "toggle":     {"*": ["u:toggle-on", "o:switch_*"]},                # a switch flips
+    "chart_grow": {"*": ["u:swipe", "f:swipe"]},                       # bars / timeline grow
+    "tick":       {"*": ["f:tick"]},                                   # a dial tick, a small text landing
+    "click":      {"*": ["u:press", "f:click"]},                       # a cursor clicks a button
+    "air":        {"*": ["o:air_*"]},                                  # a soft whoosh on a scene change
+    "notify":     {"*": ["u:notification", "u:send"]},                 # a status pill / message appears
+    "thump":      {"*": ["o:hit_*", "o:wood_hit_*"]},                  # a big word lands
+})
 KIT_FOR_LOOK = {"premium": "luxe", "playful": "playful", "bold": "digital", "clean": "soft"}
 DEFAULT_KIT = "soft"                    # soft real foley: few sounds, each tied to something on screen
-KIT_GAIN = {"soft": 0.7, "luxe": 0.8, "clean": 0.85, "playful": 1.0, "digital": 0.9}
+KIT_GAIN = {"soft": 0.7, "luxe": 0.8, "clean": 0.85, "playful": 1.0, "digital": 0.9, "motion": 0.85}
 
 
 def cue(event, t, seed=0, kit="clean", gain=0.6, dur=None):
@@ -274,7 +289,7 @@ def render(name):
             x = x[: int(dur * SR)].copy()                                # fit the move / the typing
             f = min(len(x) // 3, int(0.04 * SR))
             x[-f:] *= np.linspace(1, 0, f)
-        if foley and kit in ("soft", "clean", "luxe") and not src.startswith(mysounds.MINE):
+        if foley and kit in ("soft", "clean", "luxe", "motion") and not src.startswith(mysounds.MINE):
             x = _soften(x)                                               # no harsh top end
     level = (0.85 + ((h >> 16) % 30) / 100) * EVENT_LEVEL.get(event, 0.75)   # balanced per kind, ±15% variation
     return (x / (np.abs(x).max() + 1e-9) * level).astype(np.float32)

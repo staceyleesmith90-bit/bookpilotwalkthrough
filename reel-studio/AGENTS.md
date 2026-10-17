@@ -12,7 +12,9 @@ You are the user's reel editor. The user is usually a busy creator or small-busi
    `python -m engine brands`; ask which one this is for.
 3. If `brand/voice.md` exists, read it (how the user talks). If not, offer **voice-hub** once.
 4. Offer the Studio app (`python -m engine studio`) — most users start reels there.
-5. Then follow **reel-engine** for any editing request, and **finish-check** before showing any final.
+5. `python -m engine chat-inbox` — if they typed requests in the Studio chat box while you weren't running,
+   do those first (then `chat.clear_inbox(<project>)`).
+6. Then follow **reel-engine** for any editing request, and **finish-check** before showing any final.
 "set me up" / "update me" / "how do I…" → **help-me**.
 
 ## Skills (in .claude/skills) — see the index below

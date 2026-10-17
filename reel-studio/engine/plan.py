@@ -334,7 +334,7 @@ def to_timeline(plan, rc=None, source=None):
                 taken = [t for t in taken if t != FACE] + faces
         big_text = None
         if not on_video and not any(d.split(":")[0] in ("takeover", "card", "bubble", "cta", "title", "keep-footage",
-                                                           "broll", "label", "scrapbook", "gridcard") for d in do):
+                                                           "broll", "label", "scrapbook", "gridcard", "mg") for d in do):
             do.insert(0, "takeover")               # faceless: every beat shows its words
         if auto and not any(d.startswith(("sticker", "emoji", "badge", "icon", "3d", "anim", "stamp", "callout"))
                             for d in do) and len(used_stickers) < sticker_budget:
@@ -696,6 +696,17 @@ def to_timeline(plan, rc=None, source=None):
                 taken.append(r)
                 items.append(it)
                 cues.append((it["start"], pack["sfx"]["sticker_in"], 0.5))
+            elif kind == "mg":                    # mg:<pills|window|timeline|bars|dial|toggle|button> + beat["mg"] = {...}
+                from . import motiongfx
+                spec = dict(beat.get("mg") or {})
+                try:
+                    r = motiongfx.render(arg.strip(), spec, pack)
+                except Exception as e:
+                    print(f"[reel] motion graphic skipped: {e}")
+                    continue
+                items.append({"id": _id("mg"), "type": "mg", "kind": arg.strip(), "spec": spec, "start": a,
+                              "end": b_end, "x": r["x"], "y": r["y"], "z": 38, "anim": "none",
+                              "hide_captions": bool(spec.get("bg") or spec.get("hide_captions"))})
             elif kind == "gridcard":              # gridcard:<lead>|<big word>  full-screen colour card, words blur in
                 lead, _, bigw = arg.partition("|")
                 if not bigw:
@@ -816,7 +827,7 @@ def to_timeline(plan, rc=None, source=None):
         cues.append((0.0, "swish", 0.35))
     # outro: brand end screen (logo, name, handle, call to action)
     cta_text = next((d.split(":", 1)[1] for b in plan.get("beats", []) for d in b.get("do", []) if d.startswith("cta:")), None)
-    if plan.get("sound") in ("music", "none", "typewriter"):
+    if plan.get("sound") in ("music", "none", "typewriter", "motion"):
         plan = dict(plan, end_card=dict({"sound": False}, **(plan.get("end_card") or {})))
     tl["end_card"] = dict({"title": pack.get("label", ""), "handle": pack.get("handle", ""),
                            "cta": cta_text or "Follow for more", "enabled": True}, **(plan.get("end_card") or {}))
@@ -829,6 +840,28 @@ def to_timeline(plan, rc=None, source=None):
     cues = sounddesign.design(tl, cues, kit)
     if plan.get("sound") in ("music", "none"):   # like editorial reels: voice + music bed (+ b-roll's own sound), no effects
         cues = []
+    if plan.get("sound") not in ("music", "none"):  # motion graphics: every move gets its own interface sound
+        from . import motiongfx
+        mgk = 0
+        for it in tl["items"]:
+            if it["type"] == "mg":
+                for t_, ev in motiongfx.render(it["kind"], it["spec"], pack)["sfx"]:
+                    mgk += 1
+                    cues.append(sounddesign.cue(ev, it["start"] + t_, 700 + mgk, "motion", 0.6))
+    if plan.get("sound") == "motion":            # app-style sound: graphics + soft air on scene changes + a tick per phrase
+        keep = [c for c in cues if ":motion:" in c[1]]
+        keep += [sounddesign.cue("air", tr["t"] - 0.2, 300 + k, "motion", 0.35, 0.5)
+                 for k, tr in enumerate(tl.get("transitions", []))]
+        cap = tl.get("captions", {})
+        if cap.get("words") and cap.get("style", "off") != "off":
+            from .render import caption_groups
+            hide = [(i["start"], i["end"]) for i in tl["items"] if i.get("hide_captions")]
+            for k, g in enumerate(caption_groups(cap)):
+                if not any(a_ <= g[0]["start"] < b_ for a_, b_ in hide):
+                    keep.append(sounddesign.cue("tick", g[0]["start"], 500 + k, "motion", 0.22))
+        for k, it in enumerate(i for i in tl["items"] if i["type"] in ("gridcard", "title")):
+            keep.append(sounddesign.cue("thump", it["start"] + 0.35, 600 + k, "motion", 0.45))
+        cues = keep
     if plan.get("sound") == "typewriter":        # no whooshes or effects: one soft key as each word appears
         hide = [(i["start"], i["end"]) for i in tl["items"] if i.get("hide_captions")]
         words = [w for w in tl.get("captions", {}).get("words", []) if not any(a <= w["start"] < b for a, b in hide)]
