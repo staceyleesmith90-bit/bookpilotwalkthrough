@@ -892,6 +892,7 @@ def to_timeline(plan, rc=None, source=None):
         if cap.get("words") and cap.get("style", "off") != "off":
             from .render import caption_groups
             hide = [(i["start"], i["end"]) for i in tl["items"] if i.get("hide_captions")]
+            hide += [(c["start"], c["end"]) for c in tl.get("scenes", []) if (c.get("spec") or {}).get("hide_captions")]
             for k, g in enumerate(caption_groups(cap)):
                 if not any(a_ <= g[0]["start"] < b_ for a_, b_ in hide):
                     keep.append(sounddesign.cue("tick", g[0]["start"], 500 + k, "motion", 0.22))
@@ -900,6 +901,7 @@ def to_timeline(plan, rc=None, source=None):
         cues = keep
     if plan.get("sound") == "typewriter":        # no whooshes or effects: one soft key as each word appears
         hide = [(i["start"], i["end"]) for i in tl["items"] if i.get("hide_captions")]
+        hide += [(c["start"], c["end"]) for c in tl.get("scenes", []) if (c.get("spec") or {}).get("hide_captions")]
         words = [w for w in tl.get("captions", {}).get("words", []) if not any(a <= w["start"] < b for a, b in hide)]
         cues = [sounddesign.cue("type_key", w["start"], k, kit, 0.2 if k % 3 else 0.26) for k, w in enumerate(words)]
         for k, it in enumerate(i for i in tl["items"] if i["type"] == "gridcard"):

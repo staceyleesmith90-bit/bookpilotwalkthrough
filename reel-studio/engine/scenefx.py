@@ -1443,7 +1443,7 @@ def _v45_opts(name, spec, start, pack=None):
     for k, v in (spec or {}).items():
         if k in ("label", "name", "dur", "at_s"):
             continue
-        if k in ("ticks", "at"):                    # in a plan these are seconds from the effect's start
+        if k in ("ticks", "at") and V45[name][0] in ("todo", "tap"):   # these two take video time; plans give seconds from the effect's start
             vals = v if isinstance(v, list) else [float(x) for x in str(v).split("|")]
             v = "|".join(f"{start + float(x):.3f}" for x in vals) if k == "ticks" else start + float(vals[0])
         elif k == "images" and isinstance(v, str) and not os.path.isabs(v):
@@ -1452,6 +1452,34 @@ def _v45_opts(name, spec, start, pack=None):
             v = "|".join(str(x) for x in v)
         o[k] = v
     return o
+
+
+def _items(spec, default_n):
+    v = (spec or {}).get("text")
+    if isinstance(v, list):
+        return len(v)
+    return len(str(v).split("|")) if v else default_n
+
+
+def _v45_sounds(name, spec, dur):
+    """Sounds that follow the effect's own timing (one pop per message, a tick per ticked item…)."""
+    spec = spec or {}
+    rel = lambda k: [float(x) for x in (spec[k] if isinstance(spec[k], list) else str(spec[k]).split("|"))]
+    if name == "messages":
+        n = _items(spec, 4)
+        gap = min(0.4, dur * 0.75 / max(1, n))
+        return [(0.13 + i * gap, "notify") for i in range(n)]
+    if name == "todo":
+        n = _items(spec, 3)
+        ts = rel("ticks") if spec.get("ticks") else [dur * (i + 1) / (n + 1) for i in range(n)]
+        return [(t, "tick") for t in ts]
+    if name == "apple_toggles":
+        n = _items(spec, 3)
+        ts = rel("ticks") if spec.get("ticks") else [0.45 + 0.34 * i for i in range(n)]
+        return [(t, "toggle") for t in ts]
+    if name == "tap":
+        return [(rel("at")[0] if spec.get("at") else dur * 0.45, "click")]
+    return None
 
 
 def _v45_effect(name):
@@ -1534,7 +1562,10 @@ def sounds(scene):
     """(reel time, event, gain) for one scene."""
     dur = scene["end"] - scene["start"]
     out = []
-    for c in SOUNDS.get(scene["fx"], []):
+    table = SOUNDS.get(scene["fx"], [])
+    if scene["fx"] in V45:
+        table = _v45_sounds(scene["fx"], scene.get("spec"), dur) or table
+    for c in table:
         at, ev = c[0], c[1]
         g = c[2] if len(c) > 2 else 1.0
         if isinstance(at, str):

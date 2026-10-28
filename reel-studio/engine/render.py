@@ -374,6 +374,7 @@ def hf_captions(tl, scale=1.0):
     from . import hyperframes
     cap = tl["captions"]
     hide = [(it["start"] - 0.1, it["end"] + 0.1) for it in tl.get("items", []) if it.get("hide_captions")]
+    hide += [(c["start"] - 0.1, c["end"] + 0.1) for c in tl.get("scenes", []) if (c.get("spec") or {}).get("hide_captions")]
     words = [w for w in cap["words"] if not any(a <= w["start"] < b for a, b in hide)]
     if not words:
         return None
@@ -455,6 +456,7 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
         _o += len(_g)
     cap_cache = {}
     hide_caps = [(it["start"], it["end"]) for it in items if it.get("hide_captions")]
+    hide_caps += [(c["start"], c["end"]) for c in tl.get("scenes", []) if (c.get("spec") or {}).get("hide_captions")]
 
     f0, f1 = frames or (0, n_frames)
     seek = ["-ss", f"{f0 / fps:.4f}"] if f0 else []
