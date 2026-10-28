@@ -193,6 +193,18 @@ words, no logos / page numbers / buttons. Each slide picks its own `photo` (imag
   break, a deep boom on zoom-through / portal, slams for headline strips, clunks when studio lights turn on,
   soft pops for icons and checks). No music bed, no caption ticks. Low single-word captions: `"captions":
   "single-word", "caption_y": 1520, "chin_follow": false`.
+- **The 45-effect pack** (engine/vfx45, by Vibha Ramprakash, MIT): same `scene:<name>` beats. noise · lineup ·
+  locked_on · reel_orbit · lean_in · backdrop_word (text) · spotlight / glitter_spotlight (text) · the_bill (text
+  lines) · moody (grade) · swipe · todo (text items, ticks = seconds from the effect start) · comment_box (text) ·
+  tap (at) · pause_point (text) · uninstall · reel_frame (text = handle) · shortcut_rain · reject_stamp (text) ·
+  countdown_flip · rabbit_hole · cover_star / cover_star_editorial (text, lines, issue) · scribble · red_collage
+  (text, lines) · split_headline (text, hl) · pastel_word · check_pills · headline_box · profile_wall · tier_list ·
+  broll_split (images) · phone_fan · dot_reveal · headline_wall (text "headline::meta|…", total) · checklist
+  (text "step::meta|…") · glass_widgets · timeline · liquid_glass_graph / glass_bento (from, to — real numbers) ·
+  carousel_spin · match_cut (text) · apple_toggles (text rows) · led_sign (text) · slow_push · over_the_shoulder_zoom
+  (text, to) · messages (text) · place_in_grid (images, views). Lists can be JSON lists or "a|b|c".
+  `images` = a folder of their reels/screenshots (else moments from this video). Defaults say "Claude" in a few
+  places (tier list, match cut, task list) — set `text` to their words. Our sounds are added to every one.
 - Use them where a line earns it (a change of topic, a list, a reveal) — a whole reel of them only for an
   "effects showcase". In the Studio: **Scene effects** page (`/scenes?p=<project>`): tap a line, tap an effect.
 

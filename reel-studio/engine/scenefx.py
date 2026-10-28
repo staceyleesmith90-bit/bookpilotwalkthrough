@@ -1314,6 +1314,195 @@ EFFECTS = {"orbit": fx_orbit, "chat_takeover": fx_chat_takeover, "frame_escape":
            "phone_mockup": fx_phone_mockup, "recap": fx_recap, "series": fx_series, "tag_wall": fx_tag_wall}
 
 
+# ---------------------------------------------------------------- the 45-effect pack (engine/vfx45, MIT)
+# 45 starter effects by Vibha Ramprakash (github.com/Vibha-Ramprakash/claude-video-effects), run inside
+# Reel Studio: same frame-by-frame stage, our person cut-out, YuNet face tracking, brand sounds (the pack
+# itself has none), plans and the Studio page. Our name -> (their name, label, what it does, default options).
+V45 = {
+    "noise": ("noise", "The Noise", "Reels pile up behind your head.", {}),
+    "lineup": ("lineup", "The Lineup", "Numbered tiles fan out above your head.", {}),
+    "locked_on": ("locked-on", "Locked On", "Brackets lock onto your face; the camera follows you.", {}),
+    "reel_orbit": ("orbit", "Reel Orbit", "Your reels circle your head, behind you at the top.", {}),
+    "lean_in": ("lean-in", "Lean-In", "A quick punch-in on one word.", {}),
+    "backdrop_word": ("backdrop-word", "Backdrop Word", "A giant word drops in behind you.", {}),
+    "spotlight": ("spotlight", "Spotlight", "Kill the lights, keep you lit.", {}),
+    "glitter_spotlight": ("spotlight", "Glitter Spotlight", "Dark room, golden rays and sparkles, a gold word.", {"look": "sparkle"}),
+    "the_bill": ("the-bill", "The Bill", "Your instructions print out like a receipt.", {}),
+    "moody": ("moody", "Moody", "A moody colour grade.", {}),
+    "swipe": ("swipe", "Swipe", "A before-and-after slider sweeps across you.", {}),
+    "todo": ("todo", "The To-Do", "A checklist beside your head ticks off as you talk.", {}),
+    "comment_box": ("comment-box", "Comment Box", "An Instagram comment types itself and posts.", {}),
+    "tap": ("tap", "The Tap", "A Follow button flips to Following.", {}),
+    "pause_point": ("pause-point", "Pause & Point", "Freeze frame with a hand-drawn arrow.", {}),
+    "uninstall": ("uninstall", "Uninstall", "A glitchy uninstall bar breaks the frame.", {}),
+    "reel_frame": ("reel-frame", "Reel Frame", "Your video shrinks into a reel card.", {}),
+    "shortcut_rain": ("shortcut-rain", "Shortcut Rain", "Keyboard keys rain down behind you.", {}),
+    "reject_stamp": ("reject-stamp", "Reject Stamp", "A big red stamp slams down.", {}),
+    "countdown_flip": ("countdown-flip", "Countdown Flip", "A 3, 2, 1 flip clock above your head.", {}),
+    "rabbit_hole": ("rabbit-hole", "Rabbit Hole", "The room tunnels away behind you.", {}),
+    "cover_star": ("cover-star", "Cover Star", "You become a magazine cover.", {}),
+    "cover_star_editorial": ("cover-star", "Cover Star · Editorial", "A classic serif magazine cover, soft film look.", {"look": "editorial"}),
+    "scribble": ("scribble", "Scribble", "Marker doodles draw themselves around you.", {}),
+    "red_collage": ("red-collage", "Red Collage", "Black-and-white you, a giant red word, three lines slam in.", {}),
+    "split_headline": ("split-headline", "Split Headline", "A headline card slides down, you move to the bottom half.", {}),
+    "pastel_word": ("pastel-word", "Pastel Word", "Lavender room, a giant word behind you, a profile gets followed.", {}),
+    "check_pills": ("check-pills", "Check Pills", "Grid-paper room, reels pinned behind you, pills get clicked.", {}),
+    "headline_box": ("headline-box", "Headline Box", "A punch-in with a clean two-line headline.", {}),
+    "profile_wall": ("profile-wall", "Profile Wall", "Your reels grid fills the wall while a counter ticks up.", {}),
+    "tier_list": ("tier-list", "Tier List", "A tier list drops in and one item flies into S tier.", {}),
+    "broll_split": ("broll-split", "B-roll Split", "B-roll on top with a price-tag sticker, you below.", {}),
+    "phone_fan": ("phone-fan", "Phone Fan", "Your reels fan out like a hand of phones.", {}),
+    "dot_reveal": ("dot-reveal", "Dot Reveal", "Your shot builds out of glowing dots, then snaps into focus.", {}),
+    "headline_wall": ("headline-wall", "Headline Wall", "Headlines pile up behind your head, then a total pops in.", {}),
+    "checklist": ("checklist", "Task List", "A task list under your chin, each step ticks green.", {}),
+    "glass_widgets": ("glass-widgets", "Glass Widgets", "Frosted glass widgets float around your head.", {}),
+    "timeline": ("timeline", "Film Timeline", "Dark red film look with an editing timeline and playhead.", {}),
+    "liquid_glass_graph": ("liquid-glass-graph", "Liquid Glass Graph", "A glass card with a climbing graph and a counting number.", {}),
+    "glass_bento": ("liquid-glass-graph", "Glass Bento", "A glass dashboard around you: graph, donut, KPI, bars.", {"look": "bento"}),
+    "carousel_spin": ("carousel-spin", "Carousel Spin", "Your reels spin around you in a 3D carousel.", {}),
+    "match_cut": ("match-cut", "Match Cut", "News pages cut on one word, locked behind your head.", {}),
+    "apple_toggles": ("apple-toggles", "iPhone Toggles", "iPhone switches flip on, one line at a time.", {}),
+    "led_sign": ("led-sign", "LED Sign", "The lights drop and an LED sign types itself out behind you.", {}),
+    "slow_push": ("slow-push", "Slow Push", "A slow cinematic push-in while the room melts out of focus.", {}),
+    "over_the_shoulder_zoom": ("over-the-shoulder-zoom", "Over-the-Shoulder Zoom", "Pushes into a corner, a glass graph pops beside your head.", {}),
+    "messages": ("messages", "Messages", "iMessage notifications pop in one after another.", {}),
+    "place_in_grid": ("place-in-grid", "Place in Grid", "You shrink into the centre of your 3x3 profile grid.", {}),
+}
+V45_SOUNDS = {
+    "noise": [(0.25 * k, "pill_in", 0.6) for k in range(8)], "lineup": [(0.12 * k, "pill_in", 0.7) for k in range(5)],
+    "locked_on": [(0.0, "zoom_in"), (0.25, "tick")], "reel_orbit": [(0.0, "air"), (0.1, "pill_in")],
+    "lean_in": [(0.0, "zoom_in")], "backdrop_word": [(0.1, "thump")], "spotlight": [(0.0, "lights")],
+    "glitter_spotlight": [(0.0, "lights"), (0.3, "sparkle")], "the_bill": [(0.1, "typing", 0.6)], "swipe": [("p0.15", "swish")],
+    "todo": [("p%.2f" % (k / 4), "tick") for k in (1, 2, 3)], "comment_box": [(0.1, "typing", 0.6), ("p0.7", "notify")],
+    "tap": [("p0.45", "click")], "pause_point": [(0.0, "shutter"), (0.2, "writing")], "uninstall": [(0.0, "wrong"), ("p0.5", "wrong")],
+    "reel_frame": [(0.0, "window_in")], "shortcut_rain": [(0.2 * k, "type_key", 0.6) for k in range(8)],
+    "reject_stamp": [(0.3, "impact")], "countdown_flip": [("p%.2f" % (k / 3), "tick") for k in range(3)] + [("p0.95", "cta")],
+    "rabbit_hole": [(0.0, "riser")], "cover_star": [(0.0, "shutter")], "cover_star_editorial": [(0.0, "shutter")],
+    "scribble": [(0.1, "writing")], "red_collage": [(0.2 + 0.3 * k, "slam") for k in range(3)], "split_headline": [(0.0, "slide")],
+    "pastel_word": [(0.1, "thump"), ("p0.6", "click")], "check_pills": [("p%.2f" % (0.3 + 0.2 * k), "click") for k in range(3)],
+    "headline_box": [(0.0, "zoom_in"), (0.25, "text_in")], "profile_wall": [(0.1, "chart_grow")] + [(0.3 + 0.2 * k, "tick", 0.6) for k in range(6)],
+    "tier_list": [(0.0, "slide"), ("p0.55", "whoosh"), ("p0.7", "thump")], "broll_split": [(0.0, "swish"), (0.4, "sticker_in")],
+    "phone_fan": [(0.0, "swish"), (0.2, "pill_in")], "dot_reveal": [(0.0, "riser"), ("p0.8", "sparkle")],
+    "headline_wall": [(0.3 * k, "slam") for k in range(5)] + [("p0.85", "thump")],
+    "checklist": [("p%.2f" % (0.2 + 0.2 * k), "tick") for k in range(4)], "glass_widgets": [(0.0, "glass"), (0.3, "pill_in")],
+    "timeline": [(0.0, "chart_grow")], "liquid_glass_graph": [(0.0, "glass"), (0.3, "chart_grow"), ("p0.85", "reveal")],
+    "glass_bento": [(0.0, "glass"), (0.3, "chart_grow")], "carousel_spin": [(0.0, "whoosh")],
+    "match_cut": [(0.25 * k, "shutter", 0.6) for k in range(6)], "apple_toggles": [(0.45 + 0.34 * k, "toggle") for k in range(4)],
+    "led_sign": [(0.0, "lights"), (0.3, "typing", 0.5)], "slow_push": [(0.0, "air")],
+    "over_the_shoulder_zoom": [(0.0, "zoom_in"), (0.4, "glass"), ("p0.5", "zoom_in"), ("p0.6", "glass")],
+    "messages": [(0.3 + 0.45 * k, "notify") for k in range(4)], "place_in_grid": [(0.3 + 0.12 * k, "pill_in", 0.6) for k in range(8)],
+}
+
+
+def _v45():
+    from .vfx45 import fx as v
+    return v
+
+
+def _face(ctx, frame, t, m):
+    """(x, y, width) of the face: YuNet on a small copy, smoothed; the cut-out's head if no face is found."""
+    key = round(t * 1000)
+    if ctx._store.get("face_key") == key:
+        return ctx._store["face"]
+    import cv2
+    aw = 540
+    ah = int(round(aw * ctx.H / ctx.W))
+
+    def det():
+        try:
+            return cv2.FaceDetectorYN.create(os.path.join(os.path.dirname(__file__), "vfx45", "models", "yunet.onnx"),
+                                             "", (aw, ah), 0.6, 0.3, 20)
+        except Exception:
+            return None
+    d = ctx.store("yunet", det)
+    face = None
+    if d is not None:
+        small = np.asarray(frame.convert("RGB").resize((aw, ah), Image.BILINEAR))
+        _, f = d.detect(cv2.cvtColor(small, cv2.COLOR_RGB2BGR))
+        if f is not None and len(f):
+            r = max(f, key=lambda r: r[2] * r[3] * r[-1])
+            k = ctx.W / aw
+            face = ((r[0] + r[2] / 2) * k, (r[1] + r[3] / 2) * k, r[2] * k)
+    if face is None:
+        hx, hy, r = ctx.head(m)
+        face = (hx, hy, r * 1.6)
+    prev = ctx._store.get("face")
+    if prev:
+        face = tuple(0.5 * a + 0.5 * b for a, b in zip(prev, face))
+    ctx._store["face_key"], ctx._store["face"] = key, face
+    return face
+
+
+def _v45_opts(name, spec, start):
+    o = dict(V45[name][3])
+    for k, v in (spec or {}).items():
+        if k in ("label", "name", "dur", "at_s"):
+            continue
+        if k in ("ticks", "at"):                    # in a plan these are seconds from the effect's start
+            vals = v if isinstance(v, list) else [float(x) for x in str(v).split("|")]
+            v = "|".join(f"{start + float(x):.3f}" for x in vals) if k == "ticks" else start + float(vals[0])
+        elif k == "images" and isinstance(v, str) and not os.path.isabs(v):
+            v = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), v)
+        elif isinstance(v, list):
+            v = "|".join(str(x) for x in v)
+        o[k] = v
+    return o
+
+
+def _v45_effect(name):
+    their = V45[name][0]
+
+    def run(frame, p, lt, dur, spec, ctx, t):
+        v = _v45()
+        sc = ctx._current
+        m = ctx.mask(frame, t)
+
+        def make():
+            e = v.Fx(dict(_v45_opts(name, spec, sc["start"]), fx=their, start=sc["start"], end=sc["end"]), ctx.fps)
+            if their in v.CARD_FX:                    # their own reels (a folder) or moments from this video
+                e.cards = v.load_cards(e.o.get("images"), _thumbs(ctx) or [frame.convert("RGB")])
+            if their == "pause-point":               # freeze the effect's first frame, whichever piece renders
+                f0 = ctx.frame_at(sc["start"]) or frame
+                m0 = ctx.mask(f0, sc["start"], live=False)
+                fx0 = _face(ctx, f0, sc["start"] - 1e-3, m0)
+                ctx._store.pop("face", None)
+                e.state["f"] = (np.asarray(f0.convert("RGB"), np.float32) / 255, np.asarray(m0, np.float32) / 255) + tuple(fx0)
+            return e
+        e = ctx.store(("v45", sc.get("id"), sc["start"], name), make)
+        c = v.Ctx()
+        c.W, c.H, c.t, c.fps, c.lt = ctx.W, ctx.H, t, ctx.fps, lt
+        c.img = np.asarray(frame.convert("RGB"), np.float32) / 255
+        c.m = np.asarray(m, np.float32) / 255
+        c.fx, c.fy, c.fw = _face(ctx, frame, t, m)
+        c.fw = max(c.fw, ctx.W * 0.05)
+        v.EFFECTS[their][0](c, e)
+        return Image.fromarray((np.clip(c.img, 0, 1) * 255 + 0.5).astype(np.uint8), "RGB").convert("RGBA")
+    return run
+
+
+def _thumbs(ctx):
+    def make():
+        ends = [s["end"] for s in ctx.scenes]
+        dur = max(ends) if ends else 10
+        out = []
+        for j in range(10):
+            f = ctx.frame_at(dur * (j + 0.5) / 10)
+            if f is not None:
+                out.append(f.convert("RGB"))
+        return out
+    return ctx.store("thumbs", make)
+
+
+for _n, (_their, _label, _about, _o) in V45.items():
+    EFFECTS[_n] = _v45_effect(_n)
+    LABELS[_n] = _label
+    ABOUT[_n] = _about
+    SOUNDS[_n] = V45_SOUNDS.get(_n, [])
+    PERSON.add(_n)
+    DUR.setdefault(_n, 3.5)                          # the pack looks best in short windows (1.5 to 4 s)
+DUR.update({"lean_in": 1.2, "reject_stamp": 1.6, "tap": 2.0, "headline_box": 2.2})
+
+
 # ---------------------------------------------------------------- the renderer's entry point
 def apply(frame, t, ctx):
     """Run every scene effect on screen at time t (effects first, overlays last)."""

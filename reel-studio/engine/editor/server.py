@@ -604,7 +604,8 @@ def scene_lines(slug):
                 on.setdefault(b["line"], []).append(d[6:])
     lines = [{"id": l["id"], "text": l.get("text", ""), "fx": on.get(l["id"], [])} for l in rc.get("lines", []) if l.get("keep")]
     return {"lines": lines, "has_video": bool(_scene_source(slug)), "series": plan.get("series"),
-            "effects": [{"name": k, "label": v, "about": scenefx.ABOUT.get(k, "")} for k, v in scenefx.LABELS.items()]}
+            "effects": [{"name": k, "label": v, "about": scenefx.ABOUT.get(k, ""), "pack": "vfx45" if k in scenefx.V45 else "studio"}
+                        for k, v in scenefx.LABELS.items()]}
 
 
 def scene_clip(slug, fx):

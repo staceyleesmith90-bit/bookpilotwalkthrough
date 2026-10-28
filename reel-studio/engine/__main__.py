@@ -17,7 +17,7 @@
   python -m engine scrapbook-options            every scrapbook setting with its default
   python -m engine chat-inbox                   requests typed in the Studio chat box while Claude wasn't running
   python -m engine mg-preview <kind> [--set k=v] motion graphic preview strip (pills|window|timeline|bars|dial|toggle|button)
-  python -m engine scene-list                    the 20 full-frame scene effects (scene:<name> in a plan)
+  python -m engine scene-list                    the 65 full-frame scene effects (scene:<name> in a plan)
   python -m engine scene-preview <effect> --clips <video> [--set k=v]   preview strip of one scene effect
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
@@ -254,7 +254,7 @@ def main(argv=None):
     elif c == "scene-list":
         from . import scenefx
         for k, v in scenefx.LABELS.items():
-            print(f"{k:16} {v}")
+            print(f"{k:24} {v}{'   (45-effect pack, @vibha.in.progress)' if k in scenefx.V45 else ''}")
         print("overlays: series (plan option \"series\"), tag_wall")
     elif c == "scene-preview":
         from . import scenefx, packs as _packs

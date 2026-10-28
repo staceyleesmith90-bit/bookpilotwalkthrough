@@ -43,6 +43,8 @@
   .e b { display: block; font-size: 14px; }
   .e small { color: var(--muted); font-size: 12px; line-height: 1.35; display: block; margin-top: 2px; }
   .e.used { outline: 2px solid var(--ok); }
+  .sec { font-size: 16px; margin: 22px 0 10px; } .sec:first-of-type { margin-top: 0; }
+  .sec small { font: 500 12.5px "Inter", sans-serif; color: var(--muted); margin-left: 6px; } .sec a { color: var(--accent); }
   .bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
   .bar label { display: flex; gap: 8px; align-items: center; }
   .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 13.5px; display: none; z-index: 50; max-width: calc(100vw - 32px); }
@@ -52,7 +54,7 @@
 </head>
 <body>
 <header>
-  <h1>Scene effects</h1><small>20 full-screen effects, played on your own video</small>
+  <h1>Scene effects</h1><small>65 full-screen effects, played on your own video</small>
   <div class="right">
     <select id="proj" aria-label="Reel"></select>
     <button class="btn ghost" id="prevBtn">▶ Quick preview</button>
@@ -68,7 +70,10 @@
     <div class="bar">
       <label><input type="checkbox" id="series"> Show "N Video Effects" title + effect names at the top</label>
     </div>
+    <h2 class="sec">Studio effects</h2>
     <div class="grid" id="grid"></div>
+    <h2 class="sec">45-effect pack <small>by <a href="https://github.com/Vibha-Ramprakash/claude-video-effects" target="_blank" rel="noopener">@vibha.in.progress</a> · MIT</small></h2>
+    <div class="grid" id="grid45"></div>
   </section>
 </main>
 <div class="toast" id="toast"></div>
@@ -100,9 +105,11 @@ function drawLines() {
 }
 
 function drawGrid() {
-  $("#grid").innerHTML = data.effects.map(e => `<div class="e" data-fx="${e.name}" tabindex="0">
+  const card = e => `<div class="e" data-fx="${e.name}" tabindex="0">
       <div class="pic" data-fx="${e.name}"><span>${data.has_video ? "Loading preview…" : ""}</span></div>
-      <div class="meta"><b>${esc(e.label)}</b><small>${esc(e.about)}</small></div></div>`).join("");
+      <div class="meta"><b>${esc(e.label)}</b><small>${esc(e.about)}</small></div></div>`;
+  $("#grid").innerHTML = data.effects.filter(e => e.pack !== "vfx45").map(card).join("");
+  $("#grid45").innerHTML = data.effects.filter(e => e.pack === "vfx45").map(card).join("");
   document.querySelectorAll(".e").forEach(el => {
     el.onclick = () => line == null ? toast("First tap the line where it should go") : setFx(line, el.dataset.fx);
     el.onkeydown = ev => { if (ev.key === "Enter") el.click(); };

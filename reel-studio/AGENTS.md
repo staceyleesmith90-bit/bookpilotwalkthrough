@@ -42,7 +42,7 @@ engine/ — `project` (folders), `transcribe`, `roughcut`, `plan` (plan → time
 `mysounds` (their own sounds), `rules` ("remember that"), `stylesheet` (design file → brand), `library_page`, `inspire`, `titles` (layered titles), `captions` (14 styles),
 `fx` (zooms + transitions), `iconstickers` (icon/3D/animated/stamp stickers), `musicgen` (free
 composer), `templates` (reel template library), `segment` (person
-cut-out), `scrapbook` (polaroid orbit / page / stack, every setting adjustable), `scenefx` (20 full-screen scene effects: cut-out backgrounds, frame break, magazine cover, phone…), `motiongfx` (app-style graphics), `music` (AI music), `editor/` (Studio app, questionnaire, review page, timeline editor).
+cut-out), `scrapbook` (polaroid orbit / page / stack, every setting adjustable), `scenefx` (65 full-screen scene effects: our 20 + the MIT 45-effect pack in `vfx45/`, cut-out backgrounds, frame break, magazine cover, phone…), `motiongfx` (app-style graphics), `music` (AI music), `editor/` (Studio app, questionnaire, review page, timeline editor).
 CLI: `python -m engine --help`. Tests: `python -m pytest tests -q`.
 
 ## Skill index (read the file before doing that kind of task)
