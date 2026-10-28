@@ -77,7 +77,7 @@ SOUNDS = {
     "snap_zoom": [(0.0, "zoom_in"), (-0.15, "swish")],
     "checklist_pop": [(0.1, "pill_in"), (0.45, "pill_in"), (0.8, "pill_in")],
     "headline_storm": [(0.0 + 0.11 * k, "slam") for k in range(8)],
-    "zoom_portal": [(0.05, "pill_in"), ("p0.68", "whoosh"), ("p0.92", "boom")],
+    "zoom_portal": [(0.05, "pill_in"), ("p0.68", "whoosh"), ("p0.92", "boom", 1.3)],
     "growth_curve": [(0.0, "air"), (0.15, "chart_grow")] + [(0.3 + 0.17 * k, "tick", 0.7) for k in range(7)]
                     + [("p0.85", "reveal")],
     "studio_reveal": [("p0.12", "lights"), ("p0.22", "lights"), ("p0.32", "notify")],
@@ -86,9 +86,9 @@ SOUNDS = {
     "dolly_zoom": [(0.0, "riser")],
     "magazine_cover": [(0.0, "shutter"), (0.25, "pill_in"), (0.45, "pill_in"), (0.65, "thump")],
     "liquid_glass": [(0.0, "glass"), ("p0.4", "sparkle")],
-    "zoom_through": [(0.0, "whoosh"), ("p0.45", "boom")],
+    "zoom_through": [(0.0, "whoosh"), ("p0.45", "boom", 1.3)],
     "green_screen": [(0.0, "air"), ("p0.48", "sparkle")],
-    "frame_break": [(0.0, "crack"), ("p0.22", "shatter")],
+    "frame_break": [(0.0, "crack", 1.2), ("p0.22", "shatter", 2.2)],      # the loudest moment, like the reference
     "digital_zoom": [("p0.12", "camera"), ("p0.45", "camera"), ("p0.8", "camera")],
     "phone_mockup": [(0.0, "window_in")],
     "recap": [("p%.2f" % (0.05 + 0.7 * k / 19), "tick", 0.6) for k in range(0, 20, 2)] + [("p0.8", "cta")],
