@@ -32,7 +32,7 @@ Overlays for a whole "series" reel: series (top title + numbered effect name + p
 tag_wall (effect names listed down both sides).
 CLI preview strip: python -m engine scene-preview <effect> [--photos clip.mp4]
 """
-import math, os, random, subprocess
+import math, os, random, re, subprocess
 from datetime import date
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
@@ -1433,8 +1433,13 @@ def _face(ctx, frame, t, m):
     return face
 
 
-def _v45_opts(name, spec, start):
-    o = dict(V45[name][3])
+def _v45_opts(name, spec, start, pack=None):
+    pack = pack or {}
+    who = pack.get("name") or pack.get("label") or "Your Brand"
+    handle = pack.get("handle") or "@" + re.sub(r"[^a-z0-9.]", "", who.lower().replace(" ", "."))
+    o = dict(V45[name][3], name=who, handle=handle)    # their name, not the pack author's, on profile cards
+    if V45[name][0] == "comment-box":                  # Instagram comments show the name without @
+        o["handle"] = handle.lstrip("@")
     for k, v in (spec or {}).items():
         if k in ("label", "name", "dur", "at_s"):
             continue
@@ -1458,7 +1463,7 @@ def _v45_effect(name):
         m = ctx.mask(frame, t)
 
         def make():
-            e = v.Fx(dict(_v45_opts(name, spec, sc["start"]), fx=their, start=sc["start"], end=sc["end"]), ctx.fps)
+            e = v.Fx(dict(_v45_opts(name, spec, sc["start"], ctx.pack), fx=their, start=sc["start"], end=sc["end"]), ctx.fps)
             if their in v.CARD_FX:                    # their own reels (a folder) or moments from this video
                 e.cards = v.load_cards(e.o.get("images"), _thumbs(ctx) or [frame.convert("RGB")])
             if their == "pause-point":               # freeze the effect's first frame, whichever piece renders
