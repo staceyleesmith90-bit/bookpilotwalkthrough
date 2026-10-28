@@ -417,10 +417,11 @@ def fx_todo(c, e):
             d.line([(pad + bx * .22, y + lh * .12 + bx * .52), (pad + bx * .42, y + lh * .12 + bx * .74), (pad + bx * .8, y + lh * .12 + bx * .28)], fill=(255, 255, 255, 255), width=4)
             tw = f.getlength(it) * k
             d.line([(pad + bx * 1.5, y + lh * 0.36), (pad + bx * 1.5 + tw, y + lh * 0.36)], fill=INK + (255,), width=3)
-    left = c.fx > c.W / 2
+    left = e.o['side'] == 'left' if e.o.get('side') else c.fx > c.W / 2   # Reel Studio: 'side' locks it (no flipping)
     x = c.W * 0.05 + cw / 2 if left else c.W * 0.95 - cw / 2
     pop = ease_back(c.lt / 0.3)
-    place(c, shadowed(im, 14, 8, 90), x, max(im.height / 2 + c.H * 0.06, c.fy - c.fw * 1.4), 0.8 + 0.2 * pop, 0, clamp(c.lt / 0.12) * clamp((e.d - c.lt) / 0.2), behind=True)
+    y = float(e.o['y']) * c.H if e.o.get('y') else max(im.height / 2 + c.H * 0.06, c.fy - c.fw * 1.4)
+    place(c, shadowed(im, 14, 8, 90), x, y, 0.8 + 0.2 * pop, 0, clamp(c.lt / 0.12) * clamp((e.d - c.lt) / 0.2), behind=True)
 
 
 def heart(size, color=(255, 48, 64)):

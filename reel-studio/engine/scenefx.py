@@ -1494,6 +1494,11 @@ def _v45_effect(name):
             e = v.Fx(dict(_v45_opts(name, spec, sc["start"], ctx.pack), fx=their, start=sc["start"], end=sc["end"]), ctx.fps)
             if their in v.CARD_FX:                    # their own reels (a folder) or moments from this video
                 e.cards = v.load_cards(e.o.get("images"), _thumbs(ctx) or [frame.convert("RGB")])
+            if their == "todo" and not e.o.get("side"):   # pick the side once (opposite the face at the start)
+                f0 = ctx.frame_at(sc["start"]) or frame
+                hx = ctx.head(ctx.mask(f0, sc["start"], live=False))[0]
+                ctx._head = None
+                e.o["side"] = "left" if hx > ctx.W / 2 else "right"
             if their == "pause-point":               # freeze the effect's first frame, whichever piece renders
                 f0 = ctx.frame_at(sc["start"]) or frame
                 m0 = ctx.mask(f0, sc["start"], live=False)

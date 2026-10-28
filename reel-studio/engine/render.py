@@ -817,6 +817,7 @@ def _render(timeline, out, preview, no_music_out, tmp):
     spec = dict(tl.get("end_card") or {}, **({"enabled": False} if preview else {}))
     kit, speed = tl.get("sound_kit", "clean"), float(tl.get("speed", 1.0))
     finish(raw, out, pack, spec, kit, speed)
+    _fix_loudness(out, tmp)
     if no_music_out:
         dry = json.loads(json.dumps(tl))
         dry.setdefault("audio", {}).pop("music", None)
@@ -826,7 +827,24 @@ def _render(timeline, out, preview, no_music_out, tmp):
         _run(["ffmpeg", "-y", "-loglevel", "error", "-i", gfx, "-i", wav2, "-map", "0:v", "-map", "1:a",
               "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", raw2])
         finish(raw2, no_music_out, pack, spec, kit, speed)
+        _fix_loudness(no_music_out, tmp)
     return out
+
+
+def _fix_loudness(path, tmp):
+    """The end card and fades pull the whole-reel loudness down after mastering: lift it back to about
+    -14 LUFS (never past -1 dBFS peaks). Picture untouched."""
+    from .qa import loudness
+    lufs, peak = loudness(path)
+    if lufs is None or peak is None or lufs >= -15:
+        return
+    gain = min(-14 - lufs, -1.0 - peak)
+    if gain < 0.3:
+        return
+    fixed = os.path.join(tmp, "loud.mp4")
+    _run(["ffmpeg", "-y", "-loglevel", "error", "-i", path, "-map", "0", "-c:v", "copy", "-af", f"volume={gain:.2f}dB",
+          "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", fixed])
+    shutil.move(fixed, path)
 
 
 def export_layers(timeline, out_dir):
