@@ -421,7 +421,7 @@ def fx_todo(c, e):
     x = c.W * 0.05 + cw / 2 if left else c.W * 0.95 - cw / 2
     pop = ease_back(c.lt / 0.3)
     y = float(e.o['y']) * c.H if e.o.get('y') else max(im.height / 2 + c.H * 0.06, c.fy - c.fw * 1.4)
-    place(c, shadowed(im, 14, 8, 90), x, y, 0.8 + 0.2 * pop, 0, clamp(c.lt / 0.12) * clamp((e.d - c.lt) / 0.2), behind=True)
+    place(c, shadowed(im, 14, 8, 90), x, y, 0.8 + 0.2 * pop, 0, clamp(c.lt / 0.12) * clamp((e.d - c.lt) / 0.2), behind=not e.o.get('front'))
 
 
 def heart(size, color=(255, 48, 64)):
