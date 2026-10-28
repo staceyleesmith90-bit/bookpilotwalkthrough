@@ -22,6 +22,7 @@ def _motion_spans(tl):
     spans = [(z["start"], z["end"]) for z in tl.get("zooms", [])]
     spans += [(i["start"], min(i["end"], i["start"] + 1.2)) for i in tl.get("items", []) if i.get("role") != "logo"]
     spans += [(t["t"] - 0.2, t["t"] + 0.2) for t in tl.get("transitions", [])]
+    spans += [(c["start"], c["end"]) for c in tl.get("scenes", []) if c["fx"] not in ("series", "tag_wall")]
     return sorted(spans)
 
 

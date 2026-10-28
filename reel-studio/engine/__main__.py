@@ -17,6 +17,8 @@
   python -m engine scrapbook-options            every scrapbook setting with its default
   python -m engine chat-inbox                   requests typed in the Studio chat box while Claude wasn't running
   python -m engine mg-preview <kind> [--set k=v] motion graphic preview strip (pills|window|timeline|bars|dial|toggle|button)
+  python -m engine scene-list                    the 20 full-frame scene effects (scene:<name> in a plan)
+  python -m engine scene-preview <effect> --clips <video> [--set k=v]   preview strip of one scene effect
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
   python -m engine brand-image <file>           colours from a logo/photo/mood board
@@ -248,6 +250,25 @@ def main(argv=None):
                 spec[k] = v
         out = a.name or f"mg-{a.arg}.jpg"
         motiongfx.preview(a.arg, spec, _packs.load(a.pack)).save(out)
+        print(out)
+    elif c == "scene-list":
+        from . import scenefx
+        for k, v in scenefx.LABELS.items():
+            print(f"{k:16} {v}")
+        print("overlays: series (plan option \"series\"), tag_wall")
+    elif c == "scene-preview":
+        from . import scenefx, packs as _packs
+        spec = {}
+        for kv in a.set:
+            k, _, v = kv.partition("=")
+            try:
+                spec[k] = json.loads(v)
+            except ValueError:
+                spec[k] = v
+        if not a.clips:
+            sys.exit("give a talking-head clip: --clips path/to/video.mp4")
+        out = a.name or f"scene-{a.arg}.jpg"
+        scenefx.preview(a.arg, a.clips, _packs.load(a.pack), spec).save(out)
         print(out)
     elif c == "scrapbook-options":
         from .scrapbook import options_help

@@ -175,6 +175,27 @@ words, no logos / page numbers / buttons. Each slide picks its own `photo` (imag
   phrase, no whooshes or dings anywhere else. Keep a music bed under it (`"under_voice_db": 14`).
 - Use 3–6 graphics per minute, each on a line that names a thing or a step. Never cover the face.
 
+## Scene effects — 20 full-screen effects (studied from "20 effects made by AI" reels)
+- On any beat: `"do": ["scene:<effect>"]`, `"scene": {...}` (all settings optional; `"dur"` seconds, `"at_s"` start
+  later in the line). Two on one line: `"do": ["scene:frame_break", "scene:headline_storm"]`,
+  `"scene": {"frame_break": {}, "headline_storm": {"at_s": 1.4}}`. List: `python -m engine scene-list`.
+  Preview one: `python -m engine scene-preview <effect> --clips <their video>`.
+- orbit · chat_takeover (prompt, steps[]) · frame_escape · snap_zoom (steps) · checklist_pop (items[]) ·
+  headline_storm (headlines[]) · zoom_portal · growth_curve (to, label, note — real numbers only, or keep
+  "SAMPLE DATA") · studio_reveal (sign) · broll_overlay (image) · paper_cutout · dolly_zoom · magazine_cover
+  (title, big, inside[], badge[]) · liquid_glass · zoom_through · green_screen (image = their own backdrop) ·
+  frame_break (shatters whatever was on screen before it) · digital_zoom · phone_mockup (handle) · recap (items[]).
+- The person is cut out automatically, so backgrounds change behind them and text sits behind their head.
+  Brand colours everywhere. One effect at a time (each ends where the next begins).
+- `"series": {"title": "20 Video Effects\nMade by …"}` = the top title + numbered effect name + progress dashes.
+  `scene:tag_wall` = the effect names listed down both sides (an intro).
+- Sound: `"sound": "effects"` = only the effects make sounds, like the reference (glass shatter on the frame
+  break, a deep boom on zoom-through / portal, slams for headline strips, clunks when studio lights turn on,
+  soft pops for icons and checks). No music bed, no caption ticks. Low single-word captions: `"captions":
+  "single-word", "caption_y": 1520, "chin_follow": false`.
+- Use them where a line earns it (a change of topic, a list, a reveal) — a whole reel of them only for an
+  "effects showcase". In the Studio: **Scene effects** page (`/scenes?p=<project>`): tap a line, tap an effect.
+
 ## The chat box (Studio)
 The timeline editor and Scrapbook maker have an **Ask Claude** box. A message runs Claude Code on that one
 reel (`engine/chat.py`): it edits the plan / timeline, renders a preview and replies in a sentence. One

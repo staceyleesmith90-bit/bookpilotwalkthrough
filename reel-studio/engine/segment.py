@@ -30,7 +30,11 @@ class PersonMasker:
 
     def mask(self, frame_rgba, t_ms):
         """Soft person mask (PIL 'L', same size as frame), temporally smoothed."""
-        rgb = np.ascontiguousarray(np.asarray(frame_rgba.convert("RGB")))
+        W, H = frame_rgba.size
+        small = frame_rgba.convert("RGB")
+        if W > 512:                           # the model works at 256 px: feed it small, smooth it back up
+            small = small.resize((512, max(2, int(H * 512 / W))), Image.BILINEAR)
+        rgb = np.ascontiguousarray(np.asarray(small))
         img = self.mp.Image(image_format=self.mp.ImageFormat.SRGB, data=rgb)
         res = self.seg.segment_for_video(img, int(t_ms))
         m = np.array(res.confidence_masks[0].numpy_view(), dtype=np.float32, copy=True)
@@ -39,9 +43,12 @@ class PersonMasker:
         if self.prev is not None and self.prev.shape == m.shape:
             m = 0.6 * m + 0.4 * self.prev  # reduce flicker
         self.prev = m
-        m = np.clip((m - 0.35) / 0.3, 0, 1)  # firm edge, soft falloff
-        out = Image.fromarray((m * 255).astype(np.uint8), "L")
-        return out.filter(ImageFilter.GaussianBlur(1.2))
+        big = Image.fromarray((m * 255).astype(np.uint8), "L").filter(ImageFilter.GaussianBlur(1.0))
+        big = np.asarray(big.resize((W, H), Image.BICUBIC), np.float32) / 255
+        big = np.clip((big - 0.35) / 0.3, 0, 1)
+        big = big * big * (3 - 2 * big)       # smooth, firm edge (no staircase)
+        out = Image.fromarray((big * 255).astype(np.uint8), "L")
+        return out.filter(ImageFilter.GaussianBlur(1.2 * W / 1080))
 
     def close(self):
         self.seg.close()

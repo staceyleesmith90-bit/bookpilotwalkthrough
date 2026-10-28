@@ -219,6 +219,8 @@ class Handler(SimpleHTTPRequestHandler):
                 if not rel.startswith(("library", "brand")) or ".." in rel or not full.endswith(".wav"):
                     return self.send_error(404)
                 return self._file(full, "audio/wav")
+            if u.path == "/scenes":                      # Scene effects: 20 full-frame effects, previewed on their footage
+                return self._file(os.path.join(STATIC, "scenes.html"), "text/html")
             if u.path == "/scrapbook":                   # Scrapbook maker: every setting, live preview
                 return self._file(os.path.join(STATIC, "scrapbook.html"), "text/html")
             if u.path == "/review":
@@ -240,6 +242,13 @@ class Handler(SimpleHTTPRequestHandler):
                                        "available": chat.available()})
                 if what == "scrapbooks":
                     return self._json(scrapbooks(slug))
+                if what == "scenes":                    # the reel's lines + which scene effect each one has
+                    return self._json(scene_lines(slug))
+                if what == "scene-clip":                # one effect, played on this reel's own footage (cached)
+                    path = scene_clip(slug, (q.get("fx") or [""])[0])
+                    if not path:
+                        return self.send_error(404)
+                    return self._file(path, "image/webp")
                 if what == "thumb":                     # small preview of a photo / video moment in this project
                     f = _media_ok(slug, (q.get("f") or [""])[0])
                     if not f:
@@ -496,6 +505,9 @@ class Handler(SimpleHTTPRequestHandler):
                     im = preview(spec, packs.load(plan.get("pack")), data.get("t"))
                     im.thumbnail((540, 960))
                     return self._png(im, "JPEG")
+                if what == "scene-set":                 # put an effect on a line (fx "" = none), rebuild the edit
+                    return self._json(scene_set(slug, int(data.get("line", 0)), str(data.get("fx", "")),
+                                                data.get("series")))
                 if what == "scrapbook-save":
                     return self._json(save_scrapbook(slug, int(data.get("beat", 0)), _clean_spec(slug, data.get("spec") or {})))
                 if what == "brief":
@@ -570,6 +582,77 @@ def scrapbooks(slug):
                 media.append(os.path.relpath(os.path.join(root, f), project.ROOT))
     return {"scrapbooks": found, "media": media, "pack": plan.get("pack"),
             "options": {k: {"default": v[0], "about": v[1]} for k, v in OPTIONS.items()}}
+
+
+def _scene_source(slug):
+    tl = project.load(slug, "timeline.json") or {}
+    src = tl.get("source")
+    if src and not os.path.isabs(src):
+        src = os.path.join(project.ROOT, src)
+    return src if src and os.path.exists(src) else None
+
+
+def scene_lines(slug):
+    """Spoken lines (from the rough cut) and the scene effect on each, for the Scene effects page."""
+    from .. import scenefx
+    plan = project.load(slug, "plan.json") or {}
+    rc = project.load(slug, "roughcut.json") or {}
+    on = {}
+    for b in plan.get("beats", []):
+        for d in b.get("do", []):
+            if d.startswith("scene:") and "line" in b:
+                on.setdefault(b["line"], []).append(d[6:])
+    lines = [{"id": l["id"], "text": l.get("text", ""), "fx": on.get(l["id"], [])} for l in rc.get("lines", []) if l.get("keep")]
+    return {"lines": lines, "has_video": bool(_scene_source(slug)), "series": plan.get("series"),
+            "effects": [{"name": k, "label": v, "about": scenefx.ABOUT.get(k, "")} for k, v in scenefx.LABELS.items()]}
+
+
+def scene_clip(slug, fx):
+    from .. import scenefx
+    src = _scene_source(slug)
+    if fx not in scenefx.LABELS or not src:
+        return None
+    folder = project.path(slug, "cache", "scenes")
+    os.makedirs(folder, exist_ok=True)
+    plan = project.load(slug, "plan.json") or {}
+    import hashlib
+    key = hashlib.md5(f"{plan.get('pack')}|{os.path.getsize(src)}|{os.path.getmtime(scenefx.__file__)}".encode()).hexdigest()[:10]
+    out = os.path.join(folder, f"{fx}-{key}.webp")
+    if not os.path.exists(out):
+        tl = project.load(slug, "timeline.json") or {}
+        cuts = tl.get("cuts") or [[0, 3]]
+        at = float(cuts[len(cuts) // 3][0]) + 0.5      # a moment a third of the way in, where they're talking
+        scenefx.preview_anim(fx, src, out + ".part.webp", packs.load(plan.get("pack")), at=at)
+        os.replace(out + ".part.webp", out)
+    return out
+
+
+def scene_set(slug, line, fx, series=None):
+    """Put one scene effect on a spoken line (replacing any other on that line), or none; rebuild the edit."""
+    from .. import scenefx
+    if fx and fx not in scenefx.LABELS:
+        raise ValueError("unknown effect")
+    plan = project.load(slug, "plan.json") or {}
+    beats = plan.setdefault("beats", [])
+    b = next((x for x in beats if x.get("line") == line), None)
+    if b is None and fx:
+        b = {"line": line, "do": []}
+        beats.append(b)
+        beats.sort(key=lambda x: x.get("line", 0))
+    if b is not None:
+        b["do"] = [d for d in b.get("do", []) if not d.startswith("scene:")] + ([f"scene:{fx}"] if fx else [])
+        if not fx:
+            b.pop("scene", None)
+    if series is not None:
+        if series:
+            plan["series"] = {"title": series if isinstance(series, str) else f"{sum(1 for x in beats for d in x.get('do', []) if d.startswith('scene:'))} Video Effects"}
+        else:
+            plan.pop("series", None)
+    if any(d.startswith("scene:") for x in beats for d in x.get("do", [])) and "sound" not in plan:
+        plan["sound"] = "effects"             # each effect brings its own sounds (shatter, boom, lights…)
+    project.save(slug, "plan.json", plan)
+    project.build_timeline(slug)
+    return {"ok": True, **scene_lines(slug)}
 
 
 def save_scrapbook(slug, beat, spec):

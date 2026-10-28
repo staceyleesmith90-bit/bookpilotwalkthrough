@@ -32,7 +32,9 @@
   const log = box.querySelector(".rs-log"), ta = box.querySelector("textarea"), btn = box.querySelector("button"),
         hint = box.querySelector(".rs-hint");
   box.querySelector(".rs-bar").onclick = () => box.classList.toggle("rs-min");
-  try { if (localStorage.getItem("rs-chat-min") === "1") box.classList.add("rs-min"); } catch (e) {}
+  let pref = null;
+  try { pref = localStorage.getItem("rs-chat-min"); } catch (e) {}
+  if (pref === "1" || (pref === null && innerWidth < 640)) box.classList.add("rs-min");   // phones: start folded away
   box.querySelector(".rs-bar").addEventListener("click", () => { try { localStorage.setItem("rs-chat-min", box.classList.contains("rs-min") ? "1" : "0"); } catch (e) {} });
   let seen = -1, timer = null;
   function draw(d) {

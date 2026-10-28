@@ -291,6 +291,8 @@ def to_timeline(plan, rc=None, source=None):
                           "words": all_words, "y": 1245}
         if clean and not plan.get("captions"):
             tl["captions"].update(size=62, case="lower")
+        if plan.get("caption_y"):                 # a fixed caption height (e.g. 1500 = low, like "effects" reels)
+            tl["captions"]["y"] = int(plan["caption_y"])
         if cap_style == "tiered":                 # editorial captions sit at chest height, like the reference
             tl["captions"].update(y=1080, words_per_line=4)
             if plan.get("caption_highlights"):     # these words go big with a drawn underline
@@ -334,7 +336,7 @@ def to_timeline(plan, rc=None, source=None):
                 taken = [t for t in taken if t != FACE] + faces
         big_text = None
         if not on_video and not any(d.split(":")[0] in ("takeover", "card", "bubble", "cta", "title", "keep-footage",
-                                                           "broll", "label", "scrapbook", "gridcard", "mg") for d in do):
+                                                           "broll", "label", "scrapbook", "gridcard", "mg", "scene") for d in do):
             do.insert(0, "takeover")               # faceless: every beat shows its words
         if auto and not any(d.startswith(("sticker", "emoji", "badge", "icon", "3d", "anim", "stamp", "callout"))
                             for d in do) and len(used_stickers) < sticker_budget:
@@ -744,11 +746,41 @@ def to_timeline(plan, rc=None, source=None):
                 cues.append((a, "hit", 0.8))
             elif kind == "sfx":
                 cues.append((a, arg, 0.7))
+            elif kind == "scene":                 # scene:<effect> + beat["scene"] = {...}  full-frame effect (scenefx)
+                from . import scenefx
+                name = arg.strip()
+                if name not in scenefx.EFFECTS:
+                    print(f"[reel] unknown scene effect '{name}' skipped (see python -m engine scene-list)")
+                    continue
+                spec = beat.get("scene") or {}
+                if isinstance(spec.get(name), dict):   # two effects on one line: {"scene": {"orbit": {...}, "recap": {...}}}
+                    spec = spec[name]
+                spec = {k: v for k, v in spec.items() if not (k in scenefx.EFFECTS and isinstance(v, dict))}
+                at = a + float(spec.pop("at_s", 0) or 0)
+                dur = float(spec.pop("dur", 0) or 0)
+                if not dur:                        # the whole beat (short ones like zoom_through stay short)
+                    dur = min(b_end - at, scenefx.DUR.get(name, 99))
+                tl.setdefault("scenes", []).append({"id": _id("scene"), "fx": name, "start": round(at, 3),
+                                                    "end": round(min(at + max(dur, 0.3), tl.get("duration", 1e9)), 3),
+                                                    "spec": spec})
 
     if logo:
         logo.pop("_box", None)
         items.append(logo)
     tl["items"] = items
+    if tl.get("scenes"):                         # one scene effect at a time: each ends where the next begins
+        from . import scenefx
+        main = sorted((c for c in tl["scenes"] if c["fx"] not in scenefx.OVERLAYS), key=lambda c: c["start"])
+        for c, nxt in zip(main, main[1:]):
+            c["end"] = round(max(c["start"] + 0.3, min(c["end"], nxt["start"])), 3)
+    if plan.get("series") and tl.get("scenes"):  # "20 effects" style: top title + numbered effect name + progress
+        from . import scenefx
+        ser = dict(plan["series"]) if isinstance(plan["series"], dict) else {"title": str(plan["series"])}
+        steps = [[sc["start"], sc["spec"].get("name") or scenefx.LABELS.get(sc["fx"], sc["fx"])]
+                 for sc in sorted(tl["scenes"], key=lambda c: c["start"]) if sc["fx"] not in scenefx.OVERLAYS]
+        ser.setdefault("steps", steps)
+        ser.setdefault("total", len(steps))
+        tl["scenes"].append({"id": _id("scene"), "fx": "series", "start": 0.0, "end": tl["duration"], "spec": ser})
     # faceless reels: a transition between every beat, in the pack's style
     if not base_on_video and plan.get("auto_transitions", True):
         ttype = pack.get("transition", "shape-wipe")
@@ -827,7 +859,7 @@ def to_timeline(plan, rc=None, source=None):
         cues.append((0.0, "swish", 0.35))
     # outro: brand end screen (logo, name, handle, call to action)
     cta_text = next((d.split(":", 1)[1] for b in plan.get("beats", []) for d in b.get("do", []) if d.startswith("cta:")), None)
-    if plan.get("sound") in ("music", "none", "typewriter", "motion"):
+    if plan.get("sound") in ("music", "none", "typewriter", "motion", "effects"):
         plan = dict(plan, end_card=dict({"sound": False}, **(plan.get("end_card") or {})))
     tl["end_card"] = dict({"title": pack.get("label", ""), "handle": pack.get("handle", ""),
                            "cta": cta_text or "Follow for more", "enabled": True}, **(plan.get("end_card") or {}))
@@ -840,14 +872,18 @@ def to_timeline(plan, rc=None, source=None):
     cues = sounddesign.design(tl, cues, kit)
     if plan.get("sound") in ("music", "none"):   # like editorial reels: voice + music bed (+ b-roll's own sound), no effects
         cues = []
-    if plan.get("sound") not in ("music", "none"):  # motion graphics: every move gets its own interface sound
-        from . import motiongfx
-        mgk = 0
+    if plan.get("sound") not in ("music", "none"):
+        from . import motiongfx, scenefx
+        mg_cues = []                             # motion graphics: every move gets its own interface sound
         for it in tl["items"]:
             if it["type"] == "mg":
                 for t_, ev in motiongfx.render(it["kind"], it["spec"], pack)["sfx"]:
-                    mgk += 1
-                    cues.append(sounddesign.cue(ev, it["start"] + t_, 700 + mgk, "motion", 0.6))
+                    mg_cues.append(sounddesign.cue(ev, it["start"] + t_, 701 + len(mg_cues), "motion", 0.6))
+        scene_cues = [sounddesign.cue(ev, t_, 900 + 10 * k + j, "motion", 0.7 * g)   # scene effects: shatter, boom, lights…
+                      for k, sc in enumerate(tl.get("scenes", [])) for j, (t_, ev, g) in enumerate(scenefx.sounds(sc))]
+        cues += mg_cues + scene_cues
+        if plan.get("sound") == "effects":       # like "20 effects" reels: only the effects make sounds
+            cues = mg_cues + scene_cues
     if plan.get("sound") == "motion":            # app-style sound: graphics + soft air on scene changes + a tick per phrase
         keep = [c for c in cues if ":motion:" in c[1]]
         keep += [sounddesign.cue("air", tr["t"] - 0.2, 300 + k, "motion", 0.35, 0.5)

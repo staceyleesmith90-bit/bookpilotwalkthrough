@@ -37,7 +37,9 @@ EVENT_LEVEL = {"type_key": 0.55, "typing": 0.8, "type_end": 0.6, "word_pop": 0.5
                "sparkle": 0.7, "money": 0.8, "writing": 0.65, "wrong": 0.75,
                # motion-graphics events (each graphic that moves gets its own sound)
                "pill_in": 0.6, "window_in": 0.75, "toggle": 0.7, "chart_grow": 0.6, "tick": 0.45,
-               "click": 0.7, "air": 0.5, "notify": 0.6, "thump": 0.7}
+               "click": 0.7, "air": 0.5, "notify": 0.6, "thump": 0.7,
+               # scene effects (scenefx)
+               "slam": 0.55, "boom": 0.95, "shatter": 0.9, "crack": 0.6, "lights": 0.8, "camera": 0.55}
 
 # event -> kit -> candidate sources ("k:<glob>" = Kenney sample glob, "s:<synth>" = synth)
 KITS = {
@@ -87,6 +89,13 @@ KITS.update({
     "air":        {"*": ["o:air_*"]},                                  # a soft whoosh on a scene change
     "notify":     {"*": ["u:notification", "u:send"]},                 # a status pill / message appears
     "thump":      {"*": ["o:hit_*", "o:wood_hit_*"]},                  # a big word lands
+    # scene effects
+    "slam":       {"*": ["k:impact-impactPunch_medium_*", "o:wood_hit_*"]},   # a headline strip slaps in
+    "boom":       {"*": ["s:boom"]},                                   # diving through a portal / zoom-through cut
+    "shatter":    {"*": ["s:shatter"]},                                # the frame breaks
+    "crack":      {"*": ["k:impact-impactGlass_light_*"]},             # first crack in the glass
+    "lights":     {"*": ["o:switch_*", "o:metal_hit_*"]},              # studio lights clunk on
+    "camera":     {"*": ["f:click", "u:press"]},                       # a camera zoom step
 })
 KIT_FOR_LOOK = {"premium": "luxe", "playful": "playful", "bold": "digital", "clean": "soft"}
 DEFAULT_KIT = "soft"                    # soft real foley: few sounds, each tied to something on screen
@@ -236,7 +245,36 @@ def boing(seed=0):
     return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 7)).astype(np.float32)
 
 
-SYNTH = {"whoosh": whoosh, "swish": swish, "zoom": zoom, "hit_soft": hit_soft, "hit_lux": hit_lux,
+def boom(seed=0):
+    """Deep cinematic boom: long sub drop + a soft noise body (zoom-through / portal dive)."""
+    rng = np.random.default_rng(seed)
+    t = _t(1.1)
+    sub = _thump(1.1, seed, 44) * 1.0
+    body = _bandsweep(_noise(len(t), rng), 600, 120, q=1.0) * np.exp(-t * 6) * 0.6
+    click = _noise(len(t), rng) * np.exp(-t * 120) * 0.25
+    x = sub + body / (np.abs(body).max() + 1e-9) * 0.5 + click
+    return (x / np.abs(x).max()).astype(np.float32)
+
+
+def shatter(seed=0):
+    """Glass breaking: a bright noise burst plus dozens of tiny glass pings falling away."""
+    rng = np.random.default_rng(seed)
+    t = _t(1.3)
+    burst = _bandsweep(_noise(len(t), rng), 5000, 2500, q=0.8) * np.exp(-t * 9)
+    x = burst / (np.abs(burst).max() + 1e-9) * 0.7
+    th = _thump(0.3, seed, 70) * 0.35
+    x[: len(th)] += th
+    for _ in range(46):
+        st = rng.uniform(0, 0.75) ** 1.6
+        f = rng.uniform(2500, 9500)
+        dec = rng.uniform(25, 70)
+        tt = t - st
+        ping = np.where(tt > 0, np.sin(2 * np.pi * f * tt) * np.exp(-np.clip(tt, 0, None) * dec), 0)
+        x += ping * rng.uniform(0.08, 0.3) * np.exp(-st * 2.2)
+    return (x / np.abs(x).max()).astype(np.float32)
+
+
+SYNTH = {"boom": boom, "shatter": shatter, "whoosh": whoosh, "swish": swish, "zoom": zoom, "hit_soft": hit_soft, "hit_lux": hit_lux,
          "shimmer": shimmer, "riser": riser, "boing": boing}
 
 

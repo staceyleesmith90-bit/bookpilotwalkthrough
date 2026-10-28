@@ -414,6 +414,10 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
         except Exception as e:  # never fail a render over the cut-out: text goes in front instead
             print(f"[reel] person cut-out unavailable ({e}); 'behind' text will render in front")
     zooms, trans = tl.get("zooms", []), tl.get("transitions", [])
+    scene_ctx = None
+    if tl.get("scenes"):                      # full-frame scene effects (scenefx): backgrounds, frames, phones, glass…
+        from . import scenefx
+        scene_ctx = scenefx.Ctx(W, H, pack, base=base, fps=fps, scenes=tl["scenes"])
     anim = {}  # animated stickers: id -> [(frame, seconds)]
     for it in items:
         if it.get("type") == "sticker" and str(it.get("name", "")).startswith("anim:"):
@@ -478,6 +482,8 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
             frame = fx.apply(frame, t, zooms, trans, pack["colors"]["pop"])
         if tl.get("layouts"):
             frame = fx.apply_layouts(frame, t, tl["layouts"], pack["colors"]["pop"])
+        if scene_ctx:
+            frame = scenefx.apply(frame, t, scene_ctx)
         video = frame
         if layer in ("graphics", "captions"):
             frame = Image.new("RGBA", (W, H))
@@ -571,6 +577,8 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
     enc.wait()
     if masker:
         masker.close()
+    if scene_ctx:
+        scene_ctx.close()
     dec.kill()
     dec.wait()
 
@@ -740,6 +748,7 @@ def _piece_sig(tl, pack, base, scale, f0, f1, fps):
         "zooms": [z for z in tl.get("zooms", []) if near(z["start"], z["end"])],
         "trans": [t for t in tl.get("transitions", []) if near(t["t"] - 1, t["t"] + 1)],
         "layouts": [l for l in tl.get("layouts", []) if near(l["start"], l["end"])],
+        "scenes": [c for c in tl.get("scenes", []) if near(c["start"], c["end"])],
         "cap": cap, "words": [w for w in words if t0 - 4 < w["start"] < t1 + 4] if not str(cap.get("style", "")).startswith("hf:")
         else words,                          # animated caption styles depend on the whole transcript
         "dur": tl["duration"],
