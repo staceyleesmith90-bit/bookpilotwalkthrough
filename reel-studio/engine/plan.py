@@ -564,16 +564,21 @@ def to_timeline(plan, rc=None, source=None):
                 bfile, _, blook = arg.partition("|")
                 blook = (blook.strip() or plan.get("broll_look") or "").strip()
                 from .hdr import ensure_sdr
-                bf = bfile.strip()
+                bf, src_in = bfile.strip(), 0.0
+                if re.search(r"@\d+(\.\d+)?$", bf):        # clip.mp4@12.5 = start the clip 12.5 s in
+                    bf, _, at_s = bf.rpartition("@")
+                    src_in = float(at_s)
                 bf_abs = bf if os.path.isabs(bf) else os.path.join(ROOT_DIR, bf)
                 sdr = ensure_sdr(bf_abs)
                 if sdr != bf_abs:
                     bf = os.path.relpath(sdr, ROOT_DIR)
                 broll.append({"file": bf, "start": a, "dur": round(b_end - a, 3),
+                              **({"src_in": round(src_in, 3)} if src_in else {}),
                               **({"look": BROLL_LOOKS.get(blook, blook)} if blook else {})})
-                ttype = pack.get("transition", "whip")
-                transitions.append({"t": round(a, 3), "type": ttype, "dur": 0.3})
-                cues.append((max(a - 0.1, 0), TRANSITION_SFX.get(ttype, pack["sfx"]["transition"]), 0.45))
+                if not beat.get("cut"):                # "cut": true = a straight cut (no transition, no whoosh)
+                    ttype = beat.get("transition") or pack.get("transition", "whip")
+                    transitions.append({"t": round(a, 3), "type": ttype, "dur": 0.3})
+                    cues.append((max(a - 0.1, 0), TRANSITION_SFX.get(ttype, pack["sfx"]["transition"]), 0.45))
             elif kind == "card":
                 items.append({"id": _id("card"), "type": "card", "text": arg or text, "start": a, "end": b_end,
                               "x": W / 2, "y": H / 2, "anim": "fade", "z": 5, "hide_captions": True})
