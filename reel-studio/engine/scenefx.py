@@ -516,8 +516,7 @@ def fx_frame_escape(frame, p, lt, dur, spec, ctx, t):
 
 # ---------------------------------------------------------------- 04 snap zoom
 def fx_snap_zoom(frame, p, lt, dur, spec, ctx, t):
-    m = ctx.mask(frame, t)
-    hx, hy, r = ctx.head(m)
+    hx, hy, r = _focus(spec, ctx, frame, t)
     steps = spec.get("steps") or [1.3, 1.6]
     seg = (dur - 0.2) / len(steps)
     k, prev, blur = 1.0, 1.0, 0.0
@@ -981,8 +980,7 @@ def fx_liquid_glass(frame, p, lt, dur, spec, ctx, t):
 
 # ---------------------------------------------------------------- 15 zoom through cut
 def fx_zoom_through(frame, p, lt, dur, spec, ctx, t):
-    m = ctx.mask(frame, t)
-    hx, hy, r = ctx.head(m)
+    hx, hy, r = _focus(spec, ctx, frame, t)
     cx, cy = hx, hy + r * 0.2
     if p < 0.45:
         q = p / 0.45
@@ -1138,10 +1136,17 @@ def fx_frame_break(frame, p, lt, dur, spec, ctx, t):
 
 
 # ---------------------------------------------------------------- 18 digital zoom
+def _focus(spec, ctx, frame, t):
+    """Where a camera effect aims: spec "focus": [x, y] (0-1) picks a person, else the cut-out's head."""
+    if spec.get("focus"):
+        fx_, fy_ = spec["focus"]
+        return fx_ * ctx.W, fy_ * ctx.H, ctx.W * 0.1
+    return ctx.head(ctx.mask(frame, t))
+
+
 def fx_digital_zoom(frame, p, lt, dur, spec, ctx, t):
     W, H, u = ctx.W, ctx.H, ctx.u
-    m = ctx.mask(frame, t)
-    hx, hy, r = ctx.head(m)
+    hx, hy, r = _focus(spec, ctx, frame, t)
     steps = spec.get("steps") or [[0.08, 1.6], [0.42, 2.6], [0.78, 1.0]]
     k, prev, blur = 1.0, 1.0, 0.0
     for st, z in steps:
@@ -1541,6 +1546,20 @@ for _n, (_their, _label, _about, _o) in V45.items():
 DUR.update({"lean_in": 1.2, "reject_stamp": 1.6, "tap": 2.0, "headline_box": 2.2})
 
 
+# ---------------------------------------------------------------- paper collage (engine/collage.py)
+def fx_collage(frame, p, lt, dur, spec, ctx, t):
+    from . import collage
+    m = ctx.mask(frame, t) if spec.get("person", True) else None
+    cols = dict(ctx.col, pink=spec.get("pink", "#F29BB2"))
+    return collage.draw(frame, m, lt, spec, ctx.W, ctx.H, cols)
+
+
+EFFECTS["collage"] = fx_collage
+LABELS["collage"] = "Paper Collage"
+ABOUT["collage"] = "Painted stripes, you as a torn-paper cut-out, big serif title, typewriter labels, halftone stickers."
+PERSON.add("collage")
+
+
 # ---------------------------------------------------------------- the renderer's entry point
 def apply(frame, t, ctx):
     """Run every scene effect on screen at time t (effects first, overlays last)."""
@@ -1568,6 +1587,9 @@ def sounds(scene):
     dur = scene["end"] - scene["start"]
     out = []
     table = SOUNDS.get(scene["fx"], [])
+    if scene["fx"] == "collage":                       # a paper pop for every piece that lands
+        from .collage import element_times
+        table = [(0.0, "page", 0.6)] + [(tt, "sticker_in", 0.55) for tt in element_times(scene.get("spec") or {})]
     if scene["fx"] in V45:
         table = _v45_sounds(scene["fx"], scene.get("spec"), dur) or table
     for c in table:
