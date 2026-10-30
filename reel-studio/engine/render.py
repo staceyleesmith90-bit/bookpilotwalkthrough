@@ -537,7 +537,8 @@ def build_graphics(tl, pack, base, out, scale=1.0, layer=None, frames=None):
             frame.alpha_composite(im, (int(hfcap["x"] - im.width / 2), int(hfcap["y"] - im.height / 2)))
         if groups and layer != "graphics" and not any(a <= t < b for a, b in hide_caps):
             for gi, g in enumerate(groups):
-                if g[0]["start"] <= t < (groups[gi + 1][0]["start"] if gi + 1 < len(groups) else g[-1]["end"] + 0.3):
+                # on screen until the next line starts, but not lingering long after the words stop
+                if g[0]["start"] <= t < min(groups[gi + 1][0]["start"] if gi + 1 < len(groups) else 1e9, g[-1]["end"] + 0.6):
                     active = max((k for k, w in enumerate(g) if w["start"] <= t), default=0)
                     kinetic = cap.get("style") in captions.KINETIC
                     phase = min(int((t - g[active]["start"]) * fps / 1.5), captions.PHASES) if kinetic else 0

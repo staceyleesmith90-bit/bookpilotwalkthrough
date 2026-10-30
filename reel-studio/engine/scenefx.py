@@ -353,14 +353,25 @@ def _icon(kind, col, s, style):
     return _shadow(im, int(s * 0.12), 0.32, int(s * 0.06))
 
 
+def _orbit_icon(kind, col, px, i):
+    if kind.startswith("emoji:"):                    # a glossy 3D emoji instead of an app icon
+        from .iconstickers import fluent3d
+        im = fluent3d(kind[6:], int(px))
+        if im is not None:
+            return im
+        kind = "spark"
+    return _icon(kind, col, px, i)
+
+
 def fx_orbit(frame, p, lt, dur, spec, ctx, t):
     W, H, u = ctx.W, ctx.H, ctx.u
     m = ctx.mask(frame, t)
-    hx, hy, r = ctx.head(m)
+    hx, hy, r = _focus(spec, ctx, frame, t, lt) if spec.get("focus") else ctx.head(m)
     kinds = spec.get("icons") or ["cc", "aa", "play", "cut", "plus", "wave", "spark"]
-    icons = ctx.store(("orbit", tuple(kinds)), lambda: [_icon(k, ctx.col, 124 * u, i) for i, k in enumerate(kinds)])
-    cx, cy = hx, hy + r * 0.75
-    rx, ry, tilt = W * 0.42, H * 0.07, math.radians(-8)
+    px = float(spec.get("size", 124)) * u
+    icons = ctx.store(("orbit", tuple(kinds), px), lambda: [_orbit_icon(k, ctx.col, px, i) for i, k in enumerate(kinds)])
+    cx, cy = hx, hy + r * float(spec.get("drop", 0.75))
+    rx, ry, tilt = W * float(spec.get("rx", 0.42)), H * float(spec.get("ry", 0.07)), math.radians(-8)
     w = spec.get("speed", 1.5)
     back, front = Image.new("RGBA", (W, H)), Image.new("RGBA", (W, H))
     d = ImageDraw.Draw(back)
@@ -1136,11 +1147,29 @@ def fx_frame_break(frame, p, lt, dur, spec, ctx, t):
 
 
 # ---------------------------------------------------------------- 18 digital zoom
-def _focus(spec, ctx, frame, t):
-    """Where a camera effect aims: spec "focus": [x, y] (0-1) picks a person, else the cut-out's head."""
-    if spec.get("focus"):
-        fx_, fy_ = spec["focus"]
-        return fx_ * ctx.W, fy_ * ctx.H, ctx.W * 0.1
+def _focus(spec, ctx, frame, t, lt=None):
+    """Where an effect aims: spec "focus": [x, y] (0-1), or keyframes [[seconds, x, y], ...] that follow a
+    moving person; else the cut-out's head."""
+    f = spec.get("focus")
+    if f:
+        if isinstance(f[0], (list, tuple)):
+            if lt is None:
+                lt = t - ctx._current["start"]
+            ks = sorted(f)
+            if lt <= ks[0][0]:
+                x, y = ks[0][1:3]
+            elif lt >= ks[-1][0]:
+                x, y = ks[-1][1:3]
+            else:
+                for a, b in zip(ks, ks[1:]):
+                    if a[0] <= lt <= b[0]:
+                        q = (lt - a[0]) / max(b[0] - a[0], 1e-6)
+                        q = q * q * (3 - 2 * q)
+                        x, y = a[1] + (b[1] - a[1]) * q, a[2] + (b[2] - a[2]) * q
+                        break
+        else:
+            x, y = f
+        return x * ctx.W, y * ctx.H, ctx.W * float(spec.get("head", 0.1))
     return ctx.head(ctx.mask(frame, t))
 
 
