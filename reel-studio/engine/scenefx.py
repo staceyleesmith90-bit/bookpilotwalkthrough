@@ -1578,7 +1578,7 @@ DUR.update({"lean_in": 1.2, "reject_stamp": 1.6, "tap": 2.0, "headline_box": 2.2
 # ---------------------------------------------------------------- paper collage (engine/collage.py)
 def fx_collage(frame, p, lt, dur, spec, ctx, t):
     from . import collage
-    m = ctx.mask(frame, t) if spec.get("person", True) else None
+    m = ctx.mask(frame, t) if spec.get("person", True) and not spec.get("overlay") else None
     cols = dict(ctx.col, pink=spec.get("pink", "#F29BB2"))
     return collage.draw(frame, m, lt, spec, ctx.W, ctx.H, cols)
 

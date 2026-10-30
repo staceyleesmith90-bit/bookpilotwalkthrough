@@ -9,6 +9,9 @@ spec (all optional):
   title_y   0.2                              title height (0-1 of the screen)
   labels    ["(very) nervous", {"text": "...", "x": .3, "y": .7, "rot": -5}]
   stickers  [{"emoji": "Mirror ball", "x": .8, "y": .45, "size": .26, "look": "halftone"|"colour", "rot": 8}]
+  overlay   false  true = draw on the video itself (no stripes / cut-out / title): stickers, labels, song card
+  song      {"title": "Bestie, Hold My Hand", "artist": "...", "art": "path.png", "x": .5, "y": .16}
+  stickers  can also be {"image": "path/to/sticker.png", ...} (ready-made die-cut art)
   person    true   cut the person out (false = keep the whole picture as a torn photo)
   person_scale 0.76, person_x 0.5, person_y 1.0   size of the cut-out and where its bottom-centre sits
 """
@@ -104,6 +107,45 @@ def halftone(img, cell=7):
     return res
 
 
+def image_sticker(path, px):
+    """A ready-made sticker image (already die-cut, e.g. generated for the reel), sized and shadowed."""
+    key = ("img", path, px)
+    if key not in _CACHE:
+        p = path if os.path.isabs(path) else os.path.join(ROOT, path)
+        im = Image.open(p).convert("RGBA")
+        im = im.resize((px, max(1, int(im.height * px / im.width))), Image.LANCZOS)
+        _CACHE[key] = shadow_under(im, blur=max(4, px // 22), dy=max(3, px // 30))
+    return _CACHE[key]
+
+
+def song_card(title, artist, px, art=None, lt=0.0):
+    """A "now playing" music card: art, song title, artist, bouncing equaliser and a progress bar."""
+    ft = load_font(FONT("Baloo2-Variable.ttf"), int(px * 0.95), 800)
+    fa = load_font(FONT("Nunito-Variable.ttf"), int(px * 0.6), 700)
+    h = int(px * 3.1)
+    a = int(h - px * 0.8)
+    x0 = int(px * 0.6 + a)
+    w = int(x0 + max(ft.getlength(title), fa.getlength(artist)) + px * 2.6)
+    card = Image.new("RGBA", (w, h))
+    d = ImageDraw.Draw(card)
+    d.rounded_rectangle((0, 0, w - 1, h - 1), int(px * 0.7), fill=PAPER)
+    if art:
+        im = image_sticker(art, a)
+        card.alpha_composite(im, (int(px * 0.35), int((h - im.height) / 2)))
+    d.text((x0, px * 0.45), title, font=ft, fill=(59, 42, 58, 255))
+    d.text((x0, px * 1.5), artist, font=fa, fill=(59, 42, 58, 170))
+    bw = int(px * 0.2)
+    for i in range(4):                                    # equaliser
+        hh = px * (0.35 + 0.45 * abs(math.sin(lt * 7 + i * 1.7)))
+        x = w - px * 1.5 + i * bw * 1.6
+        d.rounded_rectangle((x, px * 1.3 - hh / 2, x + bw, px * 1.3 + hh / 2), bw // 2, fill=(242, 120, 92, 255))
+    py = h - px * 0.65
+    d.rounded_rectangle((x0, py, w - px * 0.6, py + px * 0.16), int(px * 0.08), fill=(59, 42, 58, 40))
+    q = min(1.0, 0.25 + lt * 0.12)
+    d.rounded_rectangle((x0, py, x0 + (w - px * 0.6 - x0) * q, py + px * 0.16), int(px * 0.08), fill=(242, 120, 92, 255))
+    return shadow_under(card, blur=max(6, px // 3), dy=max(4, px // 4), alpha=0.25)
+
+
 def cutout_sticker(emoji, px, look="halftone", seed=1):
     key = ("st", emoji, px, look, seed)
     if key in _CACHE:
@@ -197,12 +239,13 @@ DEFAULT_STICKERS = [{"emoji": "Mirror ball", "x": 0.8, "y": 0.42, "size": 0.27, 
 def draw(frame, mask, lt, spec, W, H, colors):
     """One frame of the collage over `frame` (RGBA) with the person mask (L)."""
     u = W / 1080
+    overlay = spec.get("overlay", False)                 # on the video itself: no stripes, no cut-out, no title
     st = spec.get("stripes") or [colors.get("pink", "#F29BB2"), colors.get("pop", "#EE7F62")]
-    out = stripes(W, H, st[0], st[1]).copy()
+    out = frame.copy() if overlay else stripes(W, H, st[0], st[1]).copy()
     step = int(lt * 12)                                     # stop-motion: things "boil" 12 times a second
     jit = lambda k: (random.Random(step * 31 + k).uniform(-1.2, 1.2), random.Random(step * 17 + k).uniform(-2.5, 2.5) * u)
     tk = 0.0
-    if spec.get("title", "Besties"):
+    if spec.get("title", None if overlay else "Besties"):
         im = title(spec.get("kicker", "Hi, we're"), spec.get("title", "Besties"), int(spec.get("title_px", 250) * u),
                    spec.get("ink", "#F7EE8E"))
         if im.width > W * 0.94:
@@ -217,14 +260,14 @@ def draw(frame, mask, lt, spec, W, H, colors):
     def put_stickers(lst, k0):
         for i, s in enumerate(lst):
             px = int(s.get("size", 0.22) * W)
-            im = cutout_sticker(s["emoji"], px, s.get("look", "halftone"), seed=i + 3)
+            im = image_sticker(s["image"], px) if s.get("image") else cutout_sticker(s["emoji"], px, s.get("look", "halftone"), seed=i + 3)
             if im is None:
                 continue
             k = _pop(lt, tk + 0.1 + 0.09 * (i + k0))
             r, dy = jit(10 + i + k0)
             _paste(out, im, s["x"] * W, s["y"] * H + dy, k, s.get("rot", 0) + r)
     put_stickers(behind, 0)
-    if spec.get("person", True) and mask is not None:
+    if spec.get("person", True) and mask is not None and not overlay:
         k = float(spec.get("person_scale", 0.76))            # the person smaller, standing on the bottom edge
         k *= 0.92 + 0.08 * _pop(lt, 0.0, 0.35)
         px, py = spec.get("person_x", 0.5) * W, spec.get("person_y", 1.0) * H
@@ -239,13 +282,20 @@ def draw(frame, mask, lt, spec, W, H, colors):
         out.alpha_composite(shadow_under(white, blur=int(16 * u), dy=int(10 * u), alpha=0.3))
         out.alpha_composite(p)
     put_stickers(front, len(behind))
+    if spec.get("song"):                                  # "now playing" card
+        sg = spec["song"]
+        im = song_card(sg.get("title", ""), sg.get("artist", ""), int(sg.get("px", 44) * u), sg.get("art"), lt)
+        if im.width > W * 0.92:
+            im = im.resize((int(W * 0.92), int(im.height * W * 0.92 / im.width)), Image.LANCZOS)
+        k = _pop(lt, sg.get("at", 0.15), 0.35)
+        _paste(out, im, sg.get("x", 0.5) * W, sg.get("y", 0.16) * H, k, sg.get("rot", -2))
     labels = spec.get("labels", [])
     spots = [(0.62, 0.33, 6), (0.3, 0.74, -5), (0.66, 0.62, 4), (0.4, 0.5, -3)]
     for i, l in enumerate(labels):
         l = {"text": l} if isinstance(l, str) else l
         x, y, rot = l.get("x", spots[i % 4][0]), l.get("y", spots[i % 4][1]), l.get("rot", spots[i % 4][2])
         im = label(l["text"], int(l.get("px", 52) * u), seed=i + 1)
-        k = _pop(lt, tk + 0.35 + 0.16 * i)
+        k = _pop(lt, l.get("at", tk + 0.35 + 0.16 * i))
         r, dy = jit(40 + i)
         _paste(out, im, x * W, y * H + dy, k, rot + r * 0.6)
     return out
@@ -253,9 +303,11 @@ def draw(frame, mask, lt, spec, W, H, colors):
 
 def element_times(spec):
     """When each piece lands (for the pop sounds)."""
-    tk = 0.1 if spec.get("title", "Besties") else 0.0
+    tk = 0.1 if spec.get("title", None if spec.get("overlay") else "Besties") else 0.0
     n_st = len(spec.get("stickers", DEFAULT_STICKERS))
     ts = [0.02] if tk else []
     ts += [tk + 0.1 + 0.09 * i for i in range(n_st)]
-    ts += [tk + 0.35 + 0.16 * i for i in range(len(spec.get("labels", [])))]
+    ts += [(l.get("at") if isinstance(l, dict) and "at" in l else tk + 0.35 + 0.16 * i) for i, l in enumerate(spec.get("labels", []))]
+    if spec.get("song"):
+        ts.append(spec["song"].get("at", 0.15))
     return sorted(ts)
