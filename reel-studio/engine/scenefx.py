@@ -1568,6 +1568,18 @@ def _thumbs(ctx):
     return ctx.store("thumbs", make)
 
 
+try:                                                   # effects she added since this list was written
+    from .vfx45.update import effect_names as _effect_names
+    _known = {v[0] for v in V45.values()}
+    for _their, _desc in _effect_names():
+        if _their not in _known:
+            _n = _their.replace("-", "_")
+            _n = _n if _n not in EFFECTS and _n not in V45 else "v_" + _n
+            V45[_n] = (_their, _their.replace("-", " ").title(), (_desc[:1].upper() + _desc[1:]).rstrip(".") + ".", {})
+            V45_SOUNDS.setdefault(_n, [(0.0, "sticker_in", 0.6)])
+except Exception as _e:                                 # never break the engine over the pack's list
+    print(f"[reel] couldn't read the effects pack list: {_e}")
+
 for _n, (_their, _label, _about, _o) in V45.items():
     EFFECTS[_n] = _v45_effect(_n)
     LABELS[_n] = _label

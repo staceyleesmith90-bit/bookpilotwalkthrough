@@ -205,6 +205,8 @@ words, no logos / page numbers / buttons. Each slide picks its own `photo` (imag
   (text, to) · messages (text) · place_in_grid (images, views). Lists can be JSON lists or "a|b|c".
   `images` = a folder of their reels/screenshots (else moments from this video). Defaults say "Claude" in a few
   places (tier list, match cut, task list) — set `text` to their words. Our sounds are added to every one.
+  She releases new effects often: `python -m engine effects-update` pulls them in (our fixes re-applied; new
+  names appear in plans and the Studio automatically). A daily routine runs it; `effects-update check` = just look.
 - Use them where a line earns it (a change of topic, a list, a reveal) — a whole reel of them only for an
   "effects showcase". In the Studio: **Scene effects** page (`/scenes?p=<project>`): tap a line, tap an effect.
 

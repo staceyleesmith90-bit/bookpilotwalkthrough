@@ -1,3 +1,4 @@
+import os
 from PIL import Image
 from engine import packs, scenefx, sounddesign
 from engine.plan import to_timeline
@@ -46,3 +47,13 @@ def test_plan_scene_beats_series_and_effects_sound():
     assert [s[1] for s in tl["scenes"][-1]["spec"]["steps"]] == ["Paper Cutout", "Checklist", "Zoom Through Cut", "Frame Break"]
     names = {s["name"].split(":")[2] for s in tl["audio"]["sfx"]}
     assert {"shatter", "boom"} <= names and "word_pop" not in names
+
+
+def test_effects_pack_names_are_read_and_registered():
+    from engine.vfx45.update import PATCHES, effect_names
+    names = effect_names()
+    assert len(names) >= 45
+    theirs = {v[0] for v in scenefx.V45.values()}
+    assert all(n in theirs for n, _ in names)            # every effect in fx.py is usable in plans
+    src = open(os.path.join(os.path.dirname(scenefx.__file__), "vfx45", "fx.py"), encoding="utf-8").read()
+    assert all(new in src for _, new in PATCHES)         # our fixes are in the installed copy
