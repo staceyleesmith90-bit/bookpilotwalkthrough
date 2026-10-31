@@ -554,6 +554,9 @@ def fx_checklist_pop(frame, p, lt, dur, spec, ctx, t):
     items = spec.get("items") or ["Edit", "Captions", "Effects"]
     f = _font(36 * u, 700)
     x0 = min(hx + r * 1.25, W - max(f.getlength(s) for s in items) - 110 * u)
+    y0 = hy - r * 0.55
+    if spec.get("x") is not None:                     # a fixed spot (left edge, top), e.g. clear of the face
+        x0, y0 = float(spec["x"]) * W, float(spec.get("y", 0.4)) * H
     out = frame.copy()
     for i, s in enumerate(items):
         st = 0.1 + 0.35 * i
@@ -568,7 +571,7 @@ def fx_checklist_pop(frame, p, lt, dur, spec, ctx, t):
         _spin_check(d, 35 * u, h / 2, 20 * u, _rgb(col["pop"]), _seg(lt, st + 0.1, st + 0.35) * 2)
         d.text((66 * u, h / 2), s, font=f, fill=_rgb(col["ink"]), anchor="lm")
         pil = _shadow(pil, int(12 * u), 0.3, int(6 * u))
-        _paste_center(out, pil, x0 + w / 2, hy - r * 0.55 + i * 88 * u, k)
+        _paste_center(out, pil, x0 + w / 2, y0 + i * 88 * u, k)
     return out
 
 
