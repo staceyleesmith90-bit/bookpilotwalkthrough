@@ -1540,6 +1540,8 @@ def _v45_effect(name):
                 f0 = ctx.frame_at(sc["start"]) or frame
                 m0 = ctx.mask(f0, sc["start"], live=False)
                 fx0 = _face(ctx, f0, sc["start"] - 1e-3, m0)
+                if spec.get("face"):
+                    fx0 = (spec["face"][0] * ctx.W, spec["face"][1] * ctx.H, spec["face"][2] * ctx.W)
                 ctx._store.pop("face", None)
                 e.state["f"] = (np.asarray(f0.convert("RGB"), np.float32) / 255, np.asarray(m0, np.float32) / 255) + tuple(fx0)
             return e
@@ -1549,6 +1551,8 @@ def _v45_effect(name):
         c.img = np.asarray(frame.convert("RGB"), np.float32) / 255
         c.m = np.asarray(m, np.float32) / 255
         c.fx, c.fy, c.fw = _face(ctx, frame, t, m)
+        if spec.get("face"):                          # "face": [x, y, width] (0-1): who the effect is about
+            c.fx, c.fy, c.fw = spec["face"][0] * ctx.W, spec["face"][1] * ctx.H, spec["face"][2] * ctx.W
         c.fw = max(c.fw, ctx.W * 0.05)
         v.EFFECTS[their][0](c, e)
         return Image.fromarray((np.clip(c.img, 0, 1) * 255 + 0.5).astype(np.uint8), "RGB").convert("RGBA")
