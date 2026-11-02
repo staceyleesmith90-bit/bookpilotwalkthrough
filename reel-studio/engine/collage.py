@@ -253,7 +253,7 @@ def draw(frame, mask, lt, spec, W, H, colors):
         k = _pop(lt, 0.02, 0.32)
         _paste(out, im, W / 2, H * spec.get("title_y", 0.2), k, jit(0)[0] * 0.5)
         tk = 0.1
-    stickers = spec.get("stickers", DEFAULT_STICKERS)
+    stickers = spec.get("stickers", [] if overlay else DEFAULT_STICKERS)   # on video: only the stickers asked for
     behind = [s for s in stickers if s.get("behind", True)]
     front = [s for s in stickers if not s.get("behind", True)]
 
@@ -304,7 +304,7 @@ def draw(frame, mask, lt, spec, W, H, colors):
 def element_times(spec):
     """When each piece lands (for the pop sounds)."""
     tk = 0.1 if spec.get("title", None if spec.get("overlay") else "Besties") else 0.0
-    n_st = len(spec.get("stickers", DEFAULT_STICKERS))
+    n_st = len(spec.get("stickers", [] if spec.get("overlay") else DEFAULT_STICKERS))
     ts = [0.02] if tk else []
     ts += [tk + 0.1 + 0.09 * i for i in range(n_st)]
     ts += [(l.get("at") if isinstance(l, dict) and "at" in l else tk + 0.35 + 0.16 * i) for i, l in enumerate(spec.get("labels", []))]
