@@ -15,6 +15,7 @@ the final eye:
    - no sticker/text on a face; not more than 2 graphics at once; stickers match the brand look
    - title visible against the background; captions not covering the product
    - frames look corrected (no colour cast, not too dark), the look fits the vibe
+   - the FIRST frame is the designed cover (`renders/cover.jpg`: picture + what the reel is about), not black
 3. Anything off → edit `timeline.json` (move/scale/remove items, add a zoom) → re-render → re-check.
 4. Deliver it on the review page (never only as a raw file — some players, like the Claude
    desktop app, can't play the normal AAC audio): `python -m engine share <p> --options v<N>`,

@@ -822,8 +822,13 @@ def _render(timeline, out, preview, no_music_out, tmp):
     from .endcard import finish
     spec = dict(tl.get("end_card") or {}, **({"enabled": False} if preview else {}))
     kit, speed = tl.get("sound_kit", "clean"), float(tl.get("speed", 1.0))
-    finish(raw, out, pack, spec, kit, speed)
+    from . import cover
+    has_cover = cover.spec_of(tl) is not None and speed == 1.0
+    finish(raw, out, pack, spec, kit, speed, fade_in=not has_cover)
     _fix_loudness(out, tmp)
+    cover_jpg = os.path.join(os.path.dirname(os.path.abspath(out)), "cover.jpg")
+    if has_cover:                                        # a designed cover as the first frame (no black start)
+        cover.add(out, tl, pack, base, cover_jpg, tmp)
     if no_music_out:
         dry = json.loads(json.dumps(tl))
         dry.setdefault("audio", {}).pop("music", None)
@@ -832,8 +837,10 @@ def _render(timeline, out, preview, no_music_out, tmp):
         raw2 = os.path.join(tmp, "raw2.mp4")
         _run(["ffmpeg", "-y", "-loglevel", "error", "-i", gfx, "-i", wav2, "-map", "0:v", "-map", "1:a",
               "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", raw2])
-        finish(raw2, no_music_out, pack, spec, kit, speed)
+        finish(raw2, no_music_out, pack, spec, kit, speed, fade_in=not has_cover)
         _fix_loudness(no_music_out, tmp)
+        if has_cover:
+            cover.add(no_music_out, tl, pack, base, os.path.join(tmp, "cover2.jpg"), tmp)
     return out
 
 

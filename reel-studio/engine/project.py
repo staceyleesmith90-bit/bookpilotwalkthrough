@@ -114,7 +114,9 @@ def do_render(slug, preview=False):
     extra = None if preview else path(slug, "renders", "final-for-trending-sound.mp4")
     render.render(path(slug, "timeline.json"), out, preview=preview, no_music_out=extra)
     if not preview:
-        render.thumbnail(path(slug, "timeline.json"), path(slug, "renders", "cover.jpg"))
+        from . import cover
+        if not cover.spec_of(load(slug, "timeline.json") or {}):   # the render already made a designed cover
+            render.thumbnail(path(slug, "timeline.json"), path(slug, "renders", "cover.jpg"))
         from . import qa
         notes, problems = qa.check_render(out)
         tl = load(slug, "timeline.json") or {}

@@ -870,6 +870,8 @@ def to_timeline(plan, rc=None, source=None):
                            "cta": cta_text or "Follow for more", "enabled": True}, **(plan.get("end_card") or {}))
     if plan.get("speed"):
         tl["speed"] = float(plan["speed"])
+    # cover: every reel opens on a designed cover (picture + what it's about) instead of black — engine/cover.py
+    tl["cover"] = dict(plan.get("cover") or {})
     # sound design: one coherent kit per reel, a sound for every move, variety every time
     from . import sounddesign
     kit = plan.get("sound_kit") or sounddesign.KIT_FOR_LOOK.get(look, sounddesign.DEFAULT_KIT)

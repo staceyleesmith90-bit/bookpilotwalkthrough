@@ -91,13 +91,14 @@ def make_card(pack, spec, out, W=1080, H=1920, fps=30, dur=2.6, kit="clean"):
     return out
 
 
-def finish(main, out, pack, spec, kit="clean", speed=1.0):
-    """Fade the reel in/out, optional speed-up, then append the brand end screen."""
+def finish(main, out, pack, spec, kit="clean", speed=1.0, fade_in=True):
+    """Fade the reel in/out, optional speed-up, then append the brand end screen.
+    fade_in=False: a cover frame goes in front (engine/cover.py) and cross-fades in instead of black."""
     dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", main],
                                capture_output=True, text=True).stdout.strip())
     tmp = tempfile.mkdtemp()
     parts = []
-    vf = f"fade=t=in:st=0:d=0.35,fade=t=out:st={max(dur / speed - 0.45, 0):.2f}:d=0.45"
+    vf = ("fade=t=in:st=0:d=0.35," if fade_in else "") + f"fade=t=out:st={max(dur / speed - 0.45, 0):.2f}:d=0.45"
     fade_a = 0.3 if spec.get("enabled", True) else 0.9           # an end screen follows: don't fade the last word
     af = f"afade=t=in:st=0:d=0.15,afade=t=out:st={max(dur / speed - fade_a, 0):.2f}:d={fade_a}"
     if speed != 1.0:

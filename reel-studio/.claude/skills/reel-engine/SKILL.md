@@ -108,6 +108,11 @@ e.g. "it's on my face" → move it there and press Save.
    user likes something ("save that as my 'spotlight'"), save it:
    `python -m engine effect-save spotlight --options "punch-in;label:{text}" --name "what it does"`.
 5. **Build.** `python -m engine render <project>` → `renders/final.mp4` + `renders/cover.jpg`.
+   Every reel OPENS ON A COVER (never black before play): a picture + kicker + title that says what the video is
+   about, held 0.6 s then cross-faded in, also embedded as the file thumbnail. Default text = the reel's first
+   title; always set it yourself in the plan: `"cover": {"kicker": "...", "title": "...", "photo": "<best
+   picture, face visible>" or "at": <sec>, "y": 0.72}` — keep the title off faces (check renders/cover.jpg).
+   Only `"cover": {"enabled": false}` if the user asks for no cover.
    Use `--preview` for a fast half-size check when making several changes.
 6. **Tweak.** Small changes ("bigger", "move my logo", "less stickers", "later") — either edit
    `timeline.json` directly or open the manual editor: `python -m engine editor <project>`
