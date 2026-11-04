@@ -55,6 +55,10 @@ def build_base(tl, pack, out, scale=1.0, crf=18):
     # b-roll: laid over the A-roll picture, A-roll audio keeps playing
     for k, br in enumerate(tl.get("broll", [])):
         s, d, si = br["start"], br["dur"], br.get("src_in", 0)
+        # snap to the frame grid and run one frame long (the next clip sits on top): float starts like
+        # 5.800000000000001 otherwise leave a one-frame gap that flashes the background colour at a cut
+        s = round(round(s * fps) / fps, 4)
+        d = round(round(d * fps) / fps + 1.0 / fps, 4)
         if br["file"].lower().endswith((".jpg", ".jpeg", ".png", ".webp")):  # photos: hold as a still
             inputs += ["-loop", "1", "-framerate", str(fps), "-t", str(d + 0.2), "-i", _abs(br["file"])]
             si = 0

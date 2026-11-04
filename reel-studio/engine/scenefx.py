@@ -167,6 +167,7 @@ class Ctx:
             if not self.base:
                 return None
             raw = subprocess.run(["ffmpeg", "-v", "quiet", "-ss", f"{max(t, 0):.3f}", "-i", self.base, "-frames:v", "1",
+                                  "-vf", f"scale={self.W}:{self.H}",   # preview bases are smaller than the graphics
                                   "-f", "rawvideo", "-pix_fmt", "rgba", "-"], capture_output=True).stdout
             if len(raw) < self.W * self.H * 4:
                 return None
