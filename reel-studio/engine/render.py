@@ -731,6 +731,7 @@ def build_base_cached(tl, pack, out_dir, scale):
     keys["broll_files"] = [_file_sig(_abs(b["file"])) for b in tl.get("broll", [])]   # a photo/clip replaced in place
     keys["pack_bg"] = pack["colors"].get("bg")
     keys["scale"] = scale
+    keys["engine"] = 2      # bump when build_base changes how the same timeline looks (2: no flash frame at cuts)
     path = os.path.join(out_dir, f"base-{_sig(keys)}.mp4")
     flag = path + ".voice"
     if os.path.exists(path) and os.path.exists(flag):
