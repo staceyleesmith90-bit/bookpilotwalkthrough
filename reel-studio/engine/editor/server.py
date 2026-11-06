@@ -219,6 +219,8 @@ class Handler(SimpleHTTPRequestHandler):
                 if not rel.startswith(("library", "brand")) or ".." in rel or not full.endswith(".wav"):
                     return self.send_error(404)
                 return self._file(full, "audio/wav")
+            if u.path == "/storyboard":                  # Storyboard: every moment as a still — tick before the build
+                return self._file(os.path.join(STATIC, "storyboard.html"), "text/html")
             if u.path == "/scenes":                      # Scene effects: 20 full-frame effects, previewed on their footage
                 return self._file(os.path.join(STATIC, "scenes.html"), "text/html")
             if u.path == "/scrapbook":                   # Scrapbook maker: every setting, live preview
@@ -242,6 +244,12 @@ class Handler(SimpleHTTPRequestHandler):
                                        "available": chat.available()})
                 if what == "scrapbooks":
                     return self._json(scrapbooks(slug))
+                if what == "storyboard":                # the moments, what each shows, ticks + notes
+                    if len(parts) > 4:
+                        fn = os.path.basename(parts[4])
+                        return self._file(project.path(slug, "renders", "storyboard", fn), "image/jpeg")
+                    sb = project.load(slug, "storyboard.json") or {}
+                    return self._json(dict(sb, job=JOBS.get(slug + ":storyboard")))
                 if what == "scenes":                    # the reel's lines + which scene effect each one has
                     return self._json(scene_lines(slug))
                 if what == "scene-clip":                # one effect, played on this reel's own footage (cached)
@@ -505,6 +513,42 @@ class Handler(SimpleHTTPRequestHandler):
                     im = preview(spec, packs.load(plan.get("pack")), data.get("t"))
                     im.thumbnail((540, 960))
                     return self._png(im, "JPEG")
+                if what == "storyboard":                # save ticks + notes; "build": apply them and render
+                    from .. import storyboard
+                    if data.get("redraw"):
+                        def job():
+                            JOBS[slug + ":storyboard"] = {"state": "drawing"}
+                            try:
+                                project.build_timeline(slug)
+                                storyboard.make(slug)
+                                JOBS[slug + ":storyboard"] = {"state": "done"}
+                            except Exception as e:
+                                JOBS[slug + ":storyboard"] = {"state": "error", "error": str(e)[-400:]}
+                        threading.Thread(target=job, daemon=True).start()
+                        return self._json({"ok": True, "state": "drawing"})
+                    sb = storyboard.save_choices(slug, data.get("moments", []))
+                    out = {"ok": True}
+                    if data.get("build"):
+                        r = storyboard.apply(slug)
+                        out["notes"] = r["notes"]
+                        if r["notes"]:                  # notes need Claude: hand them over through the chat box
+                            from .. import chat
+                            msg = ("Storyboard notes — please change these, redraw the storyboard, then build:\n"
+                                   + "\n".join(r["notes"]))
+                            if chat.status(slug).get("state") != "working":
+                                out["chat"] = chat.send(slug, msg)
+                        else:                           # nothing to rewrite: build straight away
+                            def job():
+                                JOBS[slug] = {"state": "rendering"}
+                                try:
+                                    project.build_timeline(slug)
+                                    project.do_render(slug)
+                                    JOBS[slug] = {"state": "done"}
+                                except Exception as e:
+                                    JOBS[slug] = {"state": "error", "error": str(e)[-400:]}
+                            threading.Thread(target=job, daemon=True).start()
+                            out["state"] = "rendering"
+                    return self._json(out)
                 if what == "scene-set":                 # put an effect on a line (fx "" = none), rebuild the edit
                     return self._json(scene_set(slug, int(data.get("line", 0)), str(data.get("fx", "")),
                                                 data.get("series")))

@@ -19,6 +19,8 @@
   python -m engine mg-preview <kind> [--set k=v] motion graphic preview strip (pills|window|timeline|bars|dial|toggle|button)
   python -m engine scene-list                    the 65 full-frame scene effects (scene:<name> in a plan)
   python -m engine scene-preview <effect> --clips <video> [--set k=v]   preview strip of one scene effect
+  python -m engine storyboard <project>          one still per moment + cover, before the full render (cheap)
+  python -m engine storyboard-apply <project>    use the ticks/notes from the storyboard page
   python -m engine effects-update [check]        get new effects from the 45-effect pack (she adds them often)
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
@@ -257,6 +259,18 @@ def main(argv=None):
         for k, v in scenefx.LABELS.items():
             print(f"{k:24} {v}{'   (45-effect pack, @vibha.in.progress)' if k in scenefx.V45 else ''}")
         print("overlays: series (plan option \"series\"), tag_wall")
+    elif c == "storyboard":
+        from . import storyboard
+        sb = storyboard.make(a.arg)
+        print(f"Storyboard: {len(sb['moments'])} moments{' + cover' if sb['cover'] else ''}")
+        print(f"  sheet: projects/{a.arg}/renders/storyboard/storyboard.jpg")
+        print(f"  tick/notes page: Studio → /storyboard?p={a.arg}")
+    elif c == "storyboard-apply":
+        from . import storyboard
+        r = storyboard.apply(a.arg)
+        print(f"{r['changed']} moment(s) changed (unticked = footage only).")
+        for n in r["notes"]:
+            print("  note: " + n)
     elif c == "effects-update":
         from .vfx45.update import update
         r = update(check_only=a.arg == "check")

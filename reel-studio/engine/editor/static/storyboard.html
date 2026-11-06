@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/brand-sp/favicon.png"><title>Storyboard · Reel Studio</title>
+<style>
+  @font-face { font-family: "Inter"; src: url("/fonts/Inter-Variable.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "Poppins"; src: url("/fonts/Poppins-Bold.ttf"); font-weight: 700; }
+  :root { --bg: #F3F5FB; --surface: #FFFFFF; --ink: #0E1638; --muted: #5F6889; --line: #E3E7F2; --soft: #EEF1F9;
+          --accent: #2E5BFF; --accent-soft: #E8EEFF; --ok: #13865A; --r: 16px;
+          --grad: linear-gradient(100deg, #18A9F5 0%, #3D5CFF 42%, #8A3BF0 75%, #E64BC8 100%); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14.5px/1.5 "Inter", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  h1, h2 { font-family: "Poppins", "Inter", sans-serif; letter-spacing: -.015em; margin: 0; }
+  button, input, textarea { font: inherit; color: inherit; }
+  header { display: flex; align-items: center; gap: 14px; padding: 18px 24px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  header h1 { font-size: 20px; } header small { color: var(--muted); }
+  header .right { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn { border: 0; border-radius: 10px; padding: 10px 18px; background: var(--grad); color: #fff; font-weight: 600; cursor: pointer; }
+  .btn.ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  main { max-width: 1280px; margin: 0 auto; padding: 22px 24px 120px; }
+  .intro { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; margin-bottom: 18px; }
+  .intro p { margin: 4px 0 0; color: var(--muted); }
+  .gauge { display: inline-flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  .gauge b { padding: 2px 9px; border-radius: 999px; background: #E3F6EC; color: var(--ok); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+  .m { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+  .m.on { border-color: var(--accent); }
+  .m .pic { aspect-ratio: 9/16; background: var(--soft) center/cover no-repeat; position: relative; cursor: pointer; }
+  .m:not(.on) .pic { filter: grayscale(.85) opacity(.55); }
+  .m .n { position: absolute; top: 8px; left: 8px; background: var(--ink); color: #fff; font-weight: 700; font-size: 12px; padding: 2px 9px; border-radius: 8px; }
+  .m .tick { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-weight: 800; color: var(--muted); box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .m.on .tick { background: var(--accent); color: #fff; }
+  .m .body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .m .t { font-size: 12px; color: var(--muted); }
+  .m ul { margin: 0; padding-left: 16px; font-size: 12.5px; }
+  .m textarea { width: 100%; min-height: 52px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 7px 9px; font-size: 12.5px; background: var(--soft); }
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 14px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .bar .msg { color: var(--muted); flex: 1; min-width: 200px; }
+  #rs-chat { bottom: 86px !important; }                 /* the chat box sits above the Build bar */
+  @media (max-width: 600px) { #rs-chat { bottom: 128px !important; } }
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  @media (max-width: 600px) { main { padding: 16px 16px 140px; } .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } header { padding: 14px 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Storyboard</h1><small id="proj"></small></div>
+  <div class="right"><a class="btn ghost" id="back" href="/">Studio</a><button class="btn ghost" id="redraw">Redraw</button></div>
+</header>
+<main>
+  <div class="intro">
+    <h2 style="font-size:16px">See your reel before it's built</h2>
+    <p>Each card is one moment with its text, stickers and effect already drawn on. Tap a card to switch its graphics
+      off (the footage stays). Write a note on any card ("bigger", "move the text left", "a different sticker").
+      Then press <b>Build my reel</b>: only what you kept gets made.</p>
+    <div class="gauge">Claude usage for this step: <b>light</b> (the pictures are drawn by the studio itself)</div>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+<div class="bar">
+  <span class="msg" id="msg"></span>
+  <button class="btn ghost" id="save">Save notes</button>
+  <button class="btn" id="build">Build my reel</button>
+</div>
+<script>
+const slug = new URLSearchParams(location.search).get("p") || "";
+document.getElementById("proj").textContent = slug;
+let sb = null;
+const $ = id => document.getElementById(id);
+async function load() {
+  const r = await fetch(`/api/p/${slug}/storyboard`); sb = await r.json();
+  const g = $("grid"); g.innerHTML = "";
+  if (!sb.moments || !sb.moments.length) {
+    g.innerHTML = `<div class="empty">No storyboard yet. Press <b>Redraw</b> to draw one.</div>`;
+    if (sb.job && sb.job.state === "drawing") { $("msg").textContent = "Drawing your storyboard…"; setTimeout(load, 3000); }
+    return;
+  }
+  if (sb.cover) g.appendChild(card({n: "cover", img: "cover.jpg", shows: ["the cover people see before they press play",
+      ...(sb.cover_text || []).filter(Boolean).map(t => `"${t}"`)], cover: true}));
+  sb.moments.forEach(m => g.appendChild(card(m)));
+  $("msg").textContent = `${sb.moments.filter(m => m.keep).length} of ${sb.moments.length} moments keep their graphics`;
+}
+function card(m) {
+  const el = document.createElement("div");
+  el.className = "m" + (m.cover || m.keep ? " on" : "");
+  const time = m.cover ? "before play" : `${m.start.toFixed(1)}–${m.end.toFixed(1)} s`;
+  el.innerHTML = `<div class="pic" style="background-image:url('/api/p/${slug}/storyboard/${m.img}?v=${Date.now()}')">
+      <span class="n">${m.cover ? "cover" : m.n}</span>${m.cover ? "" : `<span class="tick">✓</span>`}</div>
+    <div class="body"><span class="t">${time}</span><ul>${m.shows.map(s => `<li>${s.replace(/</g, "&lt;")}</li>`).join("")}</ul>
+    ${m.cover ? "" : `<textarea placeholder="A note for this moment (optional)"></textarea>`}</div>`;
+  if (!m.cover) {
+    el.querySelector(".pic").onclick = () => { m.keep = !m.keep; el.classList.toggle("on", m.keep); count(); };
+    const ta = el.querySelector("textarea"); ta.value = m.note || ""; ta.oninput = () => m.note = ta.value;
+  }
+  return el;
+}
+function count() { $("msg").textContent = `${sb.moments.filter(m => m.keep).length} of ${sb.moments.length} moments keep their graphics`; }
+async function send(build) {
+  const body = {moments: sb.moments.map(m => ({n: m.n, keep: m.keep, note: m.note || ""})), build};
+  const r = await fetch(`/api/p/${slug}/storyboard`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  const d = await r.json();
+  if (!build) { $("msg").textContent = "Saved."; return; }
+  if (d.notes && d.notes.length) $("msg").textContent = "Your notes went to Claude in the chat box: it makes the changes and redraws the storyboard first.";
+  else { $("msg").textContent = "Building your reel… it shows up on the Studio home page when it's ready."; $("build").disabled = true; }
+}
+$("save").onclick = () => send(false);
+$("build").onclick = () => send(true);
+$("redraw").onclick = async () => {
+  await fetch(`/api/p/${slug}/storyboard`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({redraw: true})});
+  $("msg").textContent = "Drawing your storyboard…"; setTimeout(load, 4000);
+};
+load();
+</script>
+<script src="/chat.js"></script>
+</body>
+</html>

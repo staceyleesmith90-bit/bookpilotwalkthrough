@@ -327,6 +327,8 @@ def to_timeline(plan, rc=None, source=None):
     for bi, (a, b_end, beat, text, ws) in enumerate(windows):
         from .styleplan import expand
         do = expand(list(beat.get("do", [])), text)       # named effects (fx:<name>) -> treatments
+        if beat.get("skip_graphics"):                    # unticked on the storyboard: footage only, no graphics
+            do = [d for d in do if d.startswith("broll:")]
         on_video = base_on_video or any(d.startswith(("broll:", "scrapbook")) for d in do)
         taken = list(fixed) + ([FACE, CAPTION_BOX] if on_video else [])
         if base_on_video and source and not beat.get("broll"):

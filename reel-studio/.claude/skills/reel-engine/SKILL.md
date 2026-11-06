@@ -107,6 +107,21 @@ e.g. "it's on my face" → move it there and press Save.
    Named effects: `python -m engine effects` lists them; use `fx:<name>` in a beat. When the
    user likes something ("save that as my 'spotlight'"), save it:
    `python -m engine effect-save spotlight --options "punch-in;label:{text}" --name "what it does"`.
+4b. **Guide them like a teacher, then STORYBOARD (never skip, it saves their Claude usage).**
+   Before writing the plan, guide in 3 short taps (one question at a time, 2–4 tap answers):
+   (a) "What's this reel about, in one line?" (if they haven't said) · (b) "Which vibe?" — offer 2–3 looks
+   that fit the story (e.g. *playful scrapbook · soft & dreamy · bold & funny*) · (c) "These are the effects I'd
+   use for this story:" — name 2–3 that fit *their* moments, each in plain words ("a freeze + arrow when she
+   looks at you", "sticky notes popping round her head for the list") and point to the moving previews on
+   the Studio's Scene effects page (`/scenes?p=<project>`). Teach one sentence of *why* each one works.
+   Then `python -m engine timeline <project>` + `python -m engine storyboard <project>` (stills drawn by the
+   engine, ~3 s a moment, no full render) and send them to the **Storyboard page** `/storyboard?p=<project>`
+   (or the one-image sheet `renders/storyboard/storyboard.jpg`). They tick moments + write notes there.
+   Read `storyboard.json` (never the pictures again): `python -m engine storyboard-apply <project>` turns
+   unticked moments into footage only and prints their notes; apply the notes to plan.json, redraw once if
+   anything visible changed, then build. Say the usage in one word after each pass: storyboard **light** ·
+   full render + check **medium** · many rounds of changes after the render **heavy** (that's why the
+   storyboard comes first).
 5. **Build.** `python -m engine render <project>` → `renders/final.mp4` + `renders/cover.jpg`.
    Every reel OPENS ON A COVER (never black before play): a picture + kicker + title that says what the video is
    about, held 0.6 s then cross-faded in, also embedded as the file thumbnail. Default text = the reel's first
