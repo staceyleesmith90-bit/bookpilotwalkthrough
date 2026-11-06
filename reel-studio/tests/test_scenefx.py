@@ -57,3 +57,20 @@ def test_effects_pack_names_are_read_and_registered():
     assert all(n in theirs for n, _ in names)            # every effect in fx.py is usable in plans
     src = open(os.path.join(os.path.dirname(scenefx.__file__), "vfx45", "fx.py"), encoding="utf-8").read()
     assert all(new in src for _, new in PATCHES)         # our fixes are in the installed copy
+
+
+def test_object_effects_registered_and_draw():
+    from PIL import Image
+    from engine import scenefx, objectfx
+    for fx in objectfx.EFFECTS:
+        assert fx in scenefx.EFFECTS and fx in scenefx.LABELS and fx in scenefx.PERSON
+        snd = scenefx.sounds({"fx": fx, "start": 1.0, "end": 1.0 + objectfx.DUR[fx], "spec": {"items": ["a", "b"]}})
+        assert len(snd) >= 2 and all(1.0 <= s[0] < 1.0 + objectfx.DUR[fx] for s in snd)
+    ctx = scenefx.Ctx(540, 960, {"colors": {"paper": "#FFFFFF", "ink": "#111111", "pop": "#E58FA6", "bg": "#EEEEEE"}},
+                      scenes=[])
+    frame = Image.new("RGBA", (540, 960), (90, 120, 160, 255))
+    for fx, f in objectfx.EFFECTS.items():
+        out = f(frame, None, objectfx.DUR[fx] * 0.6, objectfx.DUR[fx], {"items": ["one", "two"]}, ctx, 1.0)
+        assert out.size == (540, 960) and out.getbbox()
+        assert list(out.getdata()) != list(frame.getdata()), fx
+    ctx.close()

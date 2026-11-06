@@ -230,6 +230,15 @@ words, no logos / page numbers / buttons. Each slide picks its own `photo` (imag
 - Use them where a line earns it (a change of topic, a list, a reveal) — a whole reel of them only for an
   "effects showcase". In the Studio: **Scene effects** page (`/scenes?p=<project>`): tap a line, tap an effect.
 
+## Object effects (our own, drawn by the studio — no Canva, no credits)
+A real-looking object DOES something around the person instead of flat pills — use these for any list,
+steps, plan, "things I need", wins: `scene:receipt_print` (printer slot above the head prints the lines, then it
+tears off) · `scene:label_tape` (embossed tape strips punch out and stack behind the head) ·
+`scene:sticky_notes` (notes slap on in an arch round the head) · `scene:stamp_card` (index card, a stamp
+thunks DONE on each line). Spec: `{"items": [...], "behind": true, "x"/"y" to pin, "step": 0.45, "color"}`;
+receipt `title`/`footer`, stamp `mark`. Each line gets its own sound. They sit above/around the head, behind
+the hair — still check the storyboard that nothing covers a face.
+
 ## The chat box (Studio)
 The timeline editor and Scrapbook maker have an **Ask Claude** box. A message runs Claude Code on that one
 reel (`engine/chat.py`): it edits the plan / timeline, renders a preview and replies in a sentence. One

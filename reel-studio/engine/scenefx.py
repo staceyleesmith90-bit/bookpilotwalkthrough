@@ -1608,6 +1608,11 @@ LABELS["collage"] = "Paper Collage"
 ABOUT["collage"] = "Painted stripes, you as a torn-paper cut-out, big serif title, typewriter labels, halftone stickers."
 PERSON.add("collage")
 
+# ---------------------------------------------------------------- object effects (engine/objectfx.py)
+from . import objectfx as _obj
+EFFECTS.update(_obj.EFFECTS); LABELS.update(_obj.LABELS); ABOUT.update(_obj.ABOUT); DUR.update(_obj.DUR)
+PERSON.update(_obj.EFFECTS)
+
 
 # ---------------------------------------------------------------- the renderer's entry point
 def apply(frame, t, ctx):
@@ -1641,6 +1646,8 @@ def sounds(scene):
         table = [(0.0, "page", 0.6)] + [(tt, "sticker_in", 0.55) for tt in element_times(scene.get("spec") or {})]
     if scene["fx"] in V45:
         table = _v45_sounds(scene["fx"], scene.get("spec"), dur) or table
+    if scene["fx"] in _obj.EFFECTS:                    # one sound per printed / punched / stamped line
+        table = _obj.sound_times(scene["fx"], scene.get("spec"), dur)
     for c in table:
         at, ev = c[0], c[1]
         g = c[2] if len(c) > 2 else 1.0
