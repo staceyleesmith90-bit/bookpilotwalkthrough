@@ -11,7 +11,9 @@ Don't settle for generic emoji when the story has things in it. Read the story, 
 one style for the whole set (`paper` · `clay` · `watercolour` · `doodle` · `retro` · `realistic` · `3d`;
 suggest the one that fits the vibe in one line), in the reel's colours — ONE generation draws them all, so
 they match. Show them on the storyboard before building.
-1. A generator is connected (`brand/ai.json` provider cloudflare / gemini / huggingface): 
+1. Default (nothing set up): the free **hfspace** generator — no account, works from the user's own computer
+   (small daily quota; if it says the quota is used up, fall back to 2 or 3). Or a connected one
+   (`brand/ai.json` provider cloudflare / gemini / huggingface): 
    `python -m engine elements <p> --items "a; b; c" --style clay --story "one line"` → `projects/<p>/elements/*.png`.
 2. Higgsfield connected in this chat: `python -m engine elements-prompts <p> --items ...` gives the exact prompt;
    generate it with the Higgsfield tool (1 sheet ≈ 1 credit; check the balance first), save the image to

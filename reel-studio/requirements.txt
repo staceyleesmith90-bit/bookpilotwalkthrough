@@ -9,3 +9,4 @@ pycapcut>=0.0.3
 playwright>=1.40
 opencv-python-headless>=4.8
 gdown>=5
+gradio_client>=1.3

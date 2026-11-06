@@ -10,6 +10,8 @@ proxy adds them for the host):
   cloudflare    Workers AI, FLUX.1 schnell — free daily allowance with a free account (needs "account_id")
   gemini        Google's Gemini image model — free tier with a free API key ("model" optional)
   huggingface   FLUX.1 schnell on HF inference — small free monthly credits
+  hfspace       the public FLUX.1 schnell demo (Hugging Face Space) — free with no account from a home connection
+                (small daily quota; shared cloud computers get none)
   pollinations  free, no account — low quality + watermark, last resort
   file          made anywhere else (Canva AI, ChatGPT, Higgsfield…): drop the image in elements/inbox/ and run
                 `python -m engine elements-cut <p> <image>` — `elements-prompts` writes the exact prompt to paste.
@@ -41,7 +43,7 @@ def config():
     try:
         return json.load(open(p))
     except Exception:
-        return {"provider": "file"}
+        return {"provider": "hfspace"}           # free, no account — works on the user's own computer
 
 
 def prompt(items, style=DEFAULT_STYLE, colors=None, story=""):
@@ -69,7 +71,7 @@ def _post(url, body, headers, timeout=180):
 def generate(text, out, provider=None, size=1024, seed=None):
     """Draw `text` with the configured generator into `out` (PNG). Returns out. Raises with a plain message."""
     cfg = config()
-    provider = provider or cfg.get("provider", "file")
+    provider = provider or cfg.get("provider", "hfspace")
     if provider == "cloudflare":
         acc = cfg.get("account_id") or os.environ.get("CLOUDFLARE_ACCOUNT_ID")
         if not acc:
@@ -89,6 +91,12 @@ def generate(text, out, provider=None, size=1024, seed=None):
         img, ct = _post(f"https://router.huggingface.co/hf-inference/models/{model}", {"inputs": text}, {})
         if "json" in ct:
             raise RuntimeError(img.decode()[:300])
+    elif provider == "hfspace":                  # the public FLUX.1 schnell demo: free, no account on a home
+        from gradio_client import Client         # connection (small daily GPU quota; a free HF token adds more)
+        c = Client(cfg.get("space", "black-forest-labs/FLUX.1-schnell"), hf_token=os.environ.get("HF_TOKEN"), verbose=False)
+        r = c.predict(prompt=text, seed=seed or 0, randomize_seed=seed is None, width=size, height=size,
+                      num_inference_steps=4, api_name="/infer")
+        img = open(r[0] if isinstance(r, (list, tuple)) else r, "rb").read()
     elif provider == "pollinations":
         q = urllib.parse.quote(text)
         url = f"https://image.pollinations.ai/prompt/{q}?width={size}&height={size}&nologo=true" + (f"&seed={seed}" if seed else "")
