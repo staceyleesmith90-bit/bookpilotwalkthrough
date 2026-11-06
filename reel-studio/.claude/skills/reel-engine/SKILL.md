@@ -88,6 +88,8 @@ e.g. "it's on my face" → move it there and press Save.
 
 ## The flow (always in this order)
 
+0. **Scripted first?** If `my-scripts/` has a script card for this reel, read its *Studio plan* block and start
+   the style plan from it (beats, effects, AI elements, cover line) — don't re-ask what it already answers.
 1. **Intake.** Find the footage (chat attachment, `inbox/`, or a path). **Big files / lots of b-roll → Google
    Drive:** they share the folder ("anyone with the link can view") and paste the link (chat, or Studio →
    Uploads → *Bring them in*); `python -m engine footage <project> <link or synced folder>` downloads it and

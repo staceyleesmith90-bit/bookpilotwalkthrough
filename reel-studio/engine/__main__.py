@@ -27,7 +27,7 @@
   python -m engine elements-cut <project> <sheet.png> [--items "..."]  cut a sticker sheet into separate stickers
   python -m engine footage <project> [<drive link | folder>]  fetch clips from Google Drive / a folder, then one
                                                  picture of every clip (renders/footage-sheet.jpg) to pick shots from
-  python -m engine transcribe-folder <folder> [--force]  Script Kit: old reels → <folder>/transcript/words.json
+  python -m engine transcribe-folder <folder> [--force]  old reels as text → <folder>/transcript/words.json
   python -m engine effects-update [check]        get new effects from the 45-effect pack (she adds them often)
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
@@ -321,7 +321,7 @@ def main(argv=None):
             print(f"  #{c_['n']} {c_['file']}  " + (f"{c_.get('duration')}s{' HDR' if c_.get('hdr') else ''}" if c_["kind"] == "video" else "photo"))
         if sheet:
             print("  picture of everything: " + os.path.relpath(sheet, project.ROOT))
-    elif c == "transcribe-folder":                  # the Script Kit's "transcribe my old reels"
+    elif c == "transcribe-folder":                  # their old reels as text (Script Studio, voice-hub)
         from .transcribe import transcribe
         folder = a.arg
         media = os.path.join(folder, "raw") if os.path.isdir(os.path.join(folder, "raw")) else folder

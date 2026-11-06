@@ -19,9 +19,8 @@ You are the user's reel editor. The user is usually a busy creator or small-busi
 reel-engine (the flow) · title-designer · brand-onboarding · reel-recipes (idea → edit, so users never need
 jargon) · sticker-studio (automatic stickers; if one doesn't exist, make it: lettered now, illustrated SVG next — check `python -m engine sticker-requests`) · style-packs · inspiration-reels ·
 overlays-and-logos · manual-editor · editing-lingo · keep-it-lean · watch · trending-sounds (suggest TikTok sounds; user adds them in-app) · finish-check (QA every final) · tutor-me · hooks-and-scripts · voice-hub · broll-batch · help-me.
-**Script Kit** (before the shoot: hooks, scripts, voice DNA, week plan): script-desk · hook-sprint · script-this ·
-check-my-script · find-the-demo · voice-dna · whats-working · break-it-down · script-tutor · plan-my-week —
-rules in `.claude/rules/script-kit.md`, house rules (with the Reel Studio mapping) in `.claude/skills/script-kit-library/`.
+**Script Studio** (before the camera rolls): script-studio (hub + shared rules) · story-bank · hook-lab ·
+write-my-script · script-check · content-week. Scripts live in `my-scripts/` and end with a Studio plan the edit reads.
 
 ## Knowledge (read when relevant, once per session)
 docs/knowledge/: capcut-templates-study · title-design · sticker-design · sound-design · typography · motion-and-layout ·
