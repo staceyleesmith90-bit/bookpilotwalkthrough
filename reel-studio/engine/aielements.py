@@ -10,6 +10,8 @@ proxy adds them for the host):
   cloudflare    Workers AI, FLUX.1 schnell — free daily allowance with a free account (needs "account_id")
   gemini        Google's Gemini image model — free tier with a free API key ("model" optional)
   huggingface   FLUX.1 schnell on HF inference — small free monthly credits
+  reelstudio    Reel Studio's own service (cloud/elements-worker, on the owner's Cloudflare) — customers need nothing
+  local         FLUX.1 schnell on this computer via stable-diffusion.cpp (MIT) — free + unlimited, needs ~10 GB
   hfspace       the public FLUX.1 schnell demo (Hugging Face Space) — free with no account from a home connection
                 (small daily quota; shared cloud computers get none)
   pollinations  free, no account — low quality + watermark, last resort
@@ -91,6 +93,29 @@ def generate(text, out, provider=None, size=1024, seed=None):
         img, ct = _post(f"https://router.huggingface.co/hf-inference/models/{model}", {"inputs": text}, {})
         if "json" in ct:
             raise RuntimeError(img.decode()[:300])
+    elif provider == "reelstudio":               # Reel Studio's own service (cloud/elements-worker): no account
+        url = cfg.get("url", "").rstrip("/")     # needed by the customer, their licence key is enough
+        if not url:
+            raise RuntimeError("The Reel Studio elements service isn't switched on yet (cloud/elements-worker).")
+        req = urllib.request.Request(url + "/v1/elements", data=json.dumps({"prompt": text, "size": size,
+                                     **({"seed": seed} if seed is not None else {})}).encode(),
+                                     headers={"Content-Type": "application/json",
+                                              "Authorization": "Bearer " + cfg.get("key", "")})
+        with urllib.request.urlopen(req, timeout=180) as r:
+            img = r.read()
+    elif provider == "local":                    # FLUX.1 schnell on this computer (stable-diffusion.cpp, MIT):
+        import subprocess                        # free + unlimited; fast on a GPU / Apple Silicon, slow on CPU
+        d = cfg.get("models", os.path.join(ROOT, "library", "models", "flux"))
+        sd = cfg.get("sd_bin", "sd-cli")
+        tmp = out + ".raw.png"
+        subprocess.run([sd, "--diffusion-model", os.path.join(d, "flux1-schnell-q4_0.gguf"),
+                        "--vae", os.path.join(d, "ae.safetensors"), "--clip_l", os.path.join(d, "clip_l.safetensors"),
+                        "--t5xxl", os.path.join(d, "t5-v1_1-xxl-encoder-Q4_K_M.gguf"), "-p", text,
+                        "--cfg-scale", "1.0", "--sampling-method", "euler", "--steps", "4",
+                        "-W", str(cfg.get("size", 768)), "-H", str(cfg.get("size", 768)),
+                        "--seed", str(seed if seed is not None else 42), "-o", tmp], check=True)
+        img = open(tmp, "rb").read()
+        os.remove(tmp)
     elif provider == "hfspace":                  # the public FLUX.1 schnell demo: free, no account on a home
         from gradio_client import Client         # connection (small daily GPU quota; a free HF token adds more)
         c = Client(cfg.get("space", "black-forest-labs/FLUX.1-schnell"), hf_token=os.environ.get("HF_TOKEN"), verbose=False)

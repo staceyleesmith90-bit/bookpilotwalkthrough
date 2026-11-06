@@ -1,0 +1,20 @@
+name = "reelstudio-elements"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[ai]
+binding = "AI"
+
+[vars]
+DAILY_LIMIT = "20"          # sticker sheets per licence key per day
+
+# Daily counters (and, optionally, the list of licence keys). Create them once:
+#   npx wrangler kv namespace create USAGE
+#   npx wrangler kv namespace create LICENSES
+# then paste the ids it prints below and remove the leading "# ".
+# [[kv_namespaces]]
+# binding = "USAGE"
+# id = "<id>"
+# [[kv_namespaces]]
+# binding = "LICENSES"
+# id = "<id>"
