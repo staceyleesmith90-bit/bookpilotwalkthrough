@@ -27,6 +27,7 @@
   python -m engine elements-cut <project> <sheet.png> [--items "..."]  cut a sticker sheet into separate stickers
   python -m engine footage <project> [<drive link | folder>]  fetch clips from Google Drive / a folder, then one
                                                  picture of every clip (renders/footage-sheet.jpg) to pick shots from
+  python -m engine transcribe-folder <folder> [--force]  Script Kit: old reels → <folder>/transcript/words.json
   python -m engine effects-update [check]        get new effects from the 45-effect pack (she adds them often)
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
@@ -144,6 +145,7 @@ def main(argv=None):
     ap.add_argument("--provider", help="elements: cloudflare | gemini | huggingface | pollinations | file")
     ap.add_argument("--story", help="elements: one line about the reel (theme for the drawings)")
     ap.add_argument("sheet", nargs="?", help="elements-cut: the sheet image")
+    ap.add_argument("--force", action="store_true", help="transcribe-folder: redo every video")
     a = ap.parse_args(argv)
     c = a.cmd
 
@@ -319,6 +321,25 @@ def main(argv=None):
             print(f"  #{c_['n']} {c_['file']}  " + (f"{c_.get('duration')}s{' HDR' if c_.get('hdr') else ''}" if c_["kind"] == "video" else "photo"))
         if sheet:
             print("  picture of everything: " + os.path.relpath(sheet, project.ROOT))
+    elif c == "transcribe-folder":                  # the Script Kit's "transcribe my old reels"
+        from .transcribe import transcribe
+        folder = a.arg
+        media = os.path.join(folder, "raw") if os.path.isdir(os.path.join(folder, "raw")) else folder
+        out = os.path.join(folder, "transcript", "words.json")
+        have = {} if a.force or not os.path.exists(out) else {c_["clip"]: c_ for c_ in json.load(open(out)).get("clips", [])}
+        clips = []
+        for f in sorted(os.listdir(media)):
+            if not f.lower().endswith((".mov", ".mp4", ".mkv", ".m4v")):
+                continue
+            if f in have:
+                clips.append(have[f]); continue
+            print(f"  transcribing {f}…")
+            r = transcribe(os.path.join(media, f))
+            clips.append({"clip": f, "path": os.path.join(media, f), "duration": r.get("duration"),
+                          "language": r.get("language"), "words": r["words"]})
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        json.dump({"clips": clips}, open(out, "w"), indent=1)
+        print(f"{len(clips)} reel(s) → {out}")
     elif c == "effects-update":
         from .vfx45.update import update
         r = update(check_only=a.arg == "check")
