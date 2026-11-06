@@ -88,7 +88,12 @@ e.g. "it's on my face" → move it there and press Save.
 
 ## The flow (always in this order)
 
-1. **Intake.** Find the footage (chat attachment, `inbox/`, or a path). Then
+1. **Intake.** Find the footage (chat attachment, `inbox/`, or a path). **Big files / lots of b-roll → Google
+   Drive:** they share the folder ("anyone with the link can view") and paste the link (chat, or Studio →
+   Uploads → *Bring them in*); `python -m engine footage <project> <link or synced folder>` downloads it and
+   draws ONE picture of every clip (`renders/footage-sheet.jpg`, frames marked @seconds; blurry/dark frames
+   score low in footage.json). Look at that one image, pick the moments yourself (`broll:<file>@<sec>`) —
+   never ask them to choose clips. Then
    `python -m engine new <file> --name <short-name>` (copies it; the original is never touched).
    Script-only / faceless reel: `python -m engine new - --name <name>`.
 2. **Rough cut.** `python -m engine roughcut <project>` — local transcription + removes pauses,

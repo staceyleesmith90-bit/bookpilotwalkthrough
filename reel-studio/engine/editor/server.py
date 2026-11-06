@@ -193,6 +193,8 @@ class Handler(SimpleHTTPRequestHandler):
                     return self._file(pth, mimetypes.guess_type(pth)[0] or "application/octet-stream")
                 except (ValueError, FileNotFoundError):
                     return self.send_error(404)
+            if u.path == "/api/drive-job":
+                return self._json(JOBS.get("drive", {"state": "idle"}))
             if u.path == "/api/trash":
                 from .. import library_user as lu
                 return self._json(lu.trash_list())
@@ -343,6 +345,21 @@ class Handler(SimpleHTTPRequestHandler):
                         f.write(chunk)
                         remaining -= len(chunk)
                 return self._json({"ok": True, "file": os.path.relpath(dst, project.ROOT)})
+            if u.path == "/api/drive":                   # a Google Drive link → its videos/photos into the Inbox
+                data = self._body()
+                link = str(data.get("link", "")).strip()
+                if "drive.google.com" not in link:
+                    return self._json({"ok": False, "error": "Paste a Google Drive link (shared: anyone with the link)."})
+                def job():
+                    JOBS["drive"] = {"state": "downloading"}
+                    try:
+                        from .. import footage
+                        got = footage.fetch(None, link, os.path.join(project.ROOT, "inbox"))
+                        JOBS["drive"] = {"state": "done", "files": got}
+                    except BaseException as e:            # fetch raises SystemExit with a plain message
+                        JOBS["drive"] = {"state": "error", "error": str(e)[-300:]}
+                threading.Thread(target=job, daemon=True).start()
+                return self._json({"ok": True})
             if u.path in ("/api/lut-upload", "/api/sound-upload"):   # raw body; ?name=Warm.cube / pop.mp3
                 import tempfile
                 n = int(self.headers.get("Content-Length", 0))

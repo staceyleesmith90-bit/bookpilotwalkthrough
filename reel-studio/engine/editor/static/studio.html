@@ -343,6 +343,11 @@
   <section id="tab-uploads" class="hidden">
     <h2>Uploads <small>Everything in your Inbox: videos, photos, sounds, filters and fonts. It stays on your computer.</small></h2>
     <div class="drop" id="upDrop">Drag files here or <u>choose files</u> (videos, photos, sounds, .cube filters)<input type="file" id="upFiles" multiple hidden></div>
+    <div class="drive" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 4px">
+      <input id="drvLink" placeholder="Videos too big? Paste a Google Drive link (file or folder)" style="flex:1;min-width:220px;padding:11px 13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:inherit">
+      <button class="cta" id="drvGo">Bring them in</button>
+    </div>
+    <p class="note" id="drvMsg">Share the folder as <b>"Anyone with the link can view"</b>. Claude looks through everything and picks the best moments.</p>
     <div class="ups" id="upBox"></div>
   </section>
   <section id="tab-trash" class="hidden">
@@ -826,6 +831,23 @@ async function drawUploads() {
   $("#upBox").querySelectorAll("[data-trashup]").forEach(b => b.onclick = async () => { await api("/api/trash/add", { kind: "upload", id: b.dataset.trashup });
     toast("Moved to trash"); drawUploads(); });
 }
+(() => { const go = $("#drvGo"), msg = $("#drvMsg");
+  if (!go) return;
+  go.onclick = async () => {
+    const link = $("#drvLink").value.trim(); if (!link) return;
+    const r = await (await fetch("/api/drive", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({link})})).json();
+    if (!r.ok) { msg.textContent = r.error; return; }
+    go.disabled = true; msg.textContent = "Downloading from Google Drive… big videos take a minute.";
+    const poll = async () => {
+      const j = await (await fetch("/api/drive-job")).json();
+      if (j.state === "downloading") return setTimeout(poll, 2500);
+      go.disabled = false;
+      msg.textContent = j.state === "done" ? `${j.files.length} file(s) added to your Inbox.` : (j.error || "That didn't work.");
+      if (typeof drawUploads === "function") drawUploads();
+    };
+    poll();
+  };
+})();
 (() => { const d = $("#upDrop"), f = $("#upFiles");
   const send = async files => { for (const x of files) { d.firstChild.textContent = "Uploading " + x.name + "…"; await upload(x); }
     d.firstChild.textContent = "Drag files here or "; toast("Uploaded"); drawUploads(); load(); };

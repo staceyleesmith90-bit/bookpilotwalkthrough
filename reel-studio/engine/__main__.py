@@ -25,6 +25,8 @@
                                                  AI-made stickers for this reel, one matching set (see engine/aielements.py)
   python -m engine elements-prompts <project> --items "..."  the prompt to paste into Canva AI / ChatGPT / Higgsfield
   python -m engine elements-cut <project> <sheet.png> [--items "..."]  cut a sticker sheet into separate stickers
+  python -m engine footage <project> [<drive link | folder>]  fetch clips from Google Drive / a folder, then one
+                                                 picture of every clip (renders/footage-sheet.jpg) to pick shots from
   python -m engine effects-update [check]        get new effects from the 45-effect pack (she adds them often)
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
@@ -303,6 +305,20 @@ def main(argv=None):
             print(f"{len(paths)} sticker(s) from one sheet:")
             for p_ in paths:
                 print("  " + os.path.relpath(p_, project.ROOT))
+    elif c == "footage":
+        from . import footage
+        if not os.path.isdir(project.path(a.arg)):
+            os.makedirs(project.path(a.arg), exist_ok=True)
+            project.save(a.arg, "project.json", {"slug": a.arg, "source": None, "brand": None})
+        if a.sheet:
+            got = footage.fetch(a.arg, a.sheet)
+            print(f"{len(got)} new file(s) from {'Google Drive' if 'drive.google' in a.sheet else 'the folder'}")
+        clips, sheet = footage.scan(a.arg)
+        print(f"{len(clips)} clip(s)/photo(s):")
+        for c_ in clips:
+            print(f"  #{c_['n']} {c_['file']}  " + (f"{c_.get('duration')}s{' HDR' if c_.get('hdr') else ''}" if c_["kind"] == "video" else "photo"))
+        if sheet:
+            print("  picture of everything: " + os.path.relpath(sheet, project.ROOT))
     elif c == "effects-update":
         from .vfx45.update import update
         r = update(check_only=a.arg == "check")
