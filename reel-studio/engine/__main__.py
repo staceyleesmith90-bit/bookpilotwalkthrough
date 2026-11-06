@@ -21,6 +21,10 @@
   python -m engine scene-preview <effect> --clips <video> [--set k=v]   preview strip of one scene effect
   python -m engine storyboard <project>          one still per moment + cover, before the full render (cheap)
   python -m engine storyboard-apply <project>    use the ticks/notes from the storyboard page
+  python -m engine elements <project> --items "a; b; c" [--style paper|clay|watercolour|doodle|retro|realistic|3d]
+                                                 AI-made stickers for this reel, one matching set (see engine/aielements.py)
+  python -m engine elements-prompts <project> --items "..."  the prompt to paste into Canva AI / ChatGPT / Higgsfield
+  python -m engine elements-cut <project> <sheet.png> [--items "..."]  cut a sticker sheet into separate stickers
   python -m engine effects-update [check]        get new effects from the 45-effect pack (she adds them often)
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
@@ -134,6 +138,10 @@ def main(argv=None):
     ap.add_argument("--role", help="font role: headline, accent, caption, script, serif, sans, sticker, sticker_label")
     ap.add_argument("--cutout", action="store_true", help="gif-make: lift the person out of the background")
     ap.add_argument("--business", action="store_true", help="sound is approved for business accounts")
+    ap.add_argument("--items", help="elements: what to draw, separated by ;  e.g. \"sand bucket; splash\"")
+    ap.add_argument("--provider", help="elements: cloudflare | gemini | huggingface | pollinations | file")
+    ap.add_argument("--story", help="elements: one line about the reel (theme for the drawings)")
+    ap.add_argument("sheet", nargs="?", help="elements-cut: the sheet image")
     a = ap.parse_args(argv)
     c = a.cmd
 
@@ -271,6 +279,30 @@ def main(argv=None):
         print(f"{r['changed']} moment(s) changed (unticked = footage only).")
         for n in r["notes"]:
             print("  note: " + n)
+    elif c in ("elements", "elements-prompts", "elements-cut"):
+        from . import aielements as ae
+        items = [x.strip() for x in (a.items or "").split(";") if x.strip()]
+        style = a.style or ae.DEFAULT_STYLE
+        if c == "elements-prompts":
+            txt = ae.prompt(items, style, ae.colors_of(a.arg), a.story or "")
+            open(project.path(a.arg, "elements-prompt.txt"), "w").write(txt + "\n")
+            print(txt)
+            print(f"\n(saved: projects/{a.arg}/elements-prompt.txt — paste it into Canva AI / ChatGPT / Higgsfield, "
+                  f"save the image into projects/{a.arg}/elements/inbox/, then elements-cut it)")
+        elif c == "elements-cut":
+            paths = ae.cut(a.sheet, project.path(a.arg, "elements"), items or None)
+            print(f"{len(paths)} sticker(s):")
+            for p_ in paths:
+                print("  " + os.path.relpath(p_, project.ROOT))
+        else:
+            try:
+                paths, txt = ae.make(a.arg, items, style, a.provider, a.story or "")
+            except Exception as e:
+                print(f"Couldn't make them: {e}")
+                sys.exit(1)
+            print(f"{len(paths)} sticker(s) from one sheet:")
+            for p_ in paths:
+                print("  " + os.path.relpath(p_, project.ROOT))
     elif c == "effects-update":
         from .vfx45.update import update
         r = update(check_only=a.arg == "check")

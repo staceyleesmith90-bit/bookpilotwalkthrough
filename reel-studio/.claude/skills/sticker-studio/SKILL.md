@@ -5,6 +5,26 @@ description: Choose, style and draw stickers, doodles, icons, emoji and badges f
 
 # Sticker Studio
 
+## AI elements first: every reel gets its OWN set (what makes Reel Studio different)
+Don't settle for generic emoji when the story has things in it. Read the story, pick 4–8 elements that are
+*in it* (Liara's sandbox → sand bucket + spade, splash, baby bottle, tiny alarm clock, "mom on duty" badge),
+one style for the whole set (`paper` · `clay` · `watercolour` · `doodle` · `retro` · `realistic` · `3d`;
+suggest the one that fits the vibe in one line), in the reel's colours — ONE generation draws them all, so
+they match. Show them on the storyboard before building.
+1. A generator is connected (`brand/ai.json` provider cloudflare / gemini / huggingface): 
+   `python -m engine elements <p> --items "a; b; c" --style clay --story "one line"` → `projects/<p>/elements/*.png`.
+2. Higgsfield connected in this chat: `python -m engine elements-prompts <p> --items ...` gives the exact prompt;
+   generate it with the Higgsfield tool (1 sheet ≈ 1 credit; check the balance first), save the image to
+   `projects/<p>/elements/inbox/`, then `python -m engine elements-cut <p> <image> --items "..."`.
+3. Nothing connected: hand them the `elements-prompts` text for **Canva AI (Magic Media) / ChatGPT** —
+   "paste this, download the picture, drop it in your elements inbox" — then `elements-cut` it.
+   The free no-account generator (pollinations) is a last resort: quality is poor + watermarked; say so.
+Use them as `{"image": "projects/<p>/elements/<name>.png", ...}` stickers (collage scenes, plan stickers).
+Realistic props for object effects (a recipe box, a vintage printer) come from the same flow with `--style realistic`.
+Setting up a free generator: Cloudflare (free daily allowance — account id in brand/ai.json, the API token
+through the session's secure credential form for api.cloudflare.com) or a Google AI Studio key (host
+generativelanguage.googleapis.com, header `x-goog-api-key`). Never ask for keys in the chat.
+
 **Premium by default.** Read `docs/knowledge/premium-look.md`. Reels use the glass kit unless the
 brand is deliberately playful (`"look": "playful"`): frosted glass chips (`badge:`), glass icons
 (`icon:`), product **callouts** (`callout:ULTRA THIN|2mm core@540,1000` — dot at x,y on the
