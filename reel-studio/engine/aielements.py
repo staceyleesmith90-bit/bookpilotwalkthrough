@@ -56,11 +56,11 @@ def prompt(items, style=DEFAULT_STYLE, colors=None, story=""):
         pal = " Colour palette: " + ", ".join(c for c in colors if c) + "."
     n = len(items)
     cols = 3 if n > 4 else 2
-    return (f"A sticker sheet with exactly {n} separate stickers arranged in a neat grid of {cols} columns, "
-            f"each one isolated with lots of empty space around it, nothing overlapping, no text unless written "
-            f"below. Stickers, in reading order: " + "; ".join(f"({i + 1}) {it}" for i, it in enumerate(items)) +
-            f". Style: {look}.{pal} " + (f"Theme: {story}. " if story else "") +
-            "Plain pure white background, no shadows on the background, no border around the sheet, high detail.")
+    return (f"A sticker sheet with exactly {n} separate objects in a neat grid of {cols} columns, read left to right, "
+            f"top to bottom: " + ", then ".join(items) + ". Draw exactly these objects and nothing else — no people, "
+            f"no extra objects. Each one isolated with lots of empty space around it, nothing touching. "
+            f"Style: {look}.{pal} " + (f"Mood: {story}. " if story else "") +
+            "Flat pure white background, no drop shadows, no numbers, no letters, no labels, no border, high detail.")
 
 
 # ---------------------------------------------------------------- generators
@@ -145,10 +145,32 @@ def _background_mask(rgb, tol=28):
     a = rgb.astype(np.int16)
     corners = np.concatenate([a[:8, :8].reshape(-1, 3), a[:8, -8:].reshape(-1, 3), a[-8:, :8].reshape(-1, 3), a[-8:, -8:].reshape(-1, 3)])
     bg = np.median(corners, 0)
-    near = (np.abs(a - bg).max(2) < tol).astype(np.uint8)
+    # near the sheet colour, OR a pale grey/white with almost no colour (the soft drop shadows generators add)
+    sat = a.max(2) - a.min(2)
+    near = ((np.abs(a - bg).max(2) < tol) | ((a.min(2) > bg.min() - 80) & (sat < 32))).astype(np.uint8)
     n, lab = cv2.connectedComponents(near, connectivity=4)
     edge = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
     return np.isin(lab, list(edge)) & (near > 0)
+
+
+def _ai_alpha(im):
+    """Alpha mask (uint8 H×W) from rembg's general-purpose cut-out model, or None if rembg isn't installed."""
+    if os.environ.get("REEL_NO_REMBG"):
+        return None
+    try:
+        from rembg import new_session, remove
+    except Exception:
+        return None
+    global _REMBG
+    try:
+        _REMBG
+    except NameError:
+        _REMBG = new_session("isnet-general-use")
+    try:
+        out = remove(im, session=_REMBG, only_mask=True)
+        return np.asarray(out.convert("L"))
+    except Exception:
+        return None
 
 
 def cut(sheet, out_dir, names=None, border=0, min_area=0.004):
@@ -159,7 +181,13 @@ def cut(sheet, out_dir, names=None, border=0, min_area=0.004):
         im.thumbnail((1600, 1600), Image.LANCZOS)
     rgb = np.asarray(im)
     H, W = rgb.shape[:2]
-    fg = (~_background_mask(rgb)).astype(np.uint8)
+    ai = _ai_alpha(im)                                                  # AI cut-out (rembg, MIT) when installed
+    if ai is not None:
+        soft = ai
+        fg = (ai > 110).astype(np.uint8)
+    else:
+        fg = (~_background_mask(rgb)).astype(np.uint8)
+        soft = None
     fg = cv2.morphologyEx(fg, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
     blob = cv2.dilate(fg, np.ones((15, 15), np.uint8))                 # join a sticker's loose bits (eyes, sparkles)
     n, lab, stats, cen = cv2.connectedComponentsWithStats(blob, connectivity=8)
@@ -170,7 +198,11 @@ def cut(sheet, out_dir, names=None, border=0, min_area=0.004):
     boxes.sort(key=lambda b: (round((b[1] + b[3] / 2) / rowh), b[0]))
     os.makedirs(out_dir, exist_ok=True)
     paths = []
-    alpha_full = Image.fromarray((fg * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.2))
+    if soft is not None:                                                # the model's own soft edge
+        alpha_full = Image.fromarray(soft)
+    else:
+        fg = cv2.erode(fg, np.ones((3, 3), np.uint8))                   # shave the last pale fringe pixel
+        alpha_full = Image.fromarray((fg * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.0))
     for k, (x, y, w, h, i) in enumerate(boxes):
         pad = 8
         x0, y0, x1, y1 = max(0, x - pad), max(0, y - pad), min(W, x + w + pad), min(H, y + h + pad)

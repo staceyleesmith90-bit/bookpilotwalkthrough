@@ -15,7 +15,8 @@ def _sheet(path):
     im.save(path)
 
 
-def test_cut_finds_each_sticker_in_reading_order(tmp_path):
+def test_cut_finds_each_sticker_in_reading_order(tmp_path, monkeypatch):
+    monkeypatch.setenv("REEL_NO_REMBG", "1")                       # the plain colour cut, deterministic
     _sheet(tmp_path / "s.png")
     paths = aielements.cut(str(tmp_path / "s.png"), str(tmp_path / "out"), ["Bucket", "Splash!", "Cone", "Box"])
     assert [p.rsplit("/", 1)[1] for p in paths] == ["bucket.png", "splash.png", "cone.png", "box.png"]
@@ -26,4 +27,4 @@ def test_cut_finds_each_sticker_in_reading_order(tmp_path):
 
 def test_prompt_names_every_item_and_style():
     t = aielements.prompt(["a cat", "a hat"], "clay", ["#A98BD6"])
-    assert "(1) a cat" in t and "(2) a hat" in t and "clay" in t and "#A98BD6" in t and "white background" in t
+    assert "a cat, then a hat" in t and "no numbers" in t and "clay" in t and "#A98BD6" in t and "white background" in t
