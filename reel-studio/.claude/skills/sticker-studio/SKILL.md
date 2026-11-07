@@ -21,6 +21,12 @@ they match. Show them on the storyboard before building.
 3. Nothing connected: hand them the `elements-prompts` text for **Canva AI (Magic Media) / ChatGPT** —
    "paste this, download the picture, drop it in your elements inbox" — then `elements-cut` it.
    The free no-account generator (pollinations) is a last resort: quality is poor + watermarked; say so.
+**Moving stickers (free):** `python -m engine elements-animate <p> <sticker.png> --style bounce|wiggle|boil|pulse|float|spin|pop`
+→ `elements/moving/<name>-<motion>.webp`, used as a GIF item (`{"type": "gif", "file": ...}`). Pick the motion from
+the moment: alarm clock → wiggle, heart → pulse, bucket → bounce, hand-made looks → boil. Free animated emoji also
+exist (`anim:<name>` stickers, Noto Animated Emoji).
+**Each person uses their OWN Cloudflare** (their own free allowance): Studio → Free resources → *AI stickers: connect
+your free Cloudflare* (Account ID + "Workers AI" token, checked, saved only on their computer in brand/.env).
 Use them as `{"image": "projects/<p>/elements/<name>.png", ...}` stickers (collage scenes, plan stickers).
 Realistic props for object effects (a recipe box, a vintage printer) come from the same flow with `--style realistic`.
 Setting up a free generator: Cloudflare (free daily allowance — account id in brand/ai.json, the API token

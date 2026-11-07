@@ -28,3 +28,20 @@ def test_cut_finds_each_sticker_in_reading_order(tmp_path, monkeypatch):
 def test_prompt_names_every_item_and_style():
     t = aielements.prompt(["a cat", "a hat"], "clay", ["#A98BD6"])
     assert "a cat, then a hat" in t and "no numbers" in t and "clay" in t and "#A98BD6" in t and "white background" in t
+
+
+def test_animate_makes_a_looping_transparent_webp(tmp_path):
+    from PIL import ImageSequence
+    src = tmp_path / "s.png"
+    Image.new("RGBA", (120, 120), (0, 0, 0, 0)).save(src)
+    im = Image.open(src); d = ImageDraw.Draw(im); d.ellipse((10, 10, 110, 110), fill=(200, 80, 80, 255)); im.save(src)
+    for mv in aielements.MOTIONS:
+        out = aielements.animate(str(src), str(tmp_path / f"{mv}.webp"), mv, seconds=0.5, fps=10, px=100)
+        frames = [f.convert("RGBA") for f in ImageSequence.Iterator(Image.open(out))]
+        assert len(frames) == 5 and frames[0].getpixel((1, 1))[3] == 0
+
+
+def test_connect_cloudflare_rejects_bad_details_without_saving(tmp_path, monkeypatch):
+    monkeypatch.setattr(aielements, "ENV", str(tmp_path / ".env"))
+    ok, msg = aielements.connect_cloudflare("not-an-id", "x" * 40)
+    assert not ok and "Account ID" in msg and not (tmp_path / ".env").exists()

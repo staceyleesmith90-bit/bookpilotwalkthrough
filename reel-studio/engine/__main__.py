@@ -25,6 +25,8 @@
                                                  AI-made stickers for this reel, one matching set (see engine/aielements.py)
   python -m engine elements-prompts <project> --items "..."  the prompt to paste into Canva AI / ChatGPT / Higgsfield
   python -m engine elements-cut <project> <sheet.png> [--items "..."]  cut a sticker sheet into separate stickers
+  python -m engine elements-animate <project> <sticker.png> [--style bounce|wiggle|boil|pulse|float|spin|pop|all]
+                                                 a moving (GIF-style) version of a sticker, free
   python -m engine footage <project> [<drive link | folder>]  fetch clips from Google Drive / a folder, then one
                                                  picture of every clip (renders/footage-sheet.jpg) to pick shots from
   python -m engine transcribe-folder <folder> [--force]  old reels as text → <folder>/transcript/words.json
@@ -283,6 +285,13 @@ def main(argv=None):
         print(f"{r['changed']} moment(s) changed (unticked = footage only).")
         for n in r["notes"]:
             print("  note: " + n)
+    elif c == "elements-animate":
+        from . import aielements as ae
+        moves = ae.MOTIONS if (a.style or "bounce") == "all" else [a.style or "bounce"]
+        name = os.path.splitext(os.path.basename(a.sheet))[0]
+        for mv in moves:
+            out = ae.animate(a.sheet, project.path(a.arg, "elements", "moving", f"{name}-{mv}.webp"), mv)
+            print("  " + os.path.relpath(out, project.ROOT))
     elif c in ("elements", "elements-prompts", "elements-cut"):
         from . import aielements as ae
         items = [x.strip() for x in (a.items or "").split(";") if x.strip()]

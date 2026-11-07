@@ -40,10 +40,79 @@ STYLES = {
 DEFAULT_STYLE = "paper"
 
 
-def config():
-    p = os.path.join(ROOT, "brand", "ai.json")
+ENV = os.path.join(ROOT, "brand", ".env")              # the user's own keys: on their computer only, never in git
+
+
+def _env(name):
+    if os.environ.get(name):
+        return os.environ[name]
     try:
-        return json.load(open(p))
+        for line in open(ENV, encoding="utf-8"):
+            k, _, v = line.strip().partition("=")
+            if k.strip() == name:
+                return v.strip().strip('"').strip("'")
+    except OSError:
+        pass
+    return None
+
+
+def _set_env(values):
+    lines = []
+    try:
+        lines = [l.rstrip("\n") for l in open(ENV, encoding="utf-8")]
+    except OSError:
+        pass
+    keep = [l for l in lines if l.partition("=")[0].strip() not in values]
+    os.makedirs(os.path.dirname(ENV), exist_ok=True)
+    with open(ENV, "w", encoding="utf-8") as f:
+        f.write("\n".join(keep + [f"{k}={v}" for k, v in values.items()]) + "\n")
+    try:
+        os.chmod(ENV, 0o600)
+    except OSError:
+        pass
+
+
+def connect_cloudflare(account_id, token):
+    """Check the user's own Cloudflare details, then save them on this computer and switch AI elements to
+    Cloudflare. Returns (ok, message in plain words)."""
+    account_id, token = (account_id or "").strip(), (token or "").strip()
+    if not re.fullmatch(r"[0-9a-f]{32}", account_id):
+        return False, "That Account ID doesn't look right: it's 32 letters and numbers (Cloudflare home → right side)."
+    if len(token) < 20:
+        return False, "That token looks too short. Copy the whole token Cloudflare showed you."
+    ok = False
+    for url in ("https://api.cloudflare.com/client/v4/user/tokens/verify",
+                f"https://api.cloudflare.com/client/v4/accounts/{account_id}/tokens/verify"):
+        try:
+            req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                if json.loads(r.read()).get("success"):
+                    ok = True
+                    break
+        except Exception:
+            continue
+    if not ok:
+        return False, "Cloudflare didn't accept that token. Make a new one with the \"Workers AI\" template and try again."
+    _set_env({"CLOUDFLARE_ACCOUNT_ID": account_id, "CLOUDFLARE_API_TOKEN": token})
+    cfg = config()
+    cfg.update({"provider": "cloudflare"})
+    cfg.pop("account_id", None)
+    os.makedirs(os.path.dirname(_CFG), exist_ok=True)
+    json.dump(cfg, open(_CFG, "w"), indent=1)
+    return True, "Connected. Your AI stickers now use your own Cloudflare (free daily allowance)."
+
+
+def status():
+    cfg = config()
+    return {"provider": cfg.get("provider"), "cloudflare": bool(_env("CLOUDFLARE_API_TOKEN") and _env("CLOUDFLARE_ACCOUNT_ID"))}
+
+
+_CFG = os.path.join(ROOT, "brand", "ai.json")
+
+
+def config():
+    try:
+        return json.load(open(_CFG))
     except Exception:
         return {"provider": "hfspace"}           # free, no account — works on the user's own computer
 
@@ -75,12 +144,14 @@ def generate(text, out, provider=None, size=1024, seed=None):
     cfg = config()
     provider = provider or cfg.get("provider", "hfspace")
     if provider == "cloudflare":
-        acc = cfg.get("account_id") or os.environ.get("CLOUDFLARE_ACCOUNT_ID")
+        acc = cfg.get("account_id") or _env("CLOUDFLARE_ACCOUNT_ID")
         if not acc:
-            raise RuntimeError("Cloudflare needs your account id in brand/ai.json (\"account_id\").")
+            raise RuntimeError("Connect your Cloudflare first (Studio → Free resources → AI stickers).")
+        tok = _env("CLOUDFLARE_API_TOKEN")             # none = the network adds it (cloud sessions)
         model = cfg.get("model", "@cf/black-forest-labs/flux-1-schnell")
         raw, _ = _post(f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{model}",
-                       {"prompt": text, "steps": 8, **({"seed": seed} if seed is not None else {})}, {})
+                       {"prompt": text, "steps": 8, **({"seed": seed} if seed is not None else {})},
+                       {"Authorization": "Bearer " + tok} if tok else {})
         img = base64.b64decode(json.loads(raw)["result"]["image"])
     elif provider == "gemini":
         model = cfg.get("model", "gemini-2.5-flash-image")
@@ -247,3 +318,62 @@ def make(slug, items, style=DEFAULT_STYLE, provider=None, story="", seed=None):
     sheet = os.path.join(d, "sheets", f"sheet-{len(os.listdir(os.path.join(d, 'sheets'))) + 1 if os.path.isdir(os.path.join(d, 'sheets')) else 1}.png")
     generate(text, sheet, provider, seed=seed)
     return cut(sheet, d, items, border=int(config().get("border", 0))), text
+
+
+# ---------------------------------------------------------------- stickers that move (free, made here)
+MOTIONS = ("bounce", "wiggle", "boil", "pulse", "float", "spin", "pop")
+
+
+def animate(png, out, motion="bounce", seconds=1.6, fps=20, px=400):
+    """A still sticker → a looping transparent animated .webp (drop it in a reel as a GIF item).
+    bounce = squash-and-stretch hop · wiggle = side-to-side tilt · boil = hand-drawn stop-motion jitter ·
+    pulse = heartbeat · float = slow drift · spin = full turn · pop = springs in, holds, settles."""
+    import math, random
+    src = Image.open(png).convert("RGBA")
+    src.thumbnail((int(px * 0.78), int(px * 0.78)), Image.LANCZOS)
+    n = max(2, int(seconds * fps))
+    frames = []
+    rnd = random.Random(3)
+    for i in range(n):
+        p = i / n
+        sx = sy = 1.0
+        rot, dx, dy = 0.0, 0.0, 0.0
+        im = src
+        if motion == "bounce":
+            h = abs(math.sin(p * math.pi))
+            dy = -h * px * 0.14
+            sq = max(0.0, 1 - h * 4) if h < 0.25 else 0.0
+            sx, sy = 1 + 0.12 * sq, 1 - 0.12 * sq
+        elif motion == "wiggle":
+            rot = 9 * math.sin(p * 2 * math.pi * 2)
+        elif motion == "boil":                          # 12 fps hand-drawn jitter, three drawings
+            k = int(p * seconds * 12) % 3
+            r2 = random.Random(k + 11)
+            rot, dx, dy = r2.uniform(-2.5, 2.5), r2.uniform(-3, 3), r2.uniform(-3, 3)
+            sx = sy = 1 + r2.uniform(-0.015, 0.015)
+        elif motion == "pulse":
+            b = math.exp(-((p % 0.5) * 9)) * 0.14
+            sx = sy = 1 + b
+        elif motion == "float":
+            dy = math.sin(p * 2 * math.pi) * px * 0.04
+            rot = math.sin(p * 2 * math.pi + 1) * 3
+        elif motion == "spin":
+            rot = -360 * p
+        elif motion == "pop":
+            t = min(p / 0.35, 1.0)
+            c = 1.9
+            s = 1 + (c + 1) * (t - 1) ** 3 + c * (t - 1) ** 2 if t > 0 else 0.01
+            sx = sy = max(0.01, s)
+            rot = (1 - t) * -12
+        w, h = max(1, int(im.width * sx)), max(1, int(im.height * sy))
+        im = im.resize((w, h), Image.BICUBIC)
+        if rot:
+            im = im.rotate(rot, expand=True, resample=Image.BICUBIC)
+        fr = Image.new("RGBA", (px, px), (0, 0, 0, 0))
+        base_y = px / 2 + (src.height / 2 - h / 2 if motion == "bounce" else 0)      # squash from the feet
+        fr.alpha_composite(im, (int(px / 2 - im.width / 2 + dx), int(base_y - im.height / 2 + dy)))
+        frames.append(fr)
+    os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+    frames[0].save(out, save_all=True, append_images=frames[1:], duration=int(1000 / fps), loop=0,
+                   lossless=False, quality=88, method=4)
+    return out

@@ -193,6 +193,9 @@ class Handler(SimpleHTTPRequestHandler):
                     return self._file(pth, mimetypes.guess_type(pth)[0] or "application/octet-stream")
                 except (ValueError, FileNotFoundError):
                     return self.send_error(404)
+            if u.path == "/api/ai-status":               # AI stickers: which generator, is Cloudflare connected
+                from .. import aielements
+                return self._json(aielements.status())
             if u.path == "/api/drive-job":
                 return self._json(JOBS.get("drive", {"state": "idle"}))
             if u.path == "/api/trash":
@@ -345,6 +348,11 @@ class Handler(SimpleHTTPRequestHandler):
                         f.write(chunk)
                         remaining -= len(chunk)
                 return self._json({"ok": True, "file": os.path.relpath(dst, project.ROOT)})
+            if u.path == "/api/ai-connect":              # their own Cloudflare: checked, then saved on this computer
+                from .. import aielements
+                data = self._body()
+                ok, msg = aielements.connect_cloudflare(data.get("account_id"), data.get("token"))
+                return self._json({"ok": ok, "message": msg})
             if u.path == "/api/drive":                   # a Google Drive link → its videos/photos into the Inbox
                 data = self._body()
                 link = str(data.get("link", "")).strip()

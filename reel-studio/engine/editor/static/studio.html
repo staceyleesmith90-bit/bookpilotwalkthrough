@@ -446,6 +446,21 @@
       <div><h3 class="sub" style="margin-top:0">B-roll, photos and GIFs</h3>
         <p class="note">Download clips, photos or GIFs from the sites below and drop them into your <b>Inbox</b> folder (Documents → Reel Studio → inbox). Claude uses them where they fit.</p></div>
     </div>
+    <div class="fontcard" id="aiCard" style="margin-bottom:10px;grid-template-columns:1fr">
+      <div><h3 class="sub" style="margin-top:0">AI stickers: connect your free Cloudflare</h3>
+        <p class="note">Claude draws a matching set of stickers for every reel (clay, paper, watercolour, doodle…). Connect your own free Cloudflare account and you get your own daily allowance — roughly 170–230 sticker sheets a day, free. Your key stays on this computer.</p>
+        <ol class="note" style="margin:6px 0 10px 18px;padding:0">
+          <li>Sign up free at <a href="https://dash.cloudflare.com/sign-up" target="_blank" rel="noopener">dash.cloudflare.com</a> (no card).</li>
+          <li>Copy your <b>Account ID</b> (Account home → right side, or Workers &amp; Pages).</li>
+          <li>Profile → <b>API Tokens</b> → Create Token → template <b>"Workers AI"</b> → Create. Copy the token.</li>
+        </ol>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="cfAcc" placeholder="Account ID" autocomplete="off" style="flex:1;min-width:180px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);font:inherit">
+          <input id="cfTok" type="password" placeholder="API token" autocomplete="off" style="flex:1;min-width:180px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);font:inherit">
+          <button class="cta" id="cfGo">Connect</button>
+        </div>
+        <p class="note" id="cfMsg"></p></div>
+    </div>
     <div id="freeBox"></div>
     <p class="note">Two labels: <b>Free for your reels</b> means download what you need for your own videos (their rules don't allow collecting them into another library). <b>Open licence</b> means free for anything. Licences can change: the site is always the final word.</p>
   </section>
@@ -831,6 +846,17 @@ async function drawUploads() {
   $("#upBox").querySelectorAll("[data-trashup]").forEach(b => b.onclick = async () => { await api("/api/trash/add", { kind: "upload", id: b.dataset.trashup });
     toast("Moved to trash"); drawUploads(); });
 }
+(() => { const go = $("#cfGo"), msg = $("#cfMsg");
+  if (!go) return;
+  fetch("/api/ai-status").then(r => r.json()).then(st => { if (st.cloudflare) msg.textContent = "✅ Connected — your AI stickers use your own Cloudflare."; }).catch(() => {});
+  go.onclick = async () => {
+    go.disabled = true; msg.textContent = "Checking with Cloudflare…";
+    const r = await (await fetch("/api/ai-connect", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({account_id: $("#cfAcc").value, token: $("#cfTok").value})})).json();
+    go.disabled = false; msg.textContent = (r.ok ? "✅ " : "") + r.message;
+    if (r.ok) { $("#cfTok").value = ""; }
+  };
+})();
 (() => { const go = $("#drvGo"), msg = $("#drvMsg");
   if (!go) return;
   go.onclick = async () => {
