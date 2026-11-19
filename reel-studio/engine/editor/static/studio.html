@@ -919,9 +919,9 @@ async function openPosts(slug, rebuild) {
 // ------------------------------------------------------------ plan
 $("#planBtn").onclick = async e => { e.preventDefault(); const p = await api("/api/plan");
   const when = p.checked ? new Date(p.checked * 1000).toLocaleString() : "";
-  $("#planBody").innerHTML = `<h3>${p.dev ? "Tester / developer copy" : p.known ? (p.active ? "Reelmate: yours for good" : "Reelmate: key not active") : "Your Reelmate licence"}</h3>
-    <p class="sub">${p.dev ? "This copy isn't tied to a licence key." : p.known ? esc(p.message || "") + (p.renews ? ` Trial ends on ${esc(p.renews)}.` : "") : "Reelmate checks your key now and then when you use it with Claude. One payment, no subscription."}</p>
-    ${when ? `<p class="note">Last checked: ${esc(when)}. Bought copies keep working offline.</p>` : ""}
+  $("#planBody").innerHTML = `<h3>${p.dev ? "Tester / developer copy" : p.known ? (p.active ? "Reelmate: yours forever" : "Reelmate: key not active") : "Your Reelmate licence"}</h3>
+    <p class="sub">${p.dev ? "This copy isn't tied to a licence key." : p.known ? esc(p.message || "") + "" : "Reelmate checks your key now and then when you use it with Claude. One payment, no subscription."}</p>
+    ${when ? `<p class="note">Last checked: ${esc(when)}. Once activated, Reelmate keeps working, even offline.</p>` : ""}
     <p class="note">Updates are included and arrive by themselves. Your reels and files always stay on your computer.</p>
     <a class="cta" href="${p.account}" target="_blank" rel="noopener" style="margin-top:14px">My licence page ↗</a>`;
   $("#planDlg").showModal(); };

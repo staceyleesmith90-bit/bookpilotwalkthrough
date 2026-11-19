@@ -1,7 +1,7 @@
 # Reelmate as a one-click Claude extension (and for Codex)
 
 **The customer's experience**
-1. Pay once (PayFast, no subscription) → the welcome page shows their licence key + the download.
+1. Pay once (PayFast R1000 or PayPal $59, no subscription) → the welcome page shows their licence key + the download.
 2. Double-click `reel-studio-<version>.mcpb` → Claude Desktop (Windows or Mac) asks to install → **Install**.
 3. Paste the licence key when asked. Done. In any Claude chat: "edit my reel", "interview me", "make it like this link".
 
@@ -10,7 +10,7 @@
   (Inbox for new videos). Nothing is uploaded; we store no files.
 - Thinking: their own Claude plan. We pay no AI costs.
 - Our server: only the licence service (keys, paid or not) — `licence-service/`, a free Cloudflare
-  Worker fed by PayFast. A bought key is lifetime (updates included); trial keys from /api/admin/issue {days} end.
+  Worker fed by PayFast (rand) and PayPal (dollars). Every key is forever, updates included. No trials.
 - First run downloads the editing tools once (Python packages, ffmpeg, the animation browser) —
   a few minutes, automatic.
 
@@ -31,6 +31,6 @@ the local editor without uploading videos to a server. Not offered (keeps the "n
 2. `npx wrangler secret put PAYFAST_MERCHANT_ID` (and PAYFAST_MERCHANT_KEY, PAYFAST_PASSPHRASE, ADMIN_TOKEN).
 3. `npx wrangler deploy`, point reelstudio.systemspilot.co.za at it (Cloudflare custom domain).
 4. Test with PAYFAST_HOST = sandbox.payfast.co.za first, then switch to www.payfast.co.za.
-5. PayPal / EFT buyers: `POST /api/admin/issue` (Bearer ADMIN_TOKEN) → lifetime key; testers: add {"days": 14}.
-6. Set your once-off price: PRICE_ZAR in licence-service/wrangler.toml.
+5. EFT buyers or gifts: `POST /api/admin/issue` (Bearer ADMIN_TOKEN) → a forever key. Refund: `/api/admin/revoke`.
+6. Prices: PRICE_ZAR / PRICE_USD in licence-service/wrangler.toml. PayPal: `npx wrangler secret put PAYPAL_CLIENT_ID` and `PAYPAL_SECRET` (developer.paypal.com → Apps); test with PAYPAL_API = api-m.sandbox.paypal.com first.
 Tests: `node licence-service/test.mjs`.

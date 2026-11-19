@@ -5,12 +5,12 @@ const ok = (c, m) => { if (!c) { console.error("FAIL", m); process.exit(1); } el
 for (const s of ["", "abc", "merchant_id=10000100&amount=449.00&item_name=Reel+Studio", "é ünïcödé 🎬".repeat(20)])
   ok(md5(s) === createHash("md5").update(s).digest("hex"), `md5(${s.slice(0, 20)})`);
 const kv = new Map(); const env = { LICENCES: { get: async k => kv.get(k) ?? null, put: async (k, v) => kv.set(k, v) },
-  ADMIN_TOKEN: "t0k", MAX_MACHINES: "2", PRICE_ZAR: "449.00", PUBLIC_URL: "https://x", PAYFAST_HOST: "sandbox.payfast.co.za",
-  PAYFAST_MERCHANT_ID: "10000100", PAYFAST_MERCHANT_KEY: "46f0cd694581a", PAYFAST_PASSPHRASE: "jt7NOE43FZPn", PRODUCT: "Reelmate" };
+  ADMIN_TOKEN: "t0k", MAX_MACHINES: "2", PRICE_ZAR: "1000.00", PUBLIC_URL: "https://x", PAYFAST_HOST: "sandbox.payfast.co.za",
+  PAYFAST_MERCHANT_ID: "10000100", PAYFAST_MERCHANT_KEY: "46f0cd694581a", PAYFAST_PASSPHRASE: "jt7NOE43FZPn", PRODUCT: "Reelmate", PRICE_USD: "59.00", PAYPAL_API: "api-m.sandbox.paypal.com", PAYPAL_CLIENT_ID: "cid", PAYPAL_SECRET: "sec" };
 const call = (path, body, auth) => worker.fetch(new Request("https://x" + path, { method: body ? "POST" : "GET",
   headers: { "content-type": "application/json", ...(auth ? { authorization: "Bearer " + auth } : {}) }, body: body && JSON.stringify(body) }), env);
 ok((await call("/api/admin/issue", { email: "a@b.c" })).status === 401, "admin needs token");
-const { key } = await (await call("/api/admin/issue", { email: "a@b.c", days: 31 }, "t0k")).json();
+const { key } = await (await call("/api/admin/issue", { email: "a@b.c" }, "t0k")).json();
 ok(/^RS-\w{4}-\w{4}-\w{4}$/.test(key), "key format " + key);
 let v = await (await call("/api/licence/validate", { key, machine: "m1" })).json(); ok(v.valid, "valid on machine 1");
 v = await (await call("/api/licence/validate", { key, machine: "m2" })).json(); ok(v.valid, "valid on machine 2");
@@ -19,7 +19,7 @@ v = await (await call("/api/licence/validate", { key: "RS-NOPE", machine: "m1" }
 await call("/api/admin/revoke", { key }, "t0k");
 v = await (await call("/api/licence/validate", { key, machine: "m1" })).json(); ok(!v.valid, "revoked key rejected");
 // automatic updates: only active keys get the zip
-const k2 = (await (await call("/api/admin/issue", { email: "u@b.c", days: 31 }, "t0k")).json()).key;
+const k2 = (await (await call("/api/admin/issue", { email: "u@b.c" }, "t0k")).json()).key;
 await call("/api/licence/validate", { key: k2, machine: "m9" });
 env.RELEASES = { get: async p => p === "releases/1.13.0.zip" ? { body: "ZIPDATA" } : null };
 ok((await call("/api/admin/release", { version: "1.13.0", sha256: "a".repeat(64), notes: "New effects" })).status === 401, "release needs token");
@@ -28,11 +28,41 @@ const latest = await (await call("/api/update/latest")).json(); ok(latest.versio
 ok((await call("/api/update/download", { key: k2, machine: "m9" })).status === 200, "active key downloads update");
 ok((await call("/api/update/download", { key: key, machine: "m1" })).status === 403, "revoked key gets no update");
 ok((await call("/api/update/download", { key: k2, machine: "other" })).status === 403, "unknown machine gets no update");
-const page = await (await call("/buy")).text(); ok(page.includes("sandbox.payfast.co.za/eng/process") && page.includes('name="signature"'), "checkout form");
+const page = await (await call("/buy/payfast")).text(); ok(page.includes("sandbox.payfast.co.za/eng/process") && page.includes('name="signature"'), "checkout form");
 ok(!page.includes("subscription_type") && !page.includes('name="frequency"'), "checkout is once-off (no subscription)");
-// a bought key (no days) is lifetime: valid and gets updates, no end date
+// every key is forever: valid, gets updates, no end date (no trials exist)
 const life = (await (await call("/api/admin/issue", { email: "l@b.c" }, "t0k")).json()).key;
 v = await (await call("/api/licence/validate", { key: life, machine: "mL" })).json();
 ok(v.valid && v.plan === "lifetime" && !v.renews, "lifetime key valid with no end date");
 ok((await call("/api/update/download", { key: life, machine: "mL" })).status === 200, "lifetime key gets updates");
+ok((await (await call("/api/admin/issue", { email: "x@b.c", days: 3 }, "t0k")).json()).key, "issue ignores days");
+const issued = JSON.parse(kv.get(`key:${(await (await call("/api/admin/issue", { email: "y@b.c", days: 3 }, "t0k")).json()).key}`));
+ok(issued.lifetime === true && !("renews" in issued), "issued keys never expire");
+// choose page shows both prices
+const choose = await (await call("/buy")).text();
+ok(choose.includes("R1000") && choose.includes("$59") && choose.includes("/buy/paypal") && choose.includes("/buy/payfast"), "choose page: rand + dollars");
+// PayPal: create order → approve → return → capture → forever key
+let captured = 0;
+globalThis.fetch = async (u, o = {}) => {
+  const url = String(u);
+  if (url.endsWith("/v1/oauth2/token")) return new Response(JSON.stringify({ access_token: "AT" }));
+  if (url.endsWith("/v2/checkout/orders")) {
+    const b = JSON.parse(o.body); ok(b.purchase_units[0].amount.value === "59.00" && b.purchase_units[0].amount.currency_code === "USD", "paypal order is $59");
+    globalThis.__ref = b.purchase_units[0].reference_id;
+    return new Response(JSON.stringify({ id: "ORDER123", links: [{ rel: "payer-action", href: "https://paypal.test/approve" }] }));
+  }
+  if (url.endsWith("/v2/checkout/orders/ORDER123/capture")) { captured++;
+    return new Response(JSON.stringify({ status: "COMPLETED", payer: { email_address: "buyer@x.com" }, purchase_units: [{ reference_id: globalThis.__ref,
+      payments: { captures: [{ status: "COMPLETED", amount: { currency_code: "USD", value: "59.00" } }] } }] })); }
+  if (url.endsWith("/v2/checkout/orders/BADAMT/capture"))
+    return new Response(JSON.stringify({ status: "COMPLETED", purchase_units: [{ reference_id: "r2", payments: { captures: [{ status: "COMPLETED", amount: { currency_code: "USD", value: "1.00" } }] } }] }));
+  throw new Error("unexpected fetch " + url);
+};
+const go = await call("/buy/paypal"); ok(go.status === 302 && go.headers.get("location") === "https://paypal.test/approve", "paypal: to approval");
+const back = await call("/paypal/return?token=ORDER123"); ok(back.status === 302 && back.headers.get("location").includes("/welcome?ref=" + globalThis.__ref), "paypal: captured → welcome");
+const ppKey = kv.get(`ref:${globalThis.__ref}`); const ppRec = JSON.parse(kv.get(`key:${ppKey}`));
+ok(ppRec.lifetime && ppRec.source === "paypal" && ppRec.email === "buyer@x.com", "paypal: forever key saved");
+const again = await call("/paypal/return?token=ORDER123"); ok(again.status === 302 && captured === 1, "paypal: refresh doesn't charge or make a 2nd key");
+const wel = await (await call(`/welcome?ref=${globalThis.__ref}`)).text(); ok(wel.includes(ppKey), "welcome page shows the key");
+const bad = await (await call("/paypal/return?token=BADAMT")).text(); ok(bad.includes("not finished"), "paypal: wrong amount → no key");
 console.log("all good");

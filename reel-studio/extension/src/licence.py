@@ -1,4 +1,4 @@
-"""Licence check for Reelmate (bought once, yours for good) (runs on the customer's computer).
+"""Licence check for Reelmate (bought once, yours forever) (runs on the customer's computer).
 
 The key comes from the extension settings (REEL_LICENSE_KEY). It's checked against the Systems
 Pilot licence service at most once a day; an active subscription is remembered for 7 days so a
@@ -65,7 +65,7 @@ def status(home, key=None, now=None):
         return valid, msg
     except Exception:
         # offline / service hiccup: honour a recent good check
-        grace = 365 * 86400 if cache.get("plan") == "lifetime" else GRACE   # bought once: offline is fine for a year
-        if same_key and cache.get("valid") and now - cache.get("checked", 0) < grace:
+        # bought once = theirs forever: after one good check it never needs the internet again
+        if same_key and cache.get("valid") and (cache.get("plan") == "lifetime" or now - cache.get("checked", 0) < GRACE):
             return True, "Reelmate is yours (checked earlier; offline right now)."
         return False, "Couldn't check your Reelmate key. Connect to the internet once and try again."

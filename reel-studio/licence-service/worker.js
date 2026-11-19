@@ -1,18 +1,20 @@
-// Reelmate licence service (Cloudflare Worker). Reelmate is sold as ONE once-off payment: the key is yours for
-// good, updates included.
+// Reelmate licence service (Cloudflare Worker). Reelmate is sold as ONE once-off payment and is theirs FOREVER,
+// updates included. No trials, no subscriptions, nothing that runs out.
 //
-// It knows ONLY licence keys and whether they're paid — never videos, brands or projects.
-//   GET  /buy                      -> sends the customer to PayFast's once-off checkout
+// It knows ONLY licence keys — never videos, brands or projects.
+//   GET  /buy                      -> pick how to pay: PayFast (rand, South Africa) or PayPal (dollars, worldwide)
+//   GET  /buy/payfast              -> PayFast once-off checkout (PRICE_ZAR)
 //   POST /api/payfast/itn          -> PayFast tells us about the payment (verified)
+//   GET  /buy/paypal               -> PayPal checkout (PRICE_USD), Orders API
+//   GET  /paypal/return?token=…    -> PayPal sends the buyer back: we capture the payment, then show the key
 //   GET  /welcome?ref=…            -> after paying: shows their licence key + how to install
 //   POST /api/licence/validate     -> the extension checks a key {key, machine} -> {valid, renews, message}
-//   POST /api/admin/issue|revoke   -> manual keys (PayPal customers, testers), Bearer ADMIN_TOKEN
+//   POST /api/admin/issue|revoke   -> manual keys (EFT buyers, gifts) / switch a key off (refund, abuse), Bearer ADMIN_TOKEN
 //   GET  /api/update/latest        -> the newest release {version, notes, sha256, size, min_extension}
 //   POST /api/update/download      -> the release zip, for any paid (not revoked) key {key, machine}
 //   POST /api/admin/release        -> publish a release (after uploading its zip to R2), Bearer ADMIN_TOKEN
 //
-// Storage (Workers KV): "key:<KEY>" -> {email, status, lifetime, renews?, machines[], ref}; "ref:<REF>" -> KEY;
-//   (renews only on test/trial keys made with /api/admin/issue {days}; paid keys are lifetime)
+// Storage (Workers KV): "key:<KEY>" -> {email, status, lifetime: true, machines[], ref, source}; "ref:<REF>" -> KEY;
 //   "release:latest" -> {version, notes, sha256, size, min_extension}. Release zips live in R2 (binding RELEASES)
 //   at "releases/<version>.zip" — the app only, never anyone's files.
 
@@ -20,7 +22,10 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     try {
-      if (url.pathname === "/buy") return buy(url, env);
+      if (url.pathname === "/buy") return choose(env);
+      if (url.pathname === "/buy/payfast") return buy(url, env);
+      if (url.pathname === "/buy/paypal") return await paypalBuy(env);
+      if (url.pathname === "/paypal/return") return await paypalReturn(url, env);
       if (url.pathname === "/api/payfast/itn" && req.method === "POST") return await itn(req, env);
       if (url.pathname === "/welcome") return await welcome(url, env);
       if (url.pathname === "/api/licence/validate" && req.method === "POST") return await validate(req, env);
@@ -90,8 +95,8 @@ async function itn(req, env) {
     if (!key) { key = newKey(); rec = { machines: [], ref }; await env.LICENCES.put(`ref:${ref}`, key); }
     rec.email = data.email_address || rec.email || "";
     rec.status = "active";
-    rec.lifetime = true;                                       // paid once: yours for good, updates included
-    delete rec.renews;
+    rec.lifetime = true;                                       // paid once: theirs forever, updates included
+    rec.source = "payfast";
     await env.LICENCES.put(`key:${key}`, JSON.stringify(rec));
   }
   return new Response("OK");
@@ -102,7 +107,7 @@ async function welcome(url, env) {
   const key = ref && await env.LICENCES.get(`ref:${ref}`);
   if (!key) return page("Reelmate — almost there", `<h1>Payment received?</h1><p>We're confirming it with PayFast — this page will show your licence key in a few seconds.</p><script>setTimeout(()=>location.reload(),4000)</script>`);
   return page("Welcome to Reelmate", `<h1 style="color:#104631">You're in 🎬</h1>
-<p>Your licence key (yours for good):</p><p style="font:700 22px ui-monospace,monospace;background:#E6F0EC;padding:12px 16px;border-radius:12px;user-select:all">${key}</p>
+<p>Your licence key (yours forever):</p><p style="font:700 22px ui-monospace,monospace;background:#E6F0EC;padding:12px 16px;border-radius:12px;user-select:all">${key}</p>
 <ol><li>Download <a style="color:#E8541E" href="${env.PUBLIC_URL}/download">Reelmate for Claude</a> (Windows or Mac).</li>
 <li>Double-click the file — Claude opens and asks to install it. Click <b>Install</b>.</li>
 <li>Paste your licence key when Claude asks. Done — say “edit my reel”.</li></ol>
@@ -114,29 +119,25 @@ async function validate(req, env) {
   const raw = await env.LICENCES.get(`key:${String(key).trim().toUpperCase()}`);
   if (!raw) return json({ valid: false, message: "That licence key wasn't found. Check it on your Reelmate welcome page." });
   const rec = JSON.parse(raw);
-  if (rec.status === "revoked" || !paid(rec))
-    return json({ valid: false, message: rec.status === "revoked" ? "This Reelmate key was switched off. Contact support."
-                                                                   : "Your Reelmate trial has ended. Buy Reelmate once to keep editing." });
+  if (!paid(rec)) return json({ valid: false, message: "This Reelmate key was switched off. Contact support." });
   const machines = rec.machines || [];
   if (machine && !machines.includes(machine)) {
     if (machines.length >= parseInt(env.MAX_MACHINES || "2")) return json({ valid: false, message: `This key is already used on ${machines.length} computers. Contact support to move it.` });
     machines.push(machine); rec.machines = machines;
     await env.LICENCES.put(`key:${String(key).trim().toUpperCase()}`, JSON.stringify(rec));
   }
-  return json({ valid: true, plan: rec.lifetime ? "lifetime" : "trial",
-                ...(rec.lifetime ? {} : { renews: new Date(rec.renews).toISOString().slice(0, 10) }),
-                message: rec.lifetime ? "Reelmate is yours — updates included." : "Trial active." });
+  return json({ valid: true, plan: "lifetime", message: "Reelmate is yours forever — updates included." });
 }
 
-function paid(rec) {                                           // lifetime (bought once) or a trial still running
-  return rec.lifetime === true || (rec.renews && rec.renews > Date.now());
+function paid(rec) {                                           // bought once = forever, unless switched off (refund)
+  return rec.status !== "revoked";
 }
 
 async function activeKey(key, machine, env) {
   const raw = await env.LICENCES.get(`key:${String(key).trim().toUpperCase()}`);
   if (!raw) return false;
   const rec = JSON.parse(raw);
-  return rec.status !== "revoked" && paid(rec) && (!machine || (rec.machines || []).includes(machine));
+  return paid(rec) && (!machine || (rec.machines || []).includes(machine));
 }
 
 async function download(req, env) {
@@ -158,20 +159,19 @@ async function admin(req, env, url) {
       size: b.size || 0, min_extension: b.min_extension || "0", published: new Date().toISOString().slice(0, 10) }));
     return json({ ok: true });
   }
-  if (url.pathname === "/api/admin/issue") {             // PayPal/EFT customers (no days = lifetime), testers {days}
+  if (url.pathname === "/api/admin/issue") {             // EFT buyers, gifts: always a forever key
     const key = newKey();
     await env.LICENCES.put(`key:${key}`, JSON.stringify({ email: b.email || "", status: "active", machines: [],
-      ...(b.days ? { renews: Date.now() + b.days * 86400e3 } : { lifetime: true }), source: b.source || "manual" }));
+      lifetime: true, source: b.source || "manual" }));
     return json({ key });
   }
-  if (url.pathname === "/api/admin/revoke" || url.pathname === "/api/admin/extend") {
+  if (url.pathname === "/api/admin/revoke" || url.pathname === "/api/admin/restore") {
     const raw = await env.LICENCES.get(`key:${b.key}`);
     if (!raw) return json({ error: "not_found" }, 404);
     const rec = JSON.parse(raw);
-    if (url.pathname.endsWith("revoke")) rec.status = "revoked";
-    else { rec.status = "active"; rec.renews = Math.max(rec.renews || 0, Date.now()) + (b.days || 31) * 86400e3; }
+    rec.status = url.pathname.endsWith("revoke") ? "revoked" : "active";
     await env.LICENCES.put(`key:${b.key}`, JSON.stringify(rec));
-    return json({ ok: true, status: rec.status, lifetime: !!rec.lifetime, ...(rec.renews ? { renews: new Date(rec.renews).toISOString().slice(0, 10) } : {}) });
+    return json({ ok: true, status: rec.status });
   }
   return json({ error: "unknown" }, 404);
 }
@@ -205,3 +205,60 @@ export function md5(str) {
   return [a0, b0, c0, d0].map(v => [0, 8, 16, 24].map(sh => ((v >>> sh) & 255).toString(16).padStart(2, "0")).join("")).join("");
 }
 export { pfSignature, pfEncode };
+
+// ---------------------------------------------------------------- choose how to pay
+function choose(env) {
+  const btn = (href, bg, label, sub) => `<a href="${href}" style="display:block;text-decoration:none;background:${bg};color:#fff;border-radius:18px;padding:16px 20px;margin:12px 0;font-weight:800;font-size:18px">${label}<span style="display:block;font-weight:600;font-size:14px;opacity:.9">${sub}</span></a>`;
+  return page("Get Reelmate", `<h1 style="color:#104631;margin-top:0">Get Reelmate</h1>
+<p>One payment. Yours forever, with every update. No subscription.</p>
+${btn("/buy/payfast", "#E8541E", `R${Number(env.PRICE_ZAR).toFixed(0)} · South Africa`, "Card, EFT, SnapScan and more (PayFast)")}
+${btn("/buy/paypal", "#104631", `$${Number(env.PRICE_USD).toFixed(0)} · Everywhere else`, "PayPal or card (PayPal)")}
+<p style="color:#5E6B63;font-size:14px">Your key appears straight after paying. Works on ${env.MAX_MACHINES} computers.</p>`);
+}
+
+// ---------------------------------------------------------------- PayPal (Orders v2)
+async function ppToken(env) {
+  const r = await fetch(`https://${env.PAYPAL_API}/v1/oauth2/token`, { method: "POST",
+    headers: { authorization: "Basic " + btoa(`${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_SECRET}`), "content-type": "application/x-www-form-urlencoded" },
+    body: "grant_type=client_credentials" });
+  return (await r.json()).access_token;
+}
+
+async function paypalBuy(env) {
+  const ref = crypto.randomUUID().replace(/-/g, "");
+  const tok = await ppToken(env);
+  const r = await fetch(`https://${env.PAYPAL_API}/v2/checkout/orders`, { method: "POST",
+    headers: { authorization: `Bearer ${tok}`, "content-type": "application/json" },
+    body: JSON.stringify({ intent: "CAPTURE",
+      purchase_units: [{ reference_id: ref, custom_id: ref, description: env.PRODUCT,
+                         amount: { currency_code: "USD", value: Number(env.PRICE_USD).toFixed(2) } }],
+      application_context: { brand_name: "Reelmate", user_action: "PAY_NOW", shipping_preference: "NO_SHIPPING",
+                             return_url: `${env.PUBLIC_URL}/paypal/return`, cancel_url: `${env.PUBLIC_URL}/buy` } }) });
+  const order = await r.json();
+  const approve = (order.links || []).find(l => l.rel === "approve" || l.rel === "payer-action");
+  if (!approve) return page("Reelmate — PayPal", "<h1>PayPal is busy</h1><p>Please try again in a minute.</p>");
+  return Response.redirect(approve.href, 302);
+}
+
+async function paypalReturn(url, env) {
+  const id = url.searchParams.get("token") || "";
+  if (!/^[A-Z0-9]{5,40}$/.test(id)) return page("Reelmate", "<h1>Something went wrong</h1><p>Start again at /buy.</p>");
+  const done = await env.LICENCES.get(`pp:${id}`);              // refreshed the page: show the same key again
+  if (done) return Response.redirect(`${env.PUBLIC_URL}/welcome?ref=${done}`, 302);
+  const tok = await ppToken(env);
+  const r = await fetch(`https://${env.PAYPAL_API}/v2/checkout/orders/${id}/capture`, { method: "POST",
+    headers: { authorization: `Bearer ${tok}`, "content-type": "application/json" } });
+  const cap = await r.json();
+  const unit = (cap.purchase_units || [])[0] || {};
+  const pay = ((unit.payments || {}).captures || [])[0] || {};
+  if (cap.status !== "COMPLETED" || pay.status !== "COMPLETED" || pay.amount?.currency_code !== "USD"
+      || Math.abs(parseFloat(pay.amount?.value) - parseFloat(env.PRICE_USD)) > 0.01)
+    return page("Reelmate — payment not finished", "<h1>Payment not finished</h1><p>Nothing was charged. <a href='/buy'>Try again</a>.</p>");
+  const ref = unit.reference_id || id;
+  const key = newKey();
+  await env.LICENCES.put(`key:${key}`, JSON.stringify({ email: cap.payer?.email_address || "", status: "active", lifetime: true,
+    machines: [], ref, source: "paypal", paypal_order: id }));
+  await env.LICENCES.put(`ref:${ref}`, key);
+  await env.LICENCES.put(`pp:${id}`, ref);
+  return Response.redirect(`${env.PUBLIC_URL}/welcome?ref=${ref}`, 302);
+}
