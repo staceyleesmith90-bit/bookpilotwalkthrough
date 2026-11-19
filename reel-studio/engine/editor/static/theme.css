@@ -1,59 +1,97 @@
-/* Reel Studio theme — "Spring" : blush, deep green, teal, orange-red, mustard, rose, cream.
+/* Reel Studio theme — "Spring" (from the owner's mock-up): cream pages, a soft mint menu with a coloured
+   tile behind every icon, a mustard pill on the page you're on, deep green buttons, and headings where
+   every letter takes the next spring colour (theme.js).
    Loaded LAST by every Studio page, so the whole app changes from this one file.
    Fonts (both SIL Open Font License): DynaPuff for headings, Nunito for everything you read. */
 @font-face { font-family: "DynaPuff"; src: url("/fonts/DynaPuff-Variable.ttf"); font-weight: 400 700; }
 @font-face { font-family: "Nunito"; src: url("/fonts/Nunito-Variable.ttf"); font-weight: 200 1000; }
 
 :root {
-  --green: #34403A; --green2: #3E4C44; --green3: #4E6056;
-  --teal: #3E7775; --orange: #E25A2C; --mustard: #DE9A2A; --rose: #E7898B; --cream: #FFF7EC; --blush: #F1DDD3;
-  --navy: var(--green); --navy2: var(--green2); --navy3: var(--green3); --side-ink: #EADFD2;
-  --bg: #F6E9E1; --surface: #FFFBF6; --ink: #34403A; --muted: #7A6B62; --faint: #A3958C; --line: #EBD8CC; --soft: #F8ECE4;
-  --accent: #E25A2C; --accent-soft: #FBE2D6; --ok: #3E7775;
-  --grad: linear-gradient(100deg, #E25A2C 0%, #E7898B 55%, #DE9A2A 100%);
+  --green: #104631; --green2: #1C5A41; --teal: #1F6E73; --orange: #E8541E; --mustard: #E9A21F; --rose: #E86F8A;
+  --cream: #FDF6EB; --mint: #E6F0EC; --butter: #F8D27A;
+  --navy: var(--green); --navy2: var(--green2); --navy3: var(--green2); --side-ink: var(--green);
+  --bg: #FDF6EB; --surface: #FFFDF8; --ink: #17392B; --muted: #5E6B63; --faint: #8F9A92; --line: #EADFCD; --soft: #F6EEE1;
+  --accent: #E8541E; --accent-soft: #FCE3D6; --ok: #1F6E73;
+  --grad: #E8541E;
 }
 
 body { font-family: "Nunito", system-ui, sans-serif !important; background: var(--bg) !important; color: var(--ink); }
 h1, h2, h3, .logo b, header h1 { font-family: "DynaPuff", "Nunito", sans-serif !important; letter-spacing: 0 !important; font-weight: 600 !important; }
 button, input, select, textarea { font-family: inherit; }
+.spring-letters span:nth-child(6n+1) { color: #104631; } .spring-letters span:nth-child(6n+2) { color: #E8541E; }
+.spring-letters span:nth-child(6n+3) { color: #1F6E73; } .spring-letters span:nth-child(6n+4) { color: #E86F8A; }
+.spring-letters span:nth-child(6n+5) { color: #E9A21F; } .spring-letters span:nth-child(6n+6) { color: #2E7D4F; }
 
-/* sidebar + top bar: deep green with cream text */
-.top { background: linear-gradient(180deg, #34403A 0%, #2D3832 100%) !important; }
-.mark { box-shadow: 0 6px 18px -8px #E25A2C !important; }
-.logo small, .bar-top .search input::placeholder, .search > .ico { color: #C9BBAE !important; }
-nav button.on { border-color: rgba(255, 247, 236, .28) !important; }
-.plan { border-color: rgba(255, 247, 236, .22) !important; }
-.plan li::before { color: var(--mustard) !important; }
-.plan b .ico { color: var(--mustard) !important; }
-.newreel { font-family: "DynaPuff", "Nunito", sans-serif !important; font-weight: 500 !important; box-shadow: 0 10px 26px -12px #E25A2C !important; }
+/* ---------------- menu: soft mint, dark green words, a coloured tile per icon ---------------- */
+.top { background: var(--mint) !important; color: var(--green) !important; border-right: 1px solid #D5E4DD; }
+.logo b { font-size: 24px !important; font-weight: 700 !important; }
+.logo small { color: var(--green) !important; font-weight: 700; letter-spacing: .16em !important; }
+.mark { box-shadow: 0 6px 18px -10px rgba(16, 70, 49, .5) !important; }
+.newreel { background: var(--green) !important; color: #fff !important; font-family: "DynaPuff", "Nunito", sans-serif !important;
+  font-weight: 500 !important; font-size: 17px !important; border-radius: 14px !important; box-shadow: 0 10px 22px -14px #104631 !important; }
+nav button { color: var(--green) !important; font-family: "DynaPuff", "Nunito", sans-serif !important; font-weight: 500 !important; font-size: 16px; padding: 7px 10px !important; }
+nav button .ico { width: 34px !important; height: 34px !important; padding: 7px; border-radius: 10px; stroke-width: 2 !important; }
+nav button:nth-of-type(6n+1) .ico { background: #FCE0D3; color: #E8541E; }
+nav button:nth-of-type(6n+2) .ico { background: #D3E8E6; color: #1F6E73; }
+nav button:nth-of-type(6n+3) .ico { background: #FAD9DF; color: #D9506B; }
+nav button:nth-of-type(6n+4) .ico { background: #FBE8BF; color: #C98410; }
+nav button:nth-of-type(6n+5) .ico { background: #D7EADB; color: #2E7D4F; }
+nav button:nth-of-type(6n+6) .ico { background: #DCE6F0; color: #2F5E86; }
+nav button:hover { background: rgba(16, 70, 49, .06) !important; color: var(--green) !important; }
+nav button.on { background: var(--butter) !important; border-color: transparent !important; color: var(--green) !important; }
+nav button.on .ico { background: rgba(255, 255, 255, .55) !important; }
+nav .sep { background: #CFE0D8 !important; }
+.plan { background: var(--surface) !important; border: 1px solid #D5E4DD !important; color: var(--ink) !important; }
+.plan b { color: var(--green) !important; font-family: "DynaPuff", sans-serif !important; font-weight: 500 !important; }
+.plan b .ico, .plan li::before { color: var(--mustard) !important; }
+.plan a { color: var(--green) !important; border-color: var(--green) !important; }
+
+/* ---------------- top bar: cream, pill search ---------------- */
+.bar-top { background: var(--cream) !important; color: var(--green) !important; border-bottom: 1px solid var(--line); }
+.bar-top .search input[type=text] { background: #FFFDF8 !important; border: 1.5px solid #E2D6C3 !important; color: var(--ink) !important; border-radius: 999px !important; }
+.bar-top .search input::placeholder, .search > .ico { color: var(--muted) !important; }
 .bar-top .search input[type=text]:focus { border-color: var(--mustard) !important; }
-.bell i { background: var(--orange) !important; }
+.toptabs button { color: var(--muted) !important; } .toptabs button.on { background: var(--butter) !important; color: var(--green) !important; }
+.brandsw { color: var(--green) !important; } .brandsw small { color: var(--muted) !important; } .brandsw:hover, .bell:hover { background: rgba(16, 70, 49, .06) !important; }
+.bell { color: var(--green) !important; } .bell i { background: var(--orange) !important; box-shadow: 0 0 0 2px var(--cream) !important; }
 
-/* home hero: blush card with playful blobs, multicolour title */
-.hero { color: var(--ink) !important;
-  background: radial-gradient(circle at 88% 18%, #E7898B 0 70px, transparent 71px),
-              radial-gradient(circle at 70% 100%, #DE9A2A 0 90px, transparent 91px),
-              radial-gradient(circle at 98% 82%, #3E7775 0 46px, transparent 47px),
-              linear-gradient(120deg, #F1DDD3 0%, #F4E1D8 100%) !important; }
-.hero .eyebrow { color: var(--teal) !important; }
-.hero h1 { font-family: "DynaPuff", sans-serif !important; font-weight: 700 !important; color: var(--green) !important; }
-.hero h1 em { font-family: "DynaPuff", sans-serif !important; font-weight: 700 !important; background: none !important; -webkit-background-clip: initial !important;
-  background-clip: initial !important; color: var(--orange) !important; }
-.hero p { color: #5E524B !important; }
-.hero .outline { border-color: var(--green) !important; color: var(--green) !important; }
-.hero .outline:hover { background: rgba(52, 64, 58, .06) !important; }
-.inspire { background: linear-gradient(100deg, #3E7775, #34403A) !important; }
-.rc .cover:not([style]) { background: linear-gradient(135deg, #F1DDD3, #F7E7C9) !important; }
-.panel.p1 { background: linear-gradient(160deg, #FBE2D6, #FFFBF6 60%) !important; }
-.panel.p2 { background: linear-gradient(160deg, #F7E7C9, #FFFBF6 60%) !important; }
-.panel.p3 { background: linear-gradient(160deg, #D9ECE9, #FFFBF6 60%) !important; }
+/* ---------------- home hero: cream, big multicolour title, illustration ---------------- */
+.hero { color: var(--ink) !important; background: var(--cream) !important; padding-left: 4px !important; }
+.hero .eyebrow { color: var(--green) !important; font-weight: 800 !important; }
+.hero h1 { font-family: "DynaPuff", sans-serif !important; font-weight: 700 !important; font-size: 62px !important; line-height: 1.02 !important; max-width: 560px !important; }
+.hero h1 em { font-family: "DynaPuff", sans-serif !important; font-weight: 700 !important; font-style: normal; background: none !important;
+  -webkit-background-clip: initial !important; background-clip: initial !important; color: inherit !important; padding: 0 !important; }
+.hero p { color: var(--ink) !important; font-size: 17.5px !important; }
+.hero .cta { background: var(--orange) !important; }
+.hero .outline { border: 2px solid var(--green) !important; color: var(--green) !important; font-weight: 700 !important; }
+.hero .outline:hover { background: rgba(16, 70, 49, .06) !important; }
+.hero .art > * { display: none !important; }
+.hero .art { width: 520px !important; right: 0 !important; background: url("/brand-sp/hero-spring.png") right center / contain no-repeat; }
+.inspire { background: linear-gradient(100deg, #1F6E73, #104631) !important; }
 
-/* buttons: round, warm */
-.cta, .btn:not(.ghost) { background: var(--grad) !important; color: #fff !important; }
+/* quick-start cards: soft tinted cards, big green icons */
+.fmt { border: 0 !important; box-shadow: none !important; }
+.t1 { background: #FCEFD6 !important; } .t2 { background: #E6ECE1 !important; } .t3 { background: #FFEDC3 !important; } .t4 { background: #E1EEF2 !important; }
+.fmt .ic { background: none !important; color: var(--green) !important; width: 56px !important; height: 56px !important; }
+.fmt .ic .ico { width: 44px !important; height: 44px !important; stroke-width: 1.9 !important; }
+.fmt > b { font: 600 19px/1.15 "DynaPuff", sans-serif !important; }
+.fmt .go { background: #FFFDF8 !important; }
+
+.rc .cover:not([style]) { background: linear-gradient(135deg, #FCEFD6, #E6ECE1) !important; }
+.panel.p1 { background: #FCEFD6 !important; } .panel.p2 { background: #FFEDC3 !important; } .panel.p3 { background: #E6ECE1 !important; }
+.p1 .pi { background: #FFFDF8 !important; color: var(--orange) !important; }
+.p2 .pi { background: #FFFDF8 !important; color: #C98410 !important; }
+.p3 .pi { background: #FFFDF8 !important; color: var(--teal) !important; }
+.pcard .chip.ok { background: #D3E8E6 !important; }
+.viewall { color: var(--green) !important; font-weight: 700; }
+
+/* buttons */
+.cta, .btn:not(.ghost) { background: var(--orange) !important; color: #fff !important; }
 .btn, .cta { border-radius: 999px !important; }
+.btn.ghost { border-color: var(--green) !important; color: var(--green) !important; }
 .toast { background: var(--green) !important; }
 
-/* chat box + other pages */
+/* chat box */
 #rs-chat { font-family: "Nunito", sans-serif !important; color: var(--ink) !important; }
 #rs-chat .rs-bar { background: var(--green) !important; }
 #rs-chat .rs-bar b { font-family: "DynaPuff", sans-serif; font-weight: 500; }
@@ -61,26 +99,19 @@ nav button.on { border-color: rgba(255, 247, 236, .28) !important; }
 #rs-chat .rs-you { background: var(--teal) !important; }
 #rs-chat .rs-claude { background: var(--soft) !important; }
 #rs-chat .rs-dot { background: var(--orange) !important; }
-#rs-chat button { background: var(--grad) !important; }
+#rs-chat button { background: var(--orange) !important; }
 #rs-chat a.rs-pv { color: var(--orange) !important; }
-header { background: var(--surface) !important; }
+
+/* other pages */
+header { background: var(--cream) !important; }
 .m.on, .ln.on { border-color: var(--orange) !important; }
 .m.on .tick { background: var(--orange) !important; }
-.gauge b { background: #D9ECE9 !important; color: var(--teal) !important; }
+.gauge b { background: #D3E8E6 !important; color: var(--teal) !important; }
 
-/* icon tiles: the spring colours */
-.t1 .ic { background: #FBE2D6 !important; color: var(--orange) !important; }
-.t2 .ic { background: #D9ECE9 !important; color: var(--teal) !important; }
-.t3 .ic { background: #F7E7C9 !important; color: #B37615 !important; }
-.t4 .ic { background: #F8DADA !important; color: #C2575A !important; }
-.p1 .pi { background: #FBE2D6 !important; color: var(--orange) !important; }
-.p2 .pi { background: #F7E7C9 !important; color: #B37615 !important; }
-.p3 .pi { background: #D9ECE9 !important; color: var(--teal) !important; }
-.pcard .chip.ok { background: #D9ECE9 !important; }
-
-/* phones: keep the colour blobs small and behind the corner, never under the buttons */
+/* phones */
 @media (max-width: 820px) {
-  .hero { background: radial-gradient(circle at 104% -4%, #E7898B 0 64px, transparent 65px),
-                      radial-gradient(circle at 106% 100%, #DE9A2A 0 52px, transparent 53px),
-                      linear-gradient(120deg, #F1DDD3 0%, #F4E1D8 100%) !important; }
+  .hero .art { display: none !important; }
+  .hero h1 { font-size: 40px !important; }
+  .top { border-right: 0; border-bottom: 1px solid #D5E4DD; }
+  nav button .ico { width: 30px !important; height: 30px !important; padding: 6px; }
 }
