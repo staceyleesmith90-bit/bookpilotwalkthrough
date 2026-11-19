@@ -38,7 +38,7 @@ Recommendation: start with the **zip download** (easiest for creators), add GitH
 
 **Windows**
 1. Download and unzip `reel-studio.zip` (right-click → Extract All). Move it to Documents.
-2. Open the folder → `install` → right-click **install-windows.ps1** → **Run with PowerShell**.
+2. Open the folder → `install` → double-click **Install Reelmate.bat** (if Windows warns: More info → Run anyway).
    Wait until it says "All set".
 3. Install the **Claude desktop app** and sign in.
 4. Claude → **Code** tab → choose the `reel-studio` folder → say **"hi"**. Afterwards,
