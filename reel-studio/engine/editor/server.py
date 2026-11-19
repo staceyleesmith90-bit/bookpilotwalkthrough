@@ -259,6 +259,13 @@ class Handler(SimpleHTTPRequestHandler):
                                        "available": chat.available()})
                 if what == "scrapbooks":
                     return self._json(scrapbooks(slug))
+                if what == "elements":                  # this reel's sticker set (+ one sticker image)
+                    from .. import aielements
+                    if len(parts) > 4:
+                        fn = os.path.basename(parts[4])
+                        return self._file(project.path(slug, "elements", fn), "image/png")
+                    return self._json({"stickers": [os.path.basename(f) for f in aielements.stickers_of(slug)],
+                                       "styles": list(aielements.STYLES), "job": JOBS.get(slug + ":elements")})
                 if what == "storyboard":                # the moments, what each shows, ticks + notes
                     if len(parts) > 4:
                         fn = os.path.basename(parts[4])
@@ -549,11 +556,57 @@ class Handler(SimpleHTTPRequestHandler):
                             JOBS[slug] = {"state": "error", "error": str(e)[-500:]}
                     threading.Thread(target=job, daemon=True).start()
                 return self._json({"ok": True, "slug": slug})
+            if len(parts) >= 4 and parts[0] == "api" and parts[1] == "p" and parts[3] == "elements-upload":
+                slug = parts[2]                          # the picture they made in ChatGPT / Canva → stickers
+                if not _slug_ok(slug):
+                    return self.send_error(404)
+                n = int(self.headers.get("Content-Length", 0))
+                if n > 40 * 1024 * 1024:
+                    return self._json({"ok": False, "error": "That picture is too big."})
+                raw = self.rfile.read(n)
+                d = project.path(slug, "elements", "sheets")
+                os.makedirs(d, exist_ok=True)
+                sheet = os.path.join(d, f"upload-{int(time.time())}.png")
+                try:
+                    from PIL import Image as _Im
+                    _Im.open(io.BytesIO(raw)).convert("RGB").save(sheet)
+                except Exception:
+                    return self._json({"ok": False, "error": "That doesn't look like a picture (PNG or JPG)."})
+                from .. import aielements
+                names = [x.strip() for x in (q.get("items") or [""])[0].split(";") if x.strip()] or None
+                paths = aielements.cut(sheet, project.path(slug, "elements"), names)
+                return self._json({"ok": bool(paths), "stickers": [os.path.basename(p_) for p_ in paths],
+                                   "error": "" if paths else "No stickers found in that picture: it needs a plain white background."})
             if len(parts) >= 4 and parts[0] == "api" and parts[1] == "p":
                 slug, what = parts[2], parts[3]
                 if not _slug_ok(slug):
                     return self.send_error(404)
                 data = self._body()
+                if what in ("elements-prompt", "elements-make", "elements-place"):
+                    from .. import aielements, storyboard
+                    items = [x.strip() for x in re.split(r"[;,\n]", data.get("items") or "") if x.strip()]
+                    style = data.get("style") or aielements.DEFAULT_STYLE
+                    if what == "elements-prompt":
+                        return self._json({"prompt": aielements.prompt(items or ["a sticker that fits this reel"], style,
+                                                                       aielements.colors_of(slug), data.get("story", ""))})
+                    def job(what=what, items=items, style=style, data=data):
+                        JOBS[slug + ":elements"] = {"state": "working"}
+                        try:
+                            if what == "elements-make":
+                                aielements.make(slug, items, style)
+                            elif data.get("none"):
+                                aielements.clear(slug)
+                            else:
+                                files = [project.path(slug, "elements", os.path.basename(f)) for f in data.get("files") or []]
+                                aielements.place(slug, [f for f in files if os.path.exists(f)] or aielements.stickers_of(slug))
+                            if what == "elements-place":
+                                project.build_timeline(slug)
+                                storyboard.make(slug)
+                            JOBS[slug + ":elements"] = {"state": "done", "what": what}
+                        except Exception as e:
+                            JOBS[slug + ":elements"] = {"state": "error", "error": str(e)[-300:]}
+                    threading.Thread(target=job, daemon=True).start()
+                    return self._json({"ok": True})
                 if what == "timeline":
                     project.save(slug, "timeline.json", data)
                     return self._json({"ok": True})

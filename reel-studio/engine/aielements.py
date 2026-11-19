@@ -377,3 +377,53 @@ def animate(png, out, motion="bounce", seconds=1.6, fps=20, px=400):
     frames[0].save(out, save_all=True, append_images=frames[1:], duration=int(1000 / fps), loop=0,
                    lossless=False, quality=88, method=4)
     return out
+
+
+# ---------------------------------------------------------------- put a sticker set into a reel (storyboard panel)
+CORNERS = [(0.17, 0.2), (0.83, 0.22), (0.16, 0.78), (0.84, 0.76)]   # off-centre: faces are usually in the middle
+
+
+def stickers_of(slug):
+    from . import project
+    d = project.path(slug, "elements")
+    return sorted(os.path.join(d, f) for f in os.listdir(d) if f.endswith(".png")) if os.path.isdir(d) else []
+
+
+def place(slug, files):
+    """One sticker per moment (cycling through the set), in a corner away from the middle, popping in a beat
+    after the moment starts. Moments without a scene get a light overlay scene for it. Returns how many placed."""
+    from . import project
+    plan = project.load(slug, "plan.json") or {}
+    beats = plan.get("beats") or []
+    if not files or not beats:
+        return 0
+    n = 0
+    for i, b in enumerate(beats):
+        do = b.setdefault("do", [])
+        scenes = [d for d in do if d.startswith("scene:")]
+        if scenes and scenes[0] != "scene:collage":
+            continue                                    # a full-screen effect owns this moment
+        if not scenes:
+            do.append("scene:collage")
+            b["scene"] = {"overlay": True}
+        sp = b.setdefault("scene", {"overlay": True})
+        sp["stickers"] = [s for s in sp.get("stickers", []) if not s.get("_set")]
+        x, y = CORNERS[i % len(CORNERS)]
+        f = files[n % len(files)]
+        sp["stickers"].append({"image": os.path.relpath(f, ROOT), "x": x, "y": y, "size": 0.2,
+                               "rot": -8 if i % 2 else 8, "at": 0.4, "_set": True})
+        n += 1
+    project.save(slug, "plan.json", plan)
+    return n
+
+
+def clear(slug):
+    """'No graphics': take every sticker out (words stay)."""
+    from . import project
+    plan = project.load(slug, "plan.json") or {}
+    for b in plan.get("beats") or []:
+        sp = b.get("scene")
+        if isinstance(sp, dict) and sp.get("stickers"):
+            sp["stickers"] = []
+    plan["auto_stickers"] = False
+    project.save(slug, "plan.json", plan)

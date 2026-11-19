@@ -43,6 +43,23 @@
   .bar .msg { color: var(--muted); flex: 1; min-width: 200px; }
   #rs-chat { bottom: 86px !important; }                 /* the chat box sits above the Build bar */
   @media (max-width: 600px) { #rs-chat { bottom: 128px !important; } }
+  .gfx .opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .gfx .opt { text-align: left; border: 2px solid var(--line); background: var(--surface); border-radius: 16px; padding: 12px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+  .gfx .opt b { font-size: 15px; } .gfx .opt span { color: var(--muted); font-size: 13px; }
+  .gfx .opt.on { border-color: var(--orange, #E8541E); background: #FFF3EA; }
+  .gpanel { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .gpanel label { font-weight: 700; font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
+  .gpanel input, .gpanel textarea { border: 1.5px solid var(--line); border-radius: 12px; padding: 9px 12px; font: inherit; background: #fff; }
+  .gpanel textarea { width: 100%; resize: vertical; }
+  .gpanel ol { margin: 0; padding-left: 20px; line-height: 2.1; }
+  .gpanel .styles { display: flex; flex-wrap: wrap; gap: 8px; }
+  .gpanel .chip { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 13px; cursor: pointer; font-weight: 700; text-transform: capitalize; }
+  .gpanel .chip.on { background: #F8D27A; border-color: #E9A21F; }
+  .btn.sm { padding: 5px 12px; font-size: 13px; display: inline-block; }
+  .up { cursor: pointer; }
+  .stk { display: flex; flex-wrap: wrap; gap: 10px; }
+  .stk img { width: 84px; height: 84px; object-fit: contain; background: repeating-conic-gradient(#f3ece2 0 25%, #fff 0 50%) 0 0 / 16px 16px; border-radius: 12px; }
+  @media (max-width: 760px) { .gfx .opts { grid-template-columns: 1fr; } }
   .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
   @media (max-width: 600px) { main { padding: 16px 16px 140px; } .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } header { padding: 14px 16px; } }
 </style>
@@ -61,6 +78,29 @@
       off (the footage stays). Change any words right on the card (wrong photo? just retype it) and press <b>Update the words</b>.
       Then press <b>Build my reel</b>: only what you kept gets made.</p>
     <div class="gauge">Claude usage for this step: <b>light</b> (the pictures are drawn by the studio itself)</div>
+  </div>
+  <div class="intro gfx">
+    <h2 style="font-size:16px">Graphics for this reel</h2>
+    <p>Stickers that match this story, in one style. Pick how you'd like them:</p>
+    <div class="opts">
+      <button class="opt" data-g="chatgpt"><b>Custom ones from ChatGPT</b><span>Best looking. Copy our prompt into ChatGPT (free accounts work), bring the picture back.</span></button>
+      <button class="opt" data-g="free"><b>Free stickers</b><span>Reelmate draws them for you. No account needed.</span></button>
+      <button class="opt" data-g="none"><b>No graphics</b><span>Just your photos, videos and words.</span></button>
+    </div>
+    <div id="gpanel" class="gpanel" hidden>
+      <label>What should be on them? (a few things from the story)<input id="gItems" placeholder="sand bucket, water splash, baby bottle, tiny alarm clock"></label>
+      <div class="styles" id="gStyles"></div>
+      <div id="gChat" hidden>
+        <ol><li>Copy this prompt <button class="btn ghost sm" id="gCopy">Copy</button></li>
+          <li>Paste it into <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a> and download the picture it makes.</li>
+          <li>Bring it back here: <label class="btn sm up">Upload the picture<input type="file" id="gFile" accept="image/*" hidden></label></li></ol>
+        <textarea id="gPrompt" rows="4" readonly></textarea>
+      </div>
+      <button class="btn" id="gMake" hidden>Draw my stickers</button>
+      <div id="gStickers" class="stk"></div>
+      <button class="btn" id="gPlace" hidden>Put them in my reel</button>
+      <p class="hint" id="gMsg"></p>
+    </div>
   </div>
   <div class="grid" id="grid"></div>
 </main>
@@ -128,6 +168,67 @@ $("redraw").onclick = async () => {
   $("msg").textContent = "Drawing your storyboard…"; setTimeout(load, 4000);
 };
 load();
+
+// ---------------- graphics: ChatGPT / free / none
+let G = { mode: null, style: "paper" };
+const post = (u, b) => fetch(u, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b)}).then(r => r.json());
+async function drawStickers() {
+  const d = await (await fetch(`/api/p/${slug}/elements`)).json();
+  $("gStickers").innerHTML = d.stickers.map(f => `<img src="/api/p/${slug}/elements/${encodeURIComponent(f)}?v=${Date.now()}" alt="">`).join("");
+  $("gPlace").hidden = !d.stickers.length;
+  if (!$("gStyles").children.length) {
+    $("gStyles").innerHTML = d.styles.map(s => `<button class="chip${s === G.style ? " on" : ""}" data-s="${s}">${s}</button>`).join("");
+    $("gStyles").querySelectorAll("[data-s]").forEach(b => b.onclick = () => { G.style = b.dataset.s;
+      $("gStyles").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b)); refreshPrompt(); });
+  }
+}
+async function refreshPrompt() {
+  if (G.mode !== "chatgpt") return;
+  const r = await post(`/api/p/${slug}/elements-prompt`, {items: $("gItems").value, style: G.style});
+  $("gPrompt").value = r.prompt;
+}
+function waitEl(after) {
+  const poll = async () => {
+    const d = await (await fetch(`/api/p/${slug}/elements`)).json();
+    const j = d.job || {};
+    if (j.state === "working") { setTimeout(poll, 2500); return; }
+    if (j.state === "error") { $("gMsg").textContent = j.error.includes("quota") ? "The free drawing service is busy right now. Try ChatGPT instead, or try again later." : j.error; return; }
+    after && after();
+  };
+  setTimeout(poll, 1500);
+}
+document.querySelectorAll(".opt").forEach(b => b.onclick = async () => {
+  G.mode = b.dataset.g;
+  document.querySelectorAll(".opt").forEach(o => o.classList.toggle("on", o === b));
+  if (G.mode === "none") {
+    $("gpanel").hidden = true;
+    await post(`/api/p/${slug}/elements-place`, {none: true});
+    $("msg").textContent = "Taking the stickers out and redrawing…"; waitEl(load); return;
+  }
+  $("gpanel").hidden = false; $("gChat").hidden = G.mode !== "chatgpt"; $("gMake").hidden = G.mode !== "free";
+  await drawStickers(); refreshPrompt();
+});
+$("gItems").oninput = () => { clearTimeout(G.t); G.t = setTimeout(refreshPrompt, 400); };
+$("gCopy").onclick = () => { navigator.clipboard.writeText($("gPrompt").value); $("gMsg").textContent = "Copied. Paste it into ChatGPT."; };
+$("gFile").onchange = async () => {
+  const f = $("gFile").files[0]; if (!f) return;
+  $("gMsg").textContent = "Cutting your picture into stickers…";
+  const items = $("gItems").value.split(/[,;\n]/).map(x => x.trim()).filter(Boolean).join(";");
+  const r = await (await fetch(`/api/p/${slug}/elements-upload?items=${encodeURIComponent(items)}`, {method: "POST", body: f})).json();
+  $("gMsg").textContent = r.ok ? `${r.stickers.length} stickers ready. Press "Put them in my reel".` : r.error;
+  drawStickers();
+};
+$("gMake").onclick = async () => {
+  if (!$("gItems").value.trim()) { $("gMsg").textContent = "Type a few things to draw first."; return; }
+  $("gMsg").textContent = "Drawing your stickers… (this can take a few minutes)";
+  await post(`/api/p/${slug}/elements-make`, {items: $("gItems").value, style: G.style});
+  waitEl(() => { $("gMsg").textContent = "Done. Press \"Put them in my reel\"."; drawStickers(); });
+};
+$("gPlace").onclick = async () => {
+  await post(`/api/p/${slug}/elements-place`, {});
+  $("gMsg").textContent = "Placing them (away from faces) and redrawing your storyboard…";
+  waitEl(() => { $("gMsg").textContent = "In! Check each moment below; tap a card to switch one off."; load(); });
+};
 </script>
 <script src="/chat.js"></script>
 </body>

@@ -45,3 +45,20 @@ def test_connect_cloudflare_rejects_bad_details_without_saving(tmp_path, monkeyp
     monkeypatch.setattr(aielements, "ENV", str(tmp_path / ".env"))
     ok, msg = aielements.connect_cloudflare("not-an-id", "x" * 40)
     assert not ok and "Account ID" in msg and not (tmp_path / ".env").exists()
+
+
+def test_place_puts_one_sticker_per_moment_off_centre_and_clear_removes_them(tmp_path, monkeypatch):
+    from engine import project
+    monkeypatch.setattr(project, "PROJECTS", str(tmp_path))
+    slug = "p"
+    (tmp_path / slug / "elements").mkdir(parents=True)
+    for n in ("a", "b"):
+        Image.new("RGBA", (20, 20), (200, 0, 0, 255)).save(tmp_path / slug / "elements" / f"{n}.png")
+    project.save(slug, "plan.json", {"beats": [{"do": ["broll:x.jpg"]}, {"do": ["broll:y.jpg", "scene:collage"], "scene": {"overlay": True}},
+                                               {"do": ["broll:z.jpg", "scene:product_hero"], "scene": {}}]})
+    assert aielements.place(slug, aielements.stickers_of(slug)) == 2          # the full-screen effect is left alone
+    plan = project.load(slug, "plan.json")
+    st = [b.get("scene", {}).get("stickers") for b in plan["beats"]]
+    assert st[0][0]["x"] != 0.5 and st[1][0]["image"].endswith("b.png") and not st[2]
+    aielements.clear(slug)
+    assert all(not (b.get("scene") or {}).get("stickers") for b in project.load(slug, "plan.json")["beats"])

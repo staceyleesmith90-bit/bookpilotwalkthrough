@@ -114,6 +114,10 @@ e.g. "it's on my face" → move it there and press Save.
    Named effects: `python -m engine effects` lists them; use `fx:<name>` in a beat. When the
    user likes something ("save that as my 'spotlight'"), save it:
    `python -m engine effect-save spotlight --options "punch-in;label:{text}" --name "what it does"`.
+4a. **Graphics: their choice, asked once per reel** (tap answers): *Custom ones from ChatGPT (best looking) ·
+   Free stickers · No graphics*. On the Storyboard page this is the "Graphics for this reel" panel: it writes the
+   ChatGPT prompt (style + the reel's colours), cuts the picture they bring back into stickers and places one per
+   moment away from faces. In chat: `elements-prompts` → they paste in ChatGPT → `elements-cut` → place them.
 4b. **Guide them like a teacher, then STORYBOARD (never skip, it saves their Claude usage).**
    Before writing the plan, guide in 3 short taps (one question at a time, 2–4 tap answers):
    (a) "What's this reel about, in one line?" (if they haven't said) · (b) "Which vibe?" — offer 2–3 looks
