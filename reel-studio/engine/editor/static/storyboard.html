@@ -153,7 +153,7 @@ async function send(build) {
   const d = await r.json();
   if (!build) { $("msg").textContent = "Saved."; return; }
   if (d.notes && d.notes.length) $("msg").textContent = "Your notes went to Claude in the chat box: it makes the changes and redraws the storyboard first.";
-  else { $("msg").textContent = "Building your reel… it shows up on the Studio home page when it's ready."; $("build").disabled = true; }
+  else { location.href = `/finish?p=${encodeURIComponent(slug)}`; }       // watch it build on Sound & finish
 }
 function moments() { return sb.moments.map(m => ({n: m.n, keep: m.keep, note: m.note || "",
   texts: Object.fromEntries((m.texts || []).map(t => [t.key, t.value]))})); }

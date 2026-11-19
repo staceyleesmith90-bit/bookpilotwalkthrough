@@ -28,3 +28,19 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
   new MutationObserver(run).observe(document.documentElement, { childList: true, subtree: true });
 })();
+
+// Reel step bar: every page of one reel shows where you are — Cut → Storyboard → Sound & finish.
+(function () {
+  const slug = new URLSearchParams(location.search).get("p");
+  const here = location.pathname;
+  if (!slug || !["/review", "/storyboard", "/finish", "/editor", "/scenes"].includes(here)) return;
+  fetch(`/api/p/${encodeURIComponent(slug)}/sound`).then(r => r.json()).then(info => {
+    const steps = (info.has_source ? [["/review", "Cut"]] : []).concat([["/storyboard", "Storyboard"], ["/finish", "Sound & finish"]]);
+    const bar = document.createElement("nav");
+    bar.className = "rm-steps";
+    bar.innerHTML = steps.map(([u, label], i) =>
+      `<a href="${u}?p=${encodeURIComponent(slug)}" class="${u === here ? "on" : ""}"><b>${i + 1}</b>${label}</a>`).join('<span class="sep"></span>');
+    const head = document.querySelector("header");
+    if (head) head.after(bar); else document.body.prepend(bar);
+  }).catch(() => {});
+})();

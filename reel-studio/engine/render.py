@@ -684,7 +684,7 @@ def build_audio(tl, base_has_voice, base, out_wav):
                       f"adelay={d_ms}|{d_ms}[b{bi}]")
             labels.append(f"[b{bi}]")
     music = a.get("music")
-    if music:
+    if music and music.get("file"):                    # {"none": true} = no music (a trending sound goes on in the app)
         inputs += ["-stream_loop", "-1", "-i", _abs(music["file"])]
         mi = len([x for x in inputs if x == "-i"]) - 1
         g = music.get("gain", 0.18)

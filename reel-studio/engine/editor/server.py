@@ -234,6 +234,8 @@ class Handler(SimpleHTTPRequestHandler):
                 if not rel.startswith(("library", "brand")) or ".." in rel or not full.endswith(".wav"):
                     return self.send_error(404)
                 return self._file(full, "audio/wav")
+            if u.path == "/finish":                      # Sound & Finish: sound, music, build, watch, download
+                return self._file(os.path.join(STATIC, "finish.html"), "text/html")
             if u.path == "/storyboard":                  # Storyboard: every moment as a still — tick before the build
                 return self._file(os.path.join(STATIC, "storyboard.html"), "text/html")
             if u.path == "/scenes":                      # Scene effects: 20 full-frame effects, previewed on their footage
@@ -259,6 +261,15 @@ class Handler(SimpleHTTPRequestHandler):
                                        "available": chat.available()})
                 if what == "scrapbooks":
                     return self._json(scrapbooks(slug))
+                if what == "sound":                     # Sound & Finish page: what this reel has now
+                    pl = project.load(slug, "plan.json") or {}
+                    mu = pl.get("music") or {}
+                    kind = "trending" if mu.get("none") or not mu else ("mine" if "/music/mine" in str(mu.get("file", "")) else "builtin")
+                    rd = project.path(slug, "renders")
+                    files = [f for f in ("final.mp4", "final-for-trending-sound.mp4", "cover.jpg") if os.path.exists(os.path.join(rd, f))]
+                    return self._json({"sound": pl.get("sound") or "quiet", "music": kind, "gain": mu.get("gain", 0.6),
+                                       "has_source": bool((project.load(slug, "project.json") or {}).get("source")),
+                                       "files": files, "job": JOBS.get(slug, {"state": "idle"})})
                 if what == "elements":                  # this reel's sticker set (+ one sticker image)
                     from .. import aielements
                     if len(parts) > 4:
@@ -556,6 +567,25 @@ class Handler(SimpleHTTPRequestHandler):
                             JOBS[slug] = {"state": "error", "error": str(e)[-500:]}
                     threading.Thread(target=job, daemon=True).start()
                 return self._json({"ok": True, "slug": slug})
+            if len(parts) >= 4 and parts[0] == "api" and parts[1] == "p" and parts[3] == "music-upload":
+                slug = parts[2]                          # their own song (mp3 / m4a / wav) for this reel
+                if not _slug_ok(slug):
+                    return self.send_error(404)
+                ext = os.path.splitext((q.get("name") or ["song.mp3"])[0])[1].lower()
+                if ext not in (".mp3", ".m4a", ".wav", ".aac", ".ogg"):
+                    return self._json({"ok": False, "error": "Pick an mp3, m4a or wav song."})
+                n = int(self.headers.get("Content-Length", 0))
+                if n > 60 * 1024 * 1024:
+                    return self._json({"ok": False, "error": "That song file is too big."})
+                d = project.path(slug, "music")
+                os.makedirs(d, exist_ok=True)
+                dst = os.path.join(d, "mine" + ext)
+                with open(dst, "wb") as f:
+                    f.write(self.rfile.read(n))
+                pl = project.load(slug, "plan.json") or {}
+                pl["music"] = {"file": os.path.relpath(dst, project.ROOT), "gain": 0.7}
+                project.save(slug, "plan.json", pl)
+                return self._json({"ok": True})
             if len(parts) >= 4 and parts[0] == "api" and parts[1] == "p" and parts[3] == "elements-upload":
                 slug = parts[2]                          # the picture they made in ChatGPT / Canva → stickers
                 if not _slug_ok(slug):
@@ -702,12 +732,37 @@ class Handler(SimpleHTTPRequestHandler):
                 if what == "brief":
                     project.save(slug, "brief.json", data)
                     return self._json({"ok": True})
+                if what == "sound":                     # sound effects + music choice → plan.json
+                    pl = project.load(slug, "plan.json") or {}
+                    if data.get("sound") in ("quiet", "soft"):
+                        pl["sound"] = data["sound"]
+                    m = data.get("music")
+                    if m == "trending":                 # no music in the file: they add a trending sound in the app
+                        pl["music"] = {"none": True}
+                    elif m == "builtin":
+                        cur = pl.get("music") or {}
+                        f = cur.get("file") if cur.get("file") and "/music/mine" not in cur.get("file", "") else None
+                        if not f:
+                            from .. import musicgen
+                            dur = sum(b.get("dur", 3) for b in pl.get("beats", [])) + 3 if pl.get("beats") else 60
+                            st, _ = musicgen.compose({"mood": ["calm"], "genre": ["soft piano"], "tempo": "80", "energy": "steady"}, dur, seed=7)
+                            mp = project.path(slug, "music", "bed.wav")
+                            os.makedirs(os.path.dirname(mp), exist_ok=True)
+                            musicgen.write(mp, st)
+                            f = os.path.relpath(mp, project.ROOT)
+                        pl["music"] = {"file": f, "gain": float(data.get("gain", cur.get("gain", 0.6)))}
+                    elif m == "mine" and isinstance(pl.get("music"), dict):
+                        pl["music"]["gain"] = float(data.get("gain", pl["music"].get("gain", 0.7)))
+                    project.save(slug, "plan.json", pl)
+                    return self._json({"ok": True})
                 if what == "render":
                     preview = bool(data.get("preview"))
 
                     def job():
                         JOBS[slug] = {"state": "rendering", "preview": preview}
                         try:
+                            if project.load(slug, "plan.json"):
+                                project.build_timeline(slug)     # storyboard / sound changes always go in
                             out = project.do_render(slug, preview=preview)
                             JOBS[slug] = {"state": "done", "file": os.path.basename(out)}
                         except Exception as e:
