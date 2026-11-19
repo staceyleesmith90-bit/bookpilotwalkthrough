@@ -100,6 +100,8 @@ class Handler(SimpleHTTPRequestHandler):
             if u.path.startswith("/brand-sp/"):          # Systems Pilot logo files
                 name = os.path.basename(u.path)
                 return self._file(os.path.join(project.ROOT, "library", "brand-sp", name), "image/png")
+            if u.path == "/theme.css":                   # the Studio's look (one file for every page)
+                return self._file(os.path.join(STATIC, "theme.css"), "text/css")
             if u.path == "/chat.js":                     # the chat box, shared by the Studio pages
                 return self._file(os.path.join(STATIC, "chat.js"), "application/javascript")
             if u.path.startswith("/fonts/"):
