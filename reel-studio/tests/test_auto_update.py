@@ -21,6 +21,8 @@ def test_auto_update_installs_and_keeps_user_files(tmp_path, monkeypatch):
     monkeypatch.setattr(update, "ROOT", str(app))
     monkeypatch.setattr(update, "WHATSNEW", str(app / "out" / "whatsnew.json"))
     monkeypatch.setattr(update, "STAMP", str(app / "out" / ".stamp"))
+    monkeypatch.setattr(update, "LINK", str(app / ".download-link"))
+    GOOD, BAD = "https://x/welcome?ref=" + "a" * 32, "https://x/welcome?ref=" + "b" * 32
     rel = _zip({"VERSION": "1.1.0", "engine/x.py": "new", "brand/brand.json": "SELLER'S", "../evil.txt": "no"})
     meta = {"version": "1.1.0", "sha256": hashlib.sha256(rel).hexdigest(), "notes": "New effects"}
     seen = {}
@@ -35,7 +37,7 @@ def test_auto_update_installs_and_keeps_user_files(tmp_path, monkeypatch):
 
         def do_POST(self):
             seen["body"] = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
-            ok = seen["body"]["key"] == "RS-GOOD"
+            ok = seen["body"]["link"] == GOOD
             self.send_response(200 if ok else 403); self.end_headers()
             if ok:
                 self.wfile.write(rel)
@@ -43,14 +45,17 @@ def test_auto_update_installs_and_keeps_user_files(tmp_path, monkeypatch):
     srv = http.server.HTTPServer(("127.0.0.1", 0), H)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     feed = f"http://127.0.0.1:{srv.server_port}"
-    assert update.auto_update(key="RS-BAD", force=True, feed=feed) is None          # no active subscription
+    assert "welcome page" in update.auto_update(force=True, feed=feed)              # no link saved yet: says how
+    assert update.auto_update(link=BAD, force=True, feed=feed) is None              # not a paid purchase
     assert (app / "VERSION").read_text() == "1.0.0"
-    msg = update.auto_update(key="RS-GOOD", force=True, feed=feed)
+    update.save_download_link(GOOD)                                              # pasted once in the Studio
+    assert (app / ".download-link").read_text() == GOOD
+    msg = update.auto_update(force=True, feed=feed)
     assert "1.1.0" in msg and (app / "VERSION").read_text() == "1.1.0"
     assert (app / "engine" / "x.py").read_text() == "new"
     assert (app / "brand" / "brand.json").read_text() == "MINE"                   # user's files untouched
     assert not (tmp_path / "evil.txt").exists()
     assert update.whats_new()["notes"] == "New effects"
-    assert update.auto_update(key="RS-GOOD", force=True, feed=feed) is None         # already current
-    assert update.auto_update(key="RS-GOOD", force=False, feed=feed) is None        # once a day
+    assert update.auto_update(force=True, feed=feed) is None         # already current
+    assert update.auto_update(force=False, feed=feed) is None        # once a day
     srv.shutdown()
