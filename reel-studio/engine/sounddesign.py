@@ -530,3 +530,100 @@ def soften(cues, gap=1.2, gain=0.55):
         out.append((t, name, g * gain))
         last = t
     return out
+
+
+# ---------------------------------------------------------------- "modern": the default — CapCut-style recorded sounds
+# Only real recordings (soft pops, taps, paper, page flips, airy swooshes, a sparkle, a ding). Never the Kenney game
+# sounds or anything synthesised (zooms, risers, booms, shatter) — those are what sound like an old TV game.
+MODERN_SWAP = {"zoom_in": "air", "riser": None, "boom": "air", "shatter": None, "crack": None, "glitch": None,
+               "wrong": None, "impact": "pill_in", "slam": "thump", "lights": "click", "whoosh": "air",
+               "transition": "air", "swish": "slide"}
+# what each kind of sound is called in the sound list, and the sounds people can swap to
+NICE = {"text_in": "Soft pop (text)", "word_pop": "Tiny pop (word)", "type_key": "Keyboard key", "typing": "Typing",
+        "type_end": "Done tick", "slide": "Paper swipe", "highlight": "Marker", "glass": "Glass tap",
+        "select": "Click", "sticker_in": "Sticker pop", "shutter": "Camera click", "page": "Page flip",
+        "air": "Soft swoosh", "reveal": "Sparkle", "cta": "Ding", "sparkle": "Sparkle", "money": "Ding",
+        "writing": "Pen", "pill_in": "Soft drop", "window_in": "Pop-up", "toggle": "Switch", "chart_grow": "Swipe",
+        "tick": "Tick", "click": "Click", "notify": "Notification", "thump": "Soft thud", "camera": "Click"}
+CHOICES = {   # "choose another sound": label -> files (recorded, CC0 — library/sfx)
+    "Soft pop": ["foley/softpop-*.wav"], "Pop": ["foley/pop-*.wav"], "Tap": ["foley/tap-*.wav"],
+    "Click": ["foley/click-*.wav", "uisfx/soft/press.wav", "uisfx/studio/press.wav"],
+    "Soft swoosh": ["cc0pack/air_*.wav", "foley/swoosh-*.wav"], "Whoosh": ["foley/whoosh-*.wav"],
+    "Paper swipe": ["foley/swipe-*.wav", "foley/paper-*.wav"], "Page flip": ["foley/pageflip-*.wav"],
+    "Sparkle": ["foley/sparkle-*.wav"], "Ding": ["foley/ding-*.wav", "uisfx/soft/notification.wav"],
+    "Camera click": ["foley/shutter-*.wav"], "Marker": ["foley/marker-*.wav"], "Keyboard": ["foley/key-*.wav"],
+    "Tick": ["foley/tick-*.wav"], "Success": ["uisfx/soft/success.wav", "uisfx/dreamy/success.wav", "uisfx/glass/success.wav"],
+    "Drop": ["uisfx/soft/drop.wav", "uisfx/minimal/drop.wav", "uisfx/glass/drop.wav"],
+}
+SFX_DIR = os.path.join(ROOT, "library", "sfx")
+# a sound-list name -> the kind of sound "Another sound" swaps it for
+CHOICE_FOR = {"Soft pop (text)": "Soft pop", "Tiny pop (word)": "Soft pop", "Keyboard key": "Keyboard", "Typing": "Keyboard",
+              "Done tick": "Tick", "Marker": "Marker", "Glass tap": "Tap", "Sticker pop": "Pop", "Pen": "Marker",
+              "Soft drop": "Drop", "Pop-up": "Drop", "Switch": "Click", "Swipe": "Paper swipe", "Notification": "Ding",
+              "Soft thud": "Tap"}
+
+
+def choice_files(label):
+    out = []
+    for pat in CHOICES.get(label, []):
+        out += sorted(glob.glob(os.path.join(SFX_DIR, pat)))
+    return [os.path.relpath(f, SFX_DIR) for f in out]
+
+
+def _recorded(name):
+    try:
+        src = source_file(name)[0]
+    except Exception:
+        return False
+    return not str(src).startswith("s:") and not str(src).startswith(KEN)
+
+
+def modern(cues, gap=0.7, gain=0.8):
+    """Recorded, modern sounds on the moments that matter, never two within `gap` seconds."""
+    out, last = [], -9.0
+    for t, name, g in sorted(cues):
+        if not name.startswith("sd:"):
+            continue
+        parts = name.split(":")
+        ev = parts[2]
+        if ev in MODERN_SWAP:
+            if MODERN_SWAP[ev] is None:
+                continue
+            parts[2] = MODERN_SWAP[ev]
+            name = ":".join(parts[:4])
+        if not _recorded(name) or t - last < gap:
+            continue
+        out.append((t, name, g * gain))
+        last = t
+    return out
+
+
+def label_of(name):
+    if name.startswith("file:"):
+        f = name[5:]
+        return next((lab for lab in CHOICES if f in choice_files(lab)), os.path.basename(f))
+    if name.startswith("sd:"):
+        return NICE.get(name.split(":")[2], name.split(":")[2].replace("_", " ").capitalize())
+    return name.replace("_", " ").capitalize()
+
+
+def key_of(t):
+    return f"{float(t):.2f}"
+
+
+def apply_edits(cues, edits):
+    """edits = {"<t to 0.01s>": {"off": true} | {"file": "foley/pop-221091.wav"}} — the user's sound-list choices."""
+    if not edits:
+        return cues
+    out = []
+    for t, name, g in cues:
+        e = edits.get(key_of(t)) or {}
+        if e.get("off"):
+            continue
+        if e.get("file"):
+            name = "file:" + e["file"]
+        out.append((t, name, g))
+    for k, e in edits.items():                    # sounds the user added on a moment that had none
+        if e.get("add") and e.get("file") and not any(key_of(t) == k for t, _, _ in cues):
+            out.append((float(k), "file:" + e["file"], 0.5))
+    return sorted(out)

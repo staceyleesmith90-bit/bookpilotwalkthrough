@@ -1,4 +1,4 @@
-// node test.mjs — md5, signatures, and the validate/issue flow against an in-memory KV
+// node test.mjs — md5, signatures, and the pay → instant download flow against an in-memory KV
 import worker, { md5, pfSignature } from "./worker.js";
 import { createHash } from "node:crypto";
 const ok = (c, m) => { if (!c) { console.error("FAIL", m); process.exit(1); } else console.log("ok", m); };
@@ -10,34 +10,38 @@ const kv = new Map(); const env = { LICENCES: { get: async k => kv.get(k) ?? nul
 const call = (path, body, auth) => worker.fetch(new Request("https://x" + path, { method: body ? "POST" : "GET",
   headers: { "content-type": "application/json", ...(auth ? { authorization: "Bearer " + auth } : {}) }, body: body && JSON.stringify(body) }), env);
 ok((await call("/api/admin/issue", { email: "a@b.c" })).status === 401, "admin needs token");
-const { key } = await (await call("/api/admin/issue", { email: "a@b.c" }, "t0k")).json();
-ok(/^RS-\w{4}-\w{4}-\w{4}$/.test(key), "key format " + key);
-let v = await (await call("/api/licence/validate", { key, machine: "m1" })).json(); ok(v.valid, "valid on machine 1");
-v = await (await call("/api/licence/validate", { key, machine: "m2" })).json(); ok(v.valid, "valid on machine 2");
-v = await (await call("/api/licence/validate", { key, machine: "m3" })).json(); ok(!v.valid, "blocked on a 3rd machine");
-v = await (await call("/api/licence/validate", { key: "RS-NOPE", machine: "m1" })).json(); ok(!v.valid, "unknown key rejected");
-await call("/api/admin/revoke", { key }, "t0k");
-v = await (await call("/api/licence/validate", { key, machine: "m1" })).json(); ok(!v.valid, "revoked key rejected");
-// automatic updates: only active keys get the zip
-const k2 = (await (await call("/api/admin/issue", { email: "u@b.c" }, "t0k")).json()).key;
-await call("/api/licence/validate", { key: k2, machine: "m9" });
+const { ref, welcome } = await (await call("/api/admin/issue", { email: "a@b.c" }, "t0k")).json();
+ok(/^[a-f0-9]{32}$/.test(ref) && welcome.endsWith(ref), "issue gives a download link " + ref);
+// no release yet: a friendly page, not an error
+ok((await (await call(`/download/${ref}`)).text()).includes("Almost ready"), "no release yet → friendly page");
 env.RELEASES = { get: async p => p === "releases/1.13.0.zip" ? { body: "ZIPDATA" } : null };
 ok((await call("/api/admin/release", { version: "1.13.0", sha256: "a".repeat(64), notes: "New effects" })).status === 401, "release needs token");
 await call("/api/admin/release", { version: "1.13.0", sha256: "a".repeat(64), notes: "New effects" }, "t0k");
 const latest = await (await call("/api/update/latest")).json(); ok(latest.version === "1.13.0" && latest.notes === "New effects", "latest release");
-ok((await call("/api/update/download", { key: k2, machine: "m9" })).status === 200, "active key downloads update");
-ok((await call("/api/update/download", { key: key, machine: "m1" })).status === 403, "revoked key gets no update");
-ok((await call("/api/update/download", { key: k2, machine: "other" })).status === 403, "unknown machine gets no update");
+// the welcome page starts the download and shows their own link; the zip downloads
+const wpage = await (await call(`/welcome?ref=${ref}`)).text();
+ok(wpage.includes(`/download/${ref}`) && wpage.includes("location.href") && wpage.includes(`welcome?ref=${ref}`), "welcome: auto download + own link");
+ok(!/licen[cs]e key/i.test(wpage), "welcome page has no licence key");
+const z = await call(`/download/${ref}`);
+ok(z.status === 200 && z.headers.get("content-type") === "application/zip" && (await z.text()) === "ZIPDATA", "paid link downloads the zip");
+ok(z.headers.get("content-disposition").includes("Reelmate-1.13.0.zip"), "zip has a nice name");
+ok(JSON.parse(kv.get(`buy:${ref}`)).downloads === 1, "downloads are counted");
+ok((await (await call(`/download/${"0".repeat(32)}`)).text()).includes("not found"), "unknown link → no zip");
+ok((await (await call(`/download/abc%2F..`)).text()).includes("not found"), "bad link → no zip");
+// updates use the saved download link
+ok((await call("/api/update/download", { link: welcome })).status === 200, "update with the welcome link");
+ok((await call("/api/update/download", { link: "nope" })).status === 403, "update without a link refused");
+env.MAX_DOWNLOADS = "2"; await call(`/download/${ref}`);
+ok((await (await call(`/download/${ref}`)).text()).includes("used a lot"), "download cap");
+delete env.MAX_DOWNLOADS;
+// refund: link switched off, and back on
+await call("/api/admin/revoke", { ref }, "t0k");
+ok((await call("/api/update/download", { link: welcome })).status === 403, "refunded: no updates");
+ok((await (await call(`/welcome?ref=${ref}`)).text()).includes("refunded"), "refunded: welcome says so");
+await call("/api/admin/restore", { ref }, "t0k");
+ok((await call("/api/update/download", { link: welcome })).status === 200, "restored: updates again");
 const page = await (await call("/buy/payfast")).text(); ok(page.includes("sandbox.payfast.co.za/eng/process") && page.includes('name="signature"'), "checkout form");
 ok(!page.includes("subscription_type") && !page.includes('name="frequency"'), "checkout is once-off (no subscription)");
-// every key is forever: valid, gets updates, no end date (no trials exist)
-const life = (await (await call("/api/admin/issue", { email: "l@b.c" }, "t0k")).json()).key;
-v = await (await call("/api/licence/validate", { key: life, machine: "mL" })).json();
-ok(v.valid && v.plan === "lifetime" && !v.renews, "lifetime key valid with no end date");
-ok((await call("/api/update/download", { key: life, machine: "mL" })).status === 200, "lifetime key gets updates");
-ok((await (await call("/api/admin/issue", { email: "x@b.c", days: 3 }, "t0k")).json()).key, "issue ignores days");
-const issued = JSON.parse(kv.get(`key:${(await (await call("/api/admin/issue", { email: "y@b.c", days: 3 }, "t0k")).json()).key}`));
-ok(issued.lifetime === true && !("renews" in issued), "issued keys never expire");
 // choose page shows both prices
 const choose = await (await call("/buy")).text();
 ok(choose.includes("R1000") && choose.includes("$59") && choose.includes("/buy/paypal") && choose.includes("/buy/payfast"), "choose page: rand + dollars");
@@ -60,9 +64,9 @@ globalThis.fetch = async (u, o = {}) => {
 };
 const go = await call("/buy/paypal"); ok(go.status === 302 && go.headers.get("location") === "https://paypal.test/approve", "paypal: to approval");
 const back = await call("/paypal/return?token=ORDER123"); ok(back.status === 302 && back.headers.get("location").includes("/welcome?ref=" + globalThis.__ref), "paypal: captured → welcome");
-const ppKey = kv.get(`ref:${globalThis.__ref}`); const ppRec = JSON.parse(kv.get(`key:${ppKey}`));
-ok(ppRec.lifetime && ppRec.source === "paypal" && ppRec.email === "buyer@x.com", "paypal: forever key saved");
-const again = await call("/paypal/return?token=ORDER123"); ok(again.status === 302 && captured === 1, "paypal: refresh doesn't charge or make a 2nd key");
-const wel = await (await call(`/welcome?ref=${globalThis.__ref}`)).text(); ok(wel.includes(ppKey), "welcome page shows the key");
-const bad = await (await call("/paypal/return?token=BADAMT")).text(); ok(bad.includes("not finished"), "paypal: wrong amount → no key");
+const ppRec = JSON.parse(kv.get(`buy:${globalThis.__ref}`));
+ok(ppRec.status === "active" && ppRec.source === "paypal" && ppRec.email === "buyer@x.com", "paypal: purchase saved");
+const again = await call("/paypal/return?token=ORDER123"); ok(again.status === 302 && captured === 1, "paypal: refresh doesn't charge twice");
+const wel = await (await call(`/welcome?ref=${globalThis.__ref}`)).text(); ok(wel.includes(`/download/${globalThis.__ref}`), "paypal: welcome page downloads");
+const bad = await (await call("/paypal/return?token=BADAMT")).text(); ok(bad.includes("not finished"), "paypal: wrong amount → no download");
 console.log("all good");

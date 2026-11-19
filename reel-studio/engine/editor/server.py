@@ -4,7 +4,7 @@
 
 Runs entirely on the user's computer. Nothing is uploaded anywhere.
 """
-import time, io, json, os, re, threading, traceback, urllib.parse
+import glob, time, io, json, os, re, threading, traceback, urllib.parse
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from .. import brand, layout, music, packs, project, render, roughcut, stickers, titles
 
@@ -15,6 +15,54 @@ JOBS = {}  # slug -> {"state", "file", "error"}
 def _slug_ok(s):
     return bool(re.fullmatch(r"[a-z0-9-]+", s or "")) and os.path.isdir(project.path(s))
 
+
+# built-in music Reelmate composes itself (royalty-free: it's ours) — the Finish page's music choices
+BEDS = {"upbeat": {"mood": ["sunny"], "genre": ["indie pop"], "tempo": "116", "energy": "steady"},
+        "groove": {"mood": ["playful"], "genre": ["afrobeats"], "tempo": "108", "energy": "steady"},
+        "calm": {"mood": ["calm"], "genre": ["soft piano"], "tempo": "80", "energy": "steady"}}
+
+_WHISPER = {}
+
+
+def voice_note_text(data):
+    """Voice note -> text with faster-whisper on the user's own computer (free, private, no Claude usage)."""
+    import subprocess, tempfile
+    from .. import transcribe as tr
+    d = tempfile.mkdtemp()
+    src, wav = os.path.join(d, "note.bin"), os.path.join(d, "note.wav")
+    open(src, "wb").write(data)
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", src, "-ac", "1", "-ar", "16000", wav], check=True)
+    if "m" not in _WHISPER:
+        from faster_whisper import WhisperModel
+        _WHISPER["m"] = WhisperModel(tr.MODEL_SIZE, device="auto", compute_type="int8")
+    segs, _ = _WHISPER["m"].transcribe(wav, vad_filter=True)
+    return " ".join(s.text.strip() for s in segs).strip()
+
+
+def sound_list(slug):
+    """Every sound effect in the reel with its second, a friendly name, and the user's choices."""
+    from .. import sounddesign as sd
+    pl = project.load(slug, "plan.json") or {}
+    if not pl:
+        return {"sounds": [], "choices": list(sd.CHOICES)}
+    tl = project.build_timeline(slug)
+    edits = pl.get("sfx_edits") or {}
+    beats, t0, at = pl.get("beats") or [], 0.0, []
+    from ..storyboard import texts_of
+    for n, b in enumerate(beats):
+        words = (b.get("text") or "").strip() or next((x["value"].split("\n")[0] for x in texts_of(b) if x["value"]), "")
+        at.append((t0, f"Moment {n + 1}" + (f": {words}" if words else "")))
+        t0 += float(b.get("dur", 3) or 3)
+    rows, seen = [], set()
+    for c in tl.get("audio", {}).get("sfx_auto", []):
+        k = sd.key_of(c["t"])
+        seen.add(k)
+        e = edits.get(k, {})
+        name = "file:" + e["file"] if e.get("file") else c["name"]
+        moment = next((txt for s0, txt in reversed(at) if s0 <= c["t"]), "")
+        rows.append({"t": c["t"], "key": k, "name": name, "label": sd.label_of(name), "off": bool(e.get("off")),
+                     "swapped": bool(e.get("file")), "moment": moment[:60]})
+    return {"sounds": rows, "choices": list(sd.CHOICES), "mode": pl.get("sound") or "modern"}
 
 class Handler(SimpleHTTPRequestHandler):
     def log_message(self, *a):
@@ -99,7 +147,8 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._file(os.path.join(STATIC, "editor.html"), "text/html")
             if u.path.startswith("/brand-sp/"):          # Systems Pilot logo files
                 name = os.path.basename(u.path)
-                return self._file(os.path.join(project.ROOT, "library", "brand-sp", name), "image/png")
+                return self._file(os.path.join(project.ROOT, "library", "brand-sp", name),
+                                  "image/svg+xml" if name.endswith(".svg") else "image/png")
             if u.path == "/theme.css":                   # the Studio's look (one file for every page)
                 return self._file(os.path.join(STATIC, "theme.css"), "text/css")
             if u.path == "/theme.js":
@@ -137,6 +186,19 @@ class Handler(SimpleHTTPRequestHandler):
             if u.path == "/api/templates":
                 from .. import templates as tpl
                 return self._json(tpl.all_templates())
+            if u.path == "/api/sfx-play":                 # ▶ on the sound list: one cue, as it will sound
+                from .. import sfx as sfxmod
+                name = q.get("name", [""])[0]
+                if not (name.startswith("sd:") or name.startswith("file:")) or ".." in name:
+                    return self.send_error(404)
+                if name.startswith("file:") and not os.path.exists(os.path.join(project.ROOT, "library", "sfx", name[5:])):
+                    return self.send_error(404)
+                out = os.path.join(project.ROOT, "out", "sfx-preview", re.sub(r"[^a-zA-Z0-9]+", "-", name) + ".wav")
+                if not os.path.exists(out):
+                    os.makedirs(os.path.dirname(out), exist_ok=True)
+                    x = sfxmod.load(name)
+                    sfxmod.write_wav(out, x, peak=0.7)
+                return self._file(out, "audio/wav")
             if u.path == "/api/music-preview":
                 from .. import music as mus
                 brief = {"mood": q.get("mood", ["cosy"])[0].split(","), "genre": q.get("genre", ["lo-fi"])[0].split(","),
@@ -169,17 +231,15 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._file(os.path.join(project.ROOT, "library", "samples", "hero-phone.jpg"), "image/jpeg")
             if u.path == "/api/hero-card":
                 return self._file(os.path.join(project.ROOT, "library", "samples", "hero-photo.jpg"), "image/jpeg")
-            if u.path == "/api/plan":                 # licence status (from the extension's daily licence check)
-                import time as _t
-                info = {}
+            if u.path == "/api/plan":                 # Reelmate is theirs: version + updates (no licence, no key)
+                from .. import update as upd
+                latest = None
                 try:
-                    info = json.load(open(os.path.join(project.ROOT, ".licence.json"), encoding="utf-8"))
+                    latest = upd.check()
                 except Exception:
                     pass
-                return self._json({"known": bool(info), "active": bool(info.get("valid")), "renews": info.get("renews"),
-                                   "message": info.get("message"), "checked": info.get("checked"),
-                                   "account": "https://reelstudio.systemspilot.co.za/account",
-                                   "dev": os.environ.get("REEL_DEV") == "1" or bool(os.environ.get("REEL_TESTER_UNTIL"))})
+                return self._json({"version": upd.local_version(), "link_saved": bool(upd.download_link()),
+                                   "latest": latest})
             if u.path == "/api/favourites":
                 from .. import library_user as lu
                 return self._json(lu.favourites())
@@ -203,6 +263,12 @@ class Handler(SimpleHTTPRequestHandler):
                                    "recipes": [{"id": k, "kind": v[0], "label": v[1], "about": v[2]} for k, v in brandreels.RECIPES.items()]})
             if u.path == "/api/make-job":
                 return self._json(JOBS.get("make", {"state": "idle"}))
+            if u.path.startswith("/style-examples/"):     # an example picture of each sticker style
+                fn = os.path.basename(urllib.parse.unquote(u.path))
+                full = os.path.join(project.ROOT, "library", "style-examples", fn)
+                if not fn.endswith(".jpg") or not os.path.exists(full):
+                    return self.send_error(404)
+                return self._file(full, "image/jpeg")
             if u.path == "/api/ai-status":               # AI stickers: which generator, is Cloudflare connected
                 from .. import aielements
                 return self._json(aielements.status())
@@ -264,18 +330,24 @@ class Handler(SimpleHTTPRequestHandler):
                 if what == "sound":                     # Sound & Finish page: what this reel has now
                     pl = project.load(slug, "plan.json") or {}
                     mu = pl.get("music") or {}
-                    kind = "trending" if mu.get("none") or not mu else ("mine" if "/music/mine" in str(mu.get("file", "")) else "builtin")
+                    kind = "trending" if mu.get("none") or not mu else ("mine" if "/music/mine" in str(mu.get("file", "")) else
+                                                                        next((k for k in BEDS if f"bed-{k}." in str(mu.get("file", ""))), "builtin"))
                     rd = project.path(slug, "renders")
                     files = [f for f in ("final.mp4", "final-for-trending-sound.mp4", "cover.jpg") if os.path.exists(os.path.join(rd, f))]
-                    return self._json({"sound": pl.get("sound") or "quiet", "music": kind, "gain": mu.get("gain", 0.6),
+                    return self._json({"sound": pl.get("sound") or "modern", "music": kind, "gain": mu.get("gain", 0.6),
                                        "has_source": bool((project.load(slug, "project.json") or {}).get("source")),
                                        "files": files, "job": JOBS.get(slug, {"state": "idle"})})
+                if what == "sounds":                    # the sound list: every sound, at which second, on/off/swapped
+                    return self._json(sound_list(slug))
                 if what == "elements":                  # this reel's sticker set (+ one sticker image)
                     from .. import aielements
                     if len(parts) > 4:
                         fn = os.path.basename(parts[4])
                         return self._file(project.path(slug, "elements", fn), "image/png")
                     return self._json({"stickers": [os.path.basename(f) for f in aielements.stickers_of(slug)],
+                                       "about": aielements.about_of(slug), "connected": aielements.status(),
+                                       "reference": next((os.path.basename(f) for f in glob.glob(project.path(slug, "elements", "reference.*"))), None),
+                                       "examples": sorted(os.path.splitext(f)[0] for f in os.listdir(os.path.join(project.ROOT, "library", "style-examples"))),
                                        "styles": list(aielements.STYLES), "job": JOBS.get(slug + ":elements")})
                 if what == "storyboard":                # the moments, what each shows, ticks + notes
                     if len(parts) > 4:
@@ -362,6 +434,20 @@ class Handler(SimpleHTTPRequestHandler):
         parts = [p for p in u.path.split("/") if p]
         q = urllib.parse.parse_qs(u.query)
         try:
+            if u.path == "/api/update-link":   # their welcome-page link, saved once for free updates
+                from .. import update as upd
+                n = int(self.headers.get("Content-Length", 0))
+                data = json.loads(self.rfile.read(n) or b"{}")
+                try:
+                    upd.save_download_link(data.get("link", ""))
+                except ValueError as e:
+                    return self._json({"ok": False, "error": str(e)})
+                return self._json({"ok": True, "message": upd.auto_update(force=True) or "Saved. You're on the newest version."})
+            if u.path == "/api/transcribe":   # a voice note (raw audio from the mic button) -> the words, on this computer
+                n = int(self.headers.get("Content-Length", 0))
+                if not n or n > 40 * 1024 * 1024:
+                    return self._json({"error": "That voice note is empty or too long."}, 400)
+                return self._json({"text": voice_note_text(self.rfile.read(n))})
             if u.path == "/api/upload":  # raw file body; ?name=clip.mp4
                 name = re.sub(r"[^A-Za-z0-9._-]+", "-", q.get("name", ["upload.mp4"])[0])[-80:]
                 n = int(self.headers.get("Content-Length", 0))
@@ -586,6 +672,24 @@ class Handler(SimpleHTTPRequestHandler):
                 pl["music"] = {"file": os.path.relpath(dst, project.ROOT), "gain": 0.7}
                 project.save(slug, "plan.json", pl)
                 return self._json({"ok": True})
+            if len(parts) >= 4 and parts[0] == "api" and parts[1] == "p" and parts[3] == "reference-upload":
+                slug = parts[2]                          # a picture of what they mean: they attach it in ChatGPT too
+                if not _slug_ok(slug):
+                    return self.send_error(404)
+                n = int(self.headers.get("Content-Length", 0))
+                if n > 25 * 1024 * 1024:
+                    return self._json({"ok": False, "error": "That picture is too big."})
+                raw = self.rfile.read(n)
+                d = project.path(slug, "elements")
+                os.makedirs(d, exist_ok=True)
+                for old in glob.glob(os.path.join(d, "reference.*")):
+                    os.remove(old)
+                from PIL import Image as _Im
+                import io as _io
+                im = _Im.open(_io.BytesIO(raw)).convert("RGB")
+                im.thumbnail((1600, 1600))
+                im.save(os.path.join(d, "reference.jpg"), quality=90)
+                return self._json({"ok": True})
             if len(parts) >= 4 and parts[0] == "api" and parts[1] == "p" and parts[3] == "elements-upload":
                 slug = parts[2]                          # the picture they made in ChatGPT / Canva → stickers
                 if not _slug_ok(slug):
@@ -617,8 +721,17 @@ class Handler(SimpleHTTPRequestHandler):
                     items = [x.strip() for x in re.split(r"[;,\n]", data.get("items") or "") if x.strip()]
                     style = data.get("style") or aielements.DEFAULT_STYLE
                     if what == "elements-prompt":
-                        return self._json({"prompt": aielements.prompt(items or ["a sticker that fits this reel"], style,
-                                                                       aielements.colors_of(slug), data.get("story", ""))})
+                        about = data.get("about")
+                        if about is not None:            # remember their line about the reel
+                            pl = project.load(slug, "plan.json") or {}
+                            if pl and pl.get("about") != about:
+                                pl["about"] = about
+                                project.save(slug, "plan.json", pl)
+                        else:
+                            about = aielements.about_of(slug)
+                        ref = bool(glob.glob(project.path(slug, "elements", "reference.*")))
+                        return self._json({"prompt": aielements.chatgpt_prompt(about, items,
+                                                                               style, aielements.colors_of(slug), ref)})
                     def job(what=what, items=items, style=style, data=data):
                         JOBS[slug + ":elements"] = {"state": "working"}
                         try:
@@ -732,21 +845,46 @@ class Handler(SimpleHTTPRequestHandler):
                 if what == "brief":
                     project.save(slug, "brief.json", data)
                     return self._json({"ok": True})
+                if what == "sound-edit":                # one row of the sound list: off / on / another sound
+                    from .. import sounddesign as sd
+                    pl = project.load(slug, "plan.json") or {}
+                    ed = pl.setdefault("sfx_edits", {})
+                    k = sd.key_of(data.get("t", 0))
+                    e = ed.get(k, {})
+                    if "off" in data:
+                        e["off"] = bool(data["off"])
+                    if data.get("label"):               # "another sound": the next one of that kind (or a chosen kind)
+                        lab = sd.CHOICE_FOR.get(data["label"], data["label"])
+                        files = sd.choice_files(lab if lab in sd.CHOICES else "Soft pop")
+                        if files:
+                            cur = e.get("file")
+                            e["file"] = files[(files.index(cur) + 1) % len(files)] if cur in files else files[0]
+                            e["off"] = False
+                    if data.get("reset"):
+                        e = {}
+                    if e:
+                        ed[k] = e
+                    else:
+                        ed.pop(k, None)
+                    project.save(slug, "plan.json", pl)
+                    return self._json(sound_list(slug))
                 if what == "sound":                     # sound effects + music choice → plan.json
                     pl = project.load(slug, "plan.json") or {}
-                    if data.get("sound") in ("quiet", "soft"):
+                    if data.get("sound") in ("modern", "quiet", "soft"):
                         pl["sound"] = data["sound"]
                     m = data.get("music")
                     if m == "trending":                 # no music in the file: they add a trending sound in the app
                         pl["music"] = {"none": True}
-                    elif m == "builtin":
+                    elif m == "builtin" or m in BEDS:
                         cur = pl.get("music") or {}
-                        f = cur.get("file") if cur.get("file") and "/music/mine" not in cur.get("file", "") else None
+                        f = cur.get("file") if m == "builtin" and cur.get("file") and "/music/mine" not in cur.get("file", "") \
+                            and "/bed-" not in cur.get("file", "") else None
                         if not f:
                             from .. import musicgen
                             dur = sum(b.get("dur", 3) for b in pl.get("beats", [])) + 3 if pl.get("beats") else 60
-                            st, _ = musicgen.compose({"mood": ["calm"], "genre": ["soft piano"], "tempo": "80", "energy": "steady"}, dur, seed=7)
-                            mp = project.path(slug, "music", "bed.wav")
+                            brief = BEDS.get(m, BEDS["calm"])
+                            st, _ = musicgen.compose(brief, dur, seed=7)
+                            mp = project.path(slug, "music", f"bed-{m if m in BEDS else 'calm'}.wav")
                             os.makedirs(os.path.dirname(mp), exist_ok=True)
                             musicgen.write(mp, st)
                             f = os.path.relpath(mp, project.ROOT)
@@ -836,6 +974,20 @@ def _scene_source(slug):
     return src if src and os.path.exists(src) else None
 
 
+def _example_clip():
+    """A short sample clip (from a library photo) so photo-only reels still get a moving example of every effect."""
+    import subprocess
+    out = os.path.join(project.ROOT, "out", "effect-example.mp4")
+    if not os.path.exists(out):
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        photo = os.path.join(project.ROOT, "library", "samples", "hero-photo.jpg")
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-loop", "1", "-i", photo, "-t", "6", "-vf",
+                        "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p",
+                        "-r", "30", out + ".part.mp4"], check=True)
+        os.replace(out + ".part.mp4", out)
+    return out
+
+
 def scene_lines(slug):
     """Spoken lines (from the rough cut) and the scene effect on each, for the Scene effects page."""
     from .. import scenefx
@@ -847,15 +999,15 @@ def scene_lines(slug):
             if d.startswith("scene:") and "line" in b:
                 on.setdefault(b["line"], []).append(d[6:])
     lines = [{"id": l["id"], "text": l.get("text", ""), "fx": on.get(l["id"], [])} for l in rc.get("lines", []) if l.get("keep")]
-    return {"lines": lines, "has_video": bool(_scene_source(slug)), "series": plan.get("series"),
+    return {"lines": lines, "has_video": True, "example": not _scene_source(slug), "series": plan.get("series"),
             "effects": [{"name": k, "label": v, "about": scenefx.ABOUT.get(k, ""), "pack": "vfx45" if k in scenefx.V45 else "studio"}
                         for k, v in scenefx.LABELS.items()]}
 
 
 def scene_clip(slug, fx):
     from .. import scenefx
-    src = _scene_source(slug)
-    if fx not in scenefx.LABELS or not src:
+    src = _scene_source(slug) or _example_clip()
+    if fx not in scenefx.LABELS:
         return None
     folder = project.path(slug, "cache", "scenes")
     os.makedirs(folder, exist_ok=True)

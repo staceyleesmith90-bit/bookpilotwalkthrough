@@ -8,13 +8,31 @@ Source: a git checkout pulls; otherwise the zip at library/update.json -> "zip"
 import io, json, os, shutil, subprocess, sys, urllib.request, zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KEEP = {"brand", "brands", "projects", "inbox", "out", "trash", ".git", ".venv", "venv"}
+KEEP = {"brand", "brands", "projects", "inbox", "out", "trash", ".git", ".venv", "venv", ".download-link"}
+LINK = os.path.join(ROOT, ".download-link")     # their own download link (from the welcome page): free updates, no key
 KEEP_LIB = {"emoji-cache", "models"}
 
 
 def _config():
     p = os.path.join(ROOT, "library", "update.json")
     return json.load(open(p)) if os.path.exists(p) else {}
+
+
+def download_link():
+    try:
+        return open(LINK, encoding="utf-8").read().strip()
+    except Exception:
+        return ""
+
+
+def save_download_link(link):
+    """The link from their Reelmate welcome page. Only the purchase code in it is ever sent (for updates)."""
+    import re
+    m = re.search(r"[a-f0-9]{32}", link or "")
+    if not m:
+        raise ValueError("That doesn't look like your Reelmate link. Copy it from your welcome page.")
+    open(LINK, "w", encoding="utf-8").write((link or "").strip())
+    return True
 
 
 def local_version():
@@ -66,9 +84,9 @@ def _apply_zip(data):
             shutil.copyfileobj(src, out)
 
 
-def auto_update(key=None, machine=None, force=False, feed=None):
+def auto_update(link=None, force=False, feed=None):
     """The automatic update (runs quietly when Reelmate starts, at most once a day).
-    Asks the update feed for the newest version; with a paid licence downloads and installs it.
+    Asks the update feed for the newest version; with their saved download link downloads and installs it.
     -> a one-line message, or None when there's nothing to do. Never raises."""
     import hashlib, time
     feed = (feed or _config().get("feed") or FEED).rstrip("/")
@@ -81,13 +99,13 @@ def auto_update(key=None, machine=None, force=False, feed=None):
         if not rel.get("version") or _vkey(rel["version"]) <= _vkey(local_version()):
             return None
         if _vkey(rel.get("min_extension", "0")) > _vkey(os.environ.get("REEL_EXTENSION_VERSION", "999")):
-            return (f"Reelmate {rel['version']} needs the new installer: download it from your account page "
-                    "and double-click it (your brands and reels stay as they are).")
-        key = key or os.environ.get("REEL_LICENSE_KEY", "")
-        if not machine:                                   # same id the licence check registers (extension/src/licence.py)
-            import platform, uuid
-            machine = hashlib.sha256(f"{platform.node()}|{uuid.getnode()}|{platform.system()}".encode()).hexdigest()[:24]
-        req = urllib.request.Request(feed + "/download", data=json.dumps({"key": key, "machine": machine}).encode(),
+            return (f"Reelmate {rel['version']} needs the new installer: download it from your welcome page link "
+                    "and double-click Install Reelmate (your brands and reels stay as they are).")
+        link = link or download_link()
+        if not link:
+            return (f"Reelmate {rel['version']} is out. To get updates, paste the link from your Reelmate welcome page "
+                    "once (Studio → Updates).")
+        req = urllib.request.Request(feed + "/download", data=json.dumps({"link": link}).encode(),
                                      headers={"Content-Type": "application/json"})
         data = urllib.request.urlopen(req, timeout=300).read()
         if hashlib.sha256(data).hexdigest() != rel.get("sha256"):

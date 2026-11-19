@@ -4,7 +4,7 @@
 
 The .mcpb is a zip: manifest.json + pyproject.toml (Claude installs the Python packages itself) +
 src/ (the small local server) + app/ (the engine, library, playbooks). Customers double-click it in
-Claude Desktop (Windows or Mac), paste their licence key, done.
+Claude Desktop (Windows or Mac), done. No licence key.
 """
 import json, os, shutil, sys, zipfile
 
@@ -41,11 +41,10 @@ def main():
     version = open(os.path.join(ROOT, "VERSION"), encoding="utf-8").read().strip()
     man = json.load(open(os.path.join(EXT, "manifest.json"), encoding="utf-8"))
     man["version"] = version
-    tester = "--tester-until" in sys.argv                  # private tester build: no key needed until a date
+    tester = "--tester-until" in sys.argv                  # private tester build (labelled, with an end date)
     if tester:
         until = sys.argv[sys.argv.index("--tester-until") + 1]
         man["server"]["mcp_config"]["env"]["REEL_TESTER_UNTIL"] = until
-        man["user_config"]["licence_key"]["required"] = False
         man["display_name"] += " (tester)"
     out_dir = os.path.join(ROOT, "dist")
     os.makedirs(out_dir, exist_ok=True)

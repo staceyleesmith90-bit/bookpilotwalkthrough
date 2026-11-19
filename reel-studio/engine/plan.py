@@ -867,10 +867,10 @@ def to_timeline(plan, rc=None, source=None):
         cues.append((0.0, "swish", 0.35))
     # outro: brand end screen (logo, name, handle, call to action)
     cta_text = next((d.split(":", 1)[1] for b in plan.get("beats", []) for d in b.get("do", []) if d.startswith("cta:")), None)
-    # sound effects are OFF unless asked for: "quiet" (default) = music + voice only, no whooshes or game-like sounds
-    sound_mode = plan.get("sound") or "quiet"
+    # sound effects: "modern" (default) = a few recorded CapCut-style sounds; "quiet" = none at all
+    sound_mode = plan.get("sound") or "modern"
     plan = dict(plan, sound=sound_mode)
-    if sound_mode in ("quiet", "soft", "music", "none", "typewriter", "motion", "effects"):
+    if sound_mode in ("modern", "quiet", "soft", "music", "none", "typewriter", "motion", "effects"):
         plan = dict(plan, end_card=dict({"sound": False}, **(plan.get("end_card") or {})))
     tl["end_card"] = dict({"title": pack.get("label", ""), "handle": pack.get("handle", ""),
                            "cta": cta_text or "Follow for more", "enabled": True}, **(plan.get("end_card") or {}))
@@ -923,8 +923,13 @@ def to_timeline(plan, rc=None, source=None):
             cues.append(sounddesign.cue("type_key", it["start"] + 0.4, 950 + k, kit, 0.3))
     if plan.get("sound") == "soft":              # a few gentle RECORDED sounds only, never whooshes / zooms / synths
         cues = sounddesign.soften(cues)
+    if plan.get("sound") == "modern":            # recorded CapCut-style sounds, never game sounds or synths
+        cues = sounddesign.modern(cues)
+    auto_cues = list(cues)
+    cues = sounddesign.apply_edits(cues, plan.get("sfx_edits"))   # the user's sound list: off / another sound
     tl["sound_kit"] = kit
     tl["audio"] = {"sfx": [{"t": round(t, 3), "name": n, "gain": g} for t, n, g in sorted(cues)],
+                   "sfx_auto": [{"t": round(t, 3), "name": n} for t, n, g in sorted(auto_cues)],
                    "music": plan.get("music"), "sfx_gain": 0.6,
                    "broll_sound": float(plan.get("broll_sound", 0) or 0),   # b-roll clips' own sound, softly under the voice
                    "denoise": plan.get("denoise", "auto")}      # auto (AI cleaner) · light · elevenlabs

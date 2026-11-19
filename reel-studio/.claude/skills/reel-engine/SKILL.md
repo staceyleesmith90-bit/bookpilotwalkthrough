@@ -106,7 +106,7 @@ e.g. "it's on my face" → move it there and press Save.
 4. **Style plan.** Choose the reel's **recipe** (`reel-recipes` skill) from what they said and
    what the video is. Write `projects/<p>/plan.json` (format below) — a few lines, not a
    frame-by-frame spec. Default look is **clean**: plain footage most of the time, quiet
-   single-word captions, NO sound effects (music + voice only), and ONE special treatment per moment (a takeover,
+   single-word captions, a few modern recorded sound effects (never game sounds), and ONE special treatment per moment (a takeover,
    a pop-up, an animation window) — never several at once. Then
    `python -m engine styleplan <project>` and show that table as it is (beat → line → what
    happens). Ask: "Build it, or change anything?" Apply changes in plain words ("beat 1:
@@ -193,13 +193,16 @@ look. Write `projects/<p>/posts.json` first. Business reels: tips layout (cover,
 words, no logos / page numbers / buttons. Each slide picks its own `photo` (image or `clip.mp4@2.5`) and `layout`
 (photo · polaroid · collage). Use their nicest shots only, in their language.
 
-## Sound (the owner's rule: no game-like sounds)
-Default is `"sound": "quiet"` (or leave it out): music + voice only, NO sound effects — no whooshes, swishes,
-zooms, risers, booms. Those make AI edits sound like a racing game. Only if the person asks for sounds:
-`"sound": "soft"` = a few gentle recorded sounds (paper, a soft pop, a camera click), at most one every 1.2 s,
-their own sounds first. The older modes ("full" = a sound on every move, "motion", "effects", "typewriter") only when they ask for that exact feel.
+## Sound (the owner's rule: modern, CapCut-style sounds, never game-like ones)
+Default is `"sound": "modern"` (or leave it out): a few REAL recorded sounds on the moments that matter (soft pops,
+taps, paper swipes, page flips, airy swooshes, a sparkle, a ding), never two within 0.7 s. Synth zooms, risers,
+booms, shatters and the old Kenney game blips are never used in this mode. `"quiet"` = no sound effects at all;
+`"soft"` = only a few gentle ones. The older modes ("full", "motion", "effects", "typewriter") only when asked.
+People can see and change every sound on the **Sound & finish** page: each one with its second, ▶ play, an on/off
+switch and **Another sound**. Those choices live in `plan.json` → `"sfx_edits": {"<t to 0.01 s>": {"off": true} |
+{"file": "foley/pop-221091.wav"}}` (kinds: `engine/sounddesign.py` CHOICES); keep them when you change the plan.
 Music: best is a trending sound added in Instagram/TikTok (hand over `final-for-trending-sound.mp4`) or their own
-track (Suno, a song they have the rights to, Epidemic Sound). The built-in composer is the fallback; say so.
+track (Suno, a song they have the rights to, Epidemic Sound). The built-in composer (Upbeat & happy · Fun groove · Calm piano, royalty-free because Reelmate makes it) is the free option.
 
 ## App-style motion graphics + their sounds (studied from creators who edit with their own AI app)
 - On any beat: `"do": ["mg:<kind>"]`, `"mg": {...}`. Kinds: **pills** (labels pop in, tilted), **window** (an

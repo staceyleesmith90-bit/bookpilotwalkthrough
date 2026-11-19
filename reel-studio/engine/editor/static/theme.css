@@ -15,7 +15,7 @@
   --grad: #E8541E;
 }
 
-body { font-family: "Nunito", system-ui, sans-serif !important; background: var(--bg) !important; color: var(--ink); }
+body { font-family: "Nunito", system-ui, sans-serif !important; background: var(--bg) url("/brand-sp/pattern.svg") 0 0 / 420px 420px repeat fixed !important; color: var(--ink); }
 h1, h2, h3, .logo b, header h1 { font-family: "DynaPuff", "Nunito", sans-serif !important; letter-spacing: 0 !important; font-weight: 600 !important; }
 button, input, select, textarea { font-family: inherit; }
 .spring-letters span:nth-child(6n+1) { color: #104631; } .spring-letters span:nth-child(6n+2) { color: #E8541E; }
@@ -137,7 +137,7 @@ dialog.mk .pick { max-height: 140px; overflow-y: auto; margin-top: 8px; }
 dialog.mk .pk { font-weight: 500 !important; margin: 4px 0 !important; display: flex !important; gap: 8px; align-items: center; }
 dialog.mk .pk input { width: auto; margin: 0; }
 @media (max-width: 600px) { dialog.mk .grid2 { grid-template-columns: 1fr; } }
-.note:empty { display: none !important; }
+div.note:empty, p.note:empty, span.note:empty { display: none !important; }
 
 /* the reel step bar (Cut → Storyboard → Sound & finish) */
 .rm-steps { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; background: var(--mint); border-bottom: 1px solid #D5E4DD; flex-wrap: wrap; }
@@ -146,3 +146,15 @@ dialog.mk .pk input { width: auto; margin: 0; }
 .rm-steps a.on { background: var(--butter); }
 .rm-steps a.on b { background: var(--orange); color: #fff; }
 .rm-steps .sep { width: 28px; height: 2px; background: #BFD6CC; border-radius: 2px; }
+
+/* voice-note button (theme.js) under every feedback box */
+.rm-mic { display: inline-flex; align-items: center; gap: 6px; margin: 6px 0 2px; border: 1.5px solid #1F6E73; background: #fff; color: #104631;
+  border-radius: 999px; padding: 5px 12px; font: 700 13px/1.2 Nunito, system-ui, sans-serif; cursor: pointer;
+  width: auto !important; align-self: flex-start; justify-self: start; flex: none; }
+.rm-mic:hover { background: #E6F0EC; }
+.rm-mic.rec { background: #E8541E; border-color: #E8541E; color: #fff; animation: rmpulse 1.2s ease-in-out infinite; }
+.rm-mic.busy { opacity: .7; cursor: wait; }
+#rs-chat .rm-mic.in-chat { margin: 0 6px 0 0 !important; padding: 7px 10px !important; align-self: center; background: #fff !important;
+  color: #104631 !important; border: 1.5px solid #1F6E73 !important; min-width: 0; font-size: 15px; }
+#rs-chat .rm-mic.in-chat.rec { background: #E8541E !important; color: #fff !important; }
+@keyframes rmpulse { 50% { box-shadow: 0 0 0 6px rgba(232, 84, 30, .18); } }

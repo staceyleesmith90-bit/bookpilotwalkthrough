@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="420" viewBox="0 0 420 420" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Reelmate background doodles: film frame, sparkle, heart, flower, play button, music note, squiggle, star, camera, dots -->
+  <g opacity=".5">
+    <g transform="translate(34 40) rotate(-10)" stroke="#1F6E73" stroke-width="3"><rect x="0" y="0" width="54" height="40" rx="7"/><path d="M8 0v40M46 0v40M0 10h8M0 20h8M0 30h8M46 10h8M46 20h8M46 30h8"/></g>
+    <g transform="translate(170 30)" fill="#E9A21F"><path d="M14 0c2 9 5 12 14 14-9 2-12 5-14 14-2-9-5-12-14-14 9-2 12-5 14-14z"/></g>
+    <g transform="translate(300 58) rotate(12)" fill="#E86F8A"><path d="M20 34C8 25 0 18 0 10a9 9 0 0 1 20-4 9 9 0 0 1 20 4c0 8-8 15-20 24z"/></g>
+    <g transform="translate(88 170)" fill="#E8541E"><circle cx="18" cy="8" r="8"/><circle cx="28" cy="18" r="8"/><circle cx="18" cy="28" r="8"/><circle cx="8" cy="18" r="8"/><circle cx="18" cy="18" r="6" fill="#F8D27A"/></g>
+    <g transform="translate(230 150) rotate(-8)" stroke="#104631" stroke-width="3"><rect x="0" y="0" width="44" height="44" rx="14"/><path d="M17 13l14 9-14 9z" fill="#104631"/></g>
+    <g transform="translate(350 190)" stroke="#1F6E73" stroke-width="3"><path d="M6 30V4l20-4v24"/><circle cx="3" cy="30" r="5" fill="#1F6E73"/><circle cx="23" cy="25" r="5" fill="#1F6E73"/></g>
+    <g transform="translate(20 300)" stroke="#E9A21F" stroke-width="3.5"><path d="M0 10c10-14 20 14 30 0s20 14 30 0 20 14 30 0"/></g>
+    <g transform="translate(160 290) rotate(15)" fill="#F8D27A" stroke="#E9A21F" stroke-width="2"><path d="M18 0l5 12 13 1-10 8 3 13-11-7-11 7 3-13-10-8 13-1z"/></g>
+    <g transform="translate(280 300) rotate(-6)" stroke="#E8541E" stroke-width="3"><rect x="0" y="8" width="50" height="34" rx="8"/><path d="M15 8l5-8h10l5 8"/><circle cx="25" cy="25" r="9"/></g>
+    <g fill="#E86F8A"><circle cx="130" cy="110" r="4"/><circle cx="392" cy="120" r="4"/><circle cx="60" cy="240" r="4"/><circle cx="215" cy="380" r="4"/><circle cx="370" cy="380" r="4"/></g>
+    <g fill="#1F6E73"><circle cx="250" cy="100" r="3"/><circle cx="150" cy="240" r="3"/><circle cx="330" cy="260" r="3"/><circle cx="100" cy="380" r="3"/></g>
+    <g transform="translate(380 330)" fill="#E9A21F"><path d="M8 0c1 5 3 7 8 8-5 1-7 3-8 8-1-5-3-7-8-8 5-1 7-3 8-8z"/></g>
+    <g transform="translate(120 360) rotate(-15)" stroke="#E86F8A" stroke-width="3"><path d="M0 0c6 6 6 14 0 20M10 -4c9 9 9 19 0 28"/></g>
+  </g>
+</svg>

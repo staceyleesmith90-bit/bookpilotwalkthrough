@@ -290,7 +290,7 @@
   <span class="grow"></span>
   <div class="plan"><b><svg class="ico" viewBox="0 0 24 24"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/></svg> Reelmate is yours</b>
     <ul><li>One payment, no subscription</li><li>Unlimited reels</li><li>Free updates</li><li>Your files stay with you</li></ul>
-    <a href="#" id="planBtn">My licence</a></div>
+    <a href="#" id="planBtn">Updates</a></div>
 </div>
 
 <div class="bar-top">
@@ -514,7 +514,7 @@
 <dialog id="postsDlg" style="width:min(1100px,96vw)"><div class="wz-head"><b style="flex:1" id="postsTitle">Carousel &amp; stories</b><button class="x" onclick="$('#postsDlg').close()" aria-label="Close">✕</button></div>
   <div class="wz-body" id="postsBody" style="max-height:78vh"></div></dialog>
 
-<dialog id="planDlg"><div class="wz-head"><b style="flex:1">Your plan</b><button class="x" onclick="$('#planDlg').close()" aria-label="Close">✕</button></div>
+<dialog id="planDlg"><div class="wz-head"><b style="flex:1">Reelmate is yours</b><button class="x" onclick="$('#planDlg').close()" aria-label="Close">✕</button></div>
   <div class="wz-body" id="planBody"></div></dialog>
 
 <dialog id="bs">
@@ -1008,12 +1008,17 @@ $("#brGo").onclick = async () => {
 
 // ------------------------------------------------------------ plan
 $("#planBtn").onclick = async e => { e.preventDefault(); const p = await api("/api/plan");
-  const when = p.checked ? new Date(p.checked * 1000).toLocaleString() : "";
-  $("#planBody").innerHTML = `<h3>${p.dev ? "Tester / developer copy" : p.known ? (p.active ? "Reelmate: yours forever" : "Reelmate: key not active") : "Your Reelmate licence"}</h3>
-    <p class="sub">${p.dev ? "This copy isn't tied to a licence key." : p.known ? esc(p.message || "") + "" : "Reelmate checks your key now and then when you use it with Claude. One payment, no subscription."}</p>
-    ${when ? `<p class="note">Last checked: ${esc(when)}. Once activated, Reelmate keeps working, even offline.</p>` : ""}
-    <p class="note">Updates are included and arrive by themselves. Your reels and files always stay on your computer.</p>
-    <a class="cta" href="${p.account}" target="_blank" rel="noopener" style="margin-top:14px">My licence page ↗</a>`;
+  $("#planBody").innerHTML = `<h3>Yours forever</h3>
+    <p class="sub">You paid once. No key, no subscription, and your reels and files always stay on your computer.</p>
+    <p class="note">You have version <b>${esc(p.version || "")}</b>. ${p.latest ? esc(p.latest) : "That's the newest one."}</p>
+    ${p.link_saved ? `<p class="note">✓ Free updates are on: Reelmate updates itself.</p>`
+      : `<p class="note"><b>Turn on free updates (once):</b> paste the link from your Reelmate welcome page (the page you downloaded Reelmate from).</p>
+         <input type="text" id="upLink" placeholder="https://…/welcome?ref=…" style="width:100%">
+         <button class="cta" id="upSave" style="margin-top:10px">Save my link</button><p class="note" id="upMsg"></p>`}`;
+  const sv = $("#upSave");
+  if (sv) sv.onclick = async () => { $("#upMsg").textContent = "Checking…";
+    const r = await api("/api/update-link", { link: $("#upLink").value });
+    $("#upMsg").textContent = r.ok ? r.message : r.error; };
   $("#planDlg").showModal(); };
 
 // ------------------------------------------------------------ notifications
@@ -1064,9 +1069,9 @@ const STEPS = [
       <textarea id="script" rows="7" placeholder="Stop editing for hours&#10;Your coffee deserves better&#10;Here's what I do instead…">${esc(B.script || "")}</textarea>` },
   { id: "idea", show: () => !B.template, ok: () => !!B.idea, html: () => `<h3>What's it about?</h3><p class="sub">This decides how it's edited: pacing, titles, stickers. No editing words needed.</p>
       <div class="opts">${IDEAS.map(([v, a, b]) => `<button class="opt ${B.idea === v ? "on" : ""}" data-set="idea" data-v="${v}"><b>${a}</b><span>${b}</span></button>`).join("")}</div>
-      <label class="f">In one sentence</label><input type="text" id="topic" placeholder="e.g. my 5am morning routine as a mom of two" value="${esc(B.topic || "")}">` },
+      <label class="f">In one sentence</label><input type="text" data-voice id="topic" placeholder="e.g. my 5am morning routine as a mom of two" value="${esc(B.topic || "")}">` },
   { id: "vibe", show: () => true, ok: () => (B.vibe || []).length > 0, html: () => `<h3>How should it feel?</h3><p class="sub">Pick one or two.</p>
-      ${B.template ? `<label class="f">Topic (one sentence)</label><input type="text" id="topic" value="${esc(B.topic || "")}" placeholder="what's this one about?">` : ""}
+      ${B.template ? `<label class="f">Topic (one sentence)</label><input type="text" data-voice id="topic" value="${esc(B.topic || "")}" placeholder="what's this one about?">` : ""}
       <div class="pills" style="margin-top:12px">${VIBES.map(v => `<button class="pill ${(B.vibe || []).includes(v) ? "on" : ""}" data-multi="vibe" data-v="${v}">${v}</button>`).join("")}</div>
       <label class="f">Love a reel's style? Paste its link (optional)</label><input type="text" id="insp" placeholder="https://www.instagram.com/reel/…" value="${esc(B.inspiration || "")}">
       <p class="note">I'll study its pacing, colours and text style and use them with <b>your</b> brand.</p>` },
@@ -1093,7 +1098,7 @@ const STEPS = [
         <label class="f">Style</label><div class="pills">${O.music.genres.map(v => `<button class="pill ${(B.genre || []).includes(v) ? "on" : ""}" data-multi="genre" data-v="${v}">${v}</button>`).join("")}</div>
         <label class="f">Speed</label><div class="seg">${["slow", "medium", "fast"].map(v => `<button class="${(B.tempo || "medium") === v ? "on" : ""}" data-set="tempo" data-v="${v}">${v}</button>`).join("")}</div>
         <label class="f">Energy</label><div class="seg">${[["steady", "steady"], ["build", "builds up"], ["drop", "drops in the middle"]].map(([v, a]) => `<button class="${(B.energy || "steady") === v ? "on" : ""}" data-set="energy" data-v="${v}">${a}</button>`).join("")}</div>
-        <label class="f">Describe it in your words (optional)</label><input type="text" id="mdesc" placeholder="like a rainy Sunday morning with soft piano" value="${esc(B.describe || "")}">
+        <label class="f">Describe it in your words (optional)</label><input type="text" data-voice id="mdesc" placeholder="like a rainy Sunday morning with soft piano" value="${esc(B.describe || "")}">
         ${(B.music || "free") === "free" ? `<button class="ghost" id="hear" style="margin-top:12px">▶︎ Hear a preview</button><audio id="aud" controls class="hidden"></audio>
           <p class="note">Made on your computer, royalty-free, yours to use anywhere. Want studio-grade AI music? Connect ElevenLabs (paid, cleared for social media).</p>`
           : `<p class="note">ElevenLabs makes 2 options to choose from (paid per track by ElevenLabs, cleared for social media).</p>`}

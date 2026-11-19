@@ -4,7 +4,7 @@ Everything runs on the customer's own computer:
   - their videos, brand and finished reels live in their Reelmate folder (default
     Documents/Reelmate) — nothing is uploaded or stored anywhere else;
   - the thinking happens in THEIR Claude / Codex plan; this server only runs the editing engine;
-  - a monthly licence key (from their Systems Pilot account) unlocks the tools.
+  - no licence key: people pay once on the website and download Reelmate; it's theirs forever.
 
 The engine is the same `python -m engine …` used everywhere else; it is copied from the extension
 into the Reelmate folder on first run and after every update (their own files are kept).
@@ -31,7 +31,7 @@ def _home():
 
 
 HOME = _home()
-KEEP = {"brand", "brands", "projects", "inbox", "out", "trash", ".licence.json"}
+KEEP = {"brand", "brands", "projects", "inbox", "out", "trash", ".licence.json", ".download-link"}
 KEEP_LIB = {"emoji-cache", "models", "cache"}
 COPY = ["engine", "library", ".claude", "docs", "VERSION", "AGENTS.md", "CLAUDE.md", "requirements.txt", "scripts"]
 VIDEO_EXT = (".mp4", ".mov", ".m4v", ".avi", ".mkv", ".webm")
@@ -305,15 +305,8 @@ def reel_open(what: str) -> str:
         return f"Couldn't open it: {e}"
 
 
-@mcp.tool()
-def reel_licence() -> str:
-    """Check the Reelmate licence."""
-    ok, msg = licence.status(HOME)
-    return ("✓ " if ok else "✗ ") + msg
-
-
 def _auto_update():
-    """Once a day: if a newer Reelmate is out and the licence is paid, install it quietly.
+    """Once a day: if a newer Reelmate is out, install it quietly (with the download link saved on this computer).
     Their brands, reels and uploads are never touched (engine/update.py keeps them)."""
     try:
         env = dict(ENV, REEL_EXTENSION_VERSION=_version(APP))

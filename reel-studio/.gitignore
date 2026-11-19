@@ -34,3 +34,4 @@ brand/ai.json
 
 # the brand in use is always personal: catalogue, product photos, keys — never in git
 /brand/
+/.download-link

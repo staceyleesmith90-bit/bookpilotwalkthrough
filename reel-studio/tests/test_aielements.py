@@ -62,3 +62,11 @@ def test_place_puts_one_sticker_per_moment_off_centre_and_clear_removes_them(tmp
     assert st[0][0]["x"] != 0.5 and st[1][0]["image"].endswith("b.png") and not st[2]
     aielements.clear(slug)
     assert all(not (b.get("scene") or {}).get("stickers") for b in project.load(slug, "plan.json")["beats"])
+
+
+def test_chatgpt_prompt_is_explicit():
+    from engine.aielements import chatgpt_prompt
+    p = chatgpt_prompt("our garden day", ["sand bucket", "sun"], "clay", ["#E8541E"], reference=True)
+    assert "our garden day" in p and "- sand bucket" in p and "- sun" in p and "clay" in p
+    assert "reference picture" in p and "pure white background" in p and "no words" in p
+    assert "Choose 5" in chatgpt_prompt("x", [], "paper")

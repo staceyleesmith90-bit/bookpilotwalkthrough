@@ -29,7 +29,7 @@
     <form><textarea rows="1" placeholder="e.g. make the button pink"></textarea><button>Send</button></form>
     <div class="rs-hint"></div></div>`;
   document.body.appendChild(box);
-  const log = box.querySelector(".rs-log"), ta = box.querySelector("textarea"), btn = box.querySelector("button"),
+  const log = box.querySelector(".rs-log"), ta = box.querySelector("textarea"), btn = box.querySelector("form button:not(.rm-mic)"),
         hint = box.querySelector(".rs-hint");
   box.querySelector(".rs-bar").onclick = () => box.classList.toggle("rs-min");
   let pref = null;

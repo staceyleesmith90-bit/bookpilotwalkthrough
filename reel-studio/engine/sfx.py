@@ -111,6 +111,9 @@ def load(name):
     if name.startswith("sd:"):
         from .sounddesign import render
         return render(name)
+    if name.startswith("file:"):                  # a sound the user picked in the sound list (library/sfx/...)
+        from .sounddesign import SFX_DIR, _soften, _wav
+        return _soften(_wav(os.path.join(SFX_DIR, name[5:])))
     if name in SFX:
         return SFX[name]()
     for d in ("library/sfx", "inbox"):

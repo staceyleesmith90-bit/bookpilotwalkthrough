@@ -5,7 +5,10 @@
   "version": "1.8.0",
   "description": "Reelmate, your reel-editing buddy inside Claude. Drop in a video and say what you want — rough cut, captions, sounds, stickers, CapCut export. Everything runs on your own computer.",
   "long_description": "Reelmate edits short-form videos on your own computer: rough cut, brand captions, real sound effects, CapCut-style text, animation windows, CapCut project export and a review page with voice notes. Your videos never leave your computer. Uses your own Claude plan for the thinking. One payment, yours forever: paste the licence key from your welcome page.",
-  "author": { "name": "Systems Pilot", "url": "https://systemspilot.co.za" },
+  "author": {
+    "name": "Systems Pilot",
+    "url": "https://systemspilot.co.za"
+  },
   "homepage": "https://systemspilot.co.za",
   "icon": "icon.png",
   "server": {
@@ -13,22 +16,19 @@
     "entry_point": "src/server.py",
     "mcp_config": {
       "command": "uv",
-      "args": ["--directory", "${__dirname}", "run", "src/server.py"],
+      "args": [
+        "--directory",
+        "${__dirname}",
+        "run",
+        "src/server.py"
+      ],
       "env": {
-        "REEL_LICENSE_KEY": "${user_config.licence_key}",
         "REEL_HOME": "${user_config.workspace}",
         "PYTHONUTF8": "1"
       }
     }
   },
   "user_config": {
-    "licence_key": {
-      "type": "string",
-      "title": "Licence key",
-      "description": "From your Reelmate welcome page (Systems Pilot).",
-      "sensitive": true,
-      "required": true
-    },
     "workspace": {
       "type": "directory",
       "title": "Reelmate folder",
@@ -38,16 +38,39 @@
     }
   },
   "compatibility": {
-    "platforms": ["win32", "darwin"]
+    "platforms": [
+      "win32",
+      "darwin"
+    ]
   },
   "tools": [
-    { "name": "reel_guide", "description": "How Reelmate works: the playbooks for every task." },
-    { "name": "reel_command", "description": "Run a Reelmate step (rough cut, style plan, render, CapCut export, …)." },
-    { "name": "reel_job", "description": "Check on a long step that is running." },
-    { "name": "reel_read", "description": "Read a file in the Reelmate folder." },
-    { "name": "reel_write", "description": "Write a plan or setting file in the Reelmate folder." },
-    { "name": "reel_inbox", "description": "List videos ready to edit and open the Inbox folder." },
-    { "name": "reel_open", "description": "Open the Studio app, review page or a finished reel." },
-    { "name": "reel_licence", "description": "Check the Reelmate licence." }
+    {
+      "name": "reel_guide",
+      "description": "How Reelmate works: the playbooks for every task."
+    },
+    {
+      "name": "reel_command",
+      "description": "Run a Reelmate step (rough cut, style plan, render, CapCut export, …)."
+    },
+    {
+      "name": "reel_job",
+      "description": "Check on a long step that is running."
+    },
+    {
+      "name": "reel_read",
+      "description": "Read a file in the Reelmate folder."
+    },
+    {
+      "name": "reel_write",
+      "description": "Write a plan or setting file in the Reelmate folder."
+    },
+    {
+      "name": "reel_inbox",
+      "description": "List videos ready to edit and open the Inbox folder."
+    },
+    {
+      "name": "reel_open",
+      "description": "Open the Studio app, review page or a finished reel."
+    }
   ]
 }

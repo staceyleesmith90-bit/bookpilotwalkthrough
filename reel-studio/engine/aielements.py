@@ -132,6 +132,45 @@ def prompt(items, style=DEFAULT_STYLE, colors=None, story=""):
             "Flat pure white background, no drop shadows, no numbers, no letters, no labels, no border, high detail.")
 
 
+def chatgpt_prompt(about, items, style=DEFAULT_STYLE, colors=None, reference=False):
+    """The prompt people copy into ChatGPT: says what the reel is about, exactly what to draw, and the rules the
+    cut-out step needs. Plain and explicit, because ChatGPT follows explicit instructions best."""
+    look = STYLES.get(style, style)
+    lines = [f"I'm making a short vertical video (an Instagram / TikTok reel) about: {about.strip() or 'my day'}.",
+             "Please make ONE square image: a sheet of stickers I can put on top of my video.", "",
+             ]
+    if items:
+        lines += [f"Draw exactly these {len(items)} things, each one as its own separate sticker:"] + [f"- {it}" for it in items]
+    else:
+        lines += ["Choose 5 small things that clearly belong to this story and draw each one as its own separate sticker."]
+    lines += ["", f"Style: {look}."]
+    if colors:
+        lines.append("Use these colours where it fits: " + ", ".join(c for c in colors if c) + ".")
+    if reference:
+        lines.append("I've attached a reference picture: match its style, colours and feel (not its exact content).")
+    lines += ["", "Important rules (an app cuts the stickers out automatically):",
+              "- a plain, pure white background",
+              "- every sticker separate, with lots of space around it: nothing touching or overlapping",
+              "- no words, letters, numbers, labels, people, frames or shadows",
+              "- high detail, centred, the whole object visible"]
+    return "\n".join(lines)
+
+
+def about_of(slug):
+    """One line on what the reel is about (for prompts): the user's own line, else the story / the first words."""
+    from . import project
+    plan = project.load(slug, "plan.json") or {}
+    if plan.get("about") or plan.get("story"):
+        return plan.get("about") or plan.get("story")
+    words = []
+    for b in plan.get("beats", [])[:4]:
+        sp = b.get("scene") or {}
+        w = b.get("text") or sp.get("title") or sp.get("text") or sp.get("name") or ""
+        if isinstance(w, str) and w.strip():
+            words.append(w.strip())
+    return ", ".join(words)[:160]
+
+
 # ---------------------------------------------------------------- generators
 def _post(url, body, headers, timeout=180):
     req = urllib.request.Request(url, data=json.dumps(body).encode(), headers=dict({"Content-Type": "application/json"}, **headers))

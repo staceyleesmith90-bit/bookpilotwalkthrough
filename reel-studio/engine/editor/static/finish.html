@@ -30,6 +30,23 @@
   .bar { height: 8px; background: var(--soft); border-radius: 9px; overflow: hidden; margin-top: 10px; display: none; }
   .bar i { display: block; height: 100%; width: 30%; background: #E8541E; border-radius: 9px; animation: go 1.4s ease-in-out infinite; }
   @keyframes go { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
+  .sl { margin-top: 14px; }
+  .sl h3 { margin: 0 0 6px; font-size: 15px; }
+  .sl .row { display: grid; grid-template-columns: 52px 34px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: #fff; margin: 6px 0; }
+  .sl .row.off { opacity: .5; } .sl .row.off .nm { text-decoration: line-through; }
+  .sl .tm { font-weight: 800; font-variant-numeric: tabular-nums; color: #1F6E73; }
+  .sl .nm b { display: block; font-size: 14px; } .sl .nm small { color: var(--muted); font-size: 12.5px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+  .sl .play { width: 34px; height: 34px; border-radius: 50%; border: 0; background: #E6F0EC; color: #104631; cursor: pointer; font-size: 13px; }
+  .sl .sw { position: relative; width: 44px; height: 26px; } .sl .sw input { opacity: 0; width: 0; height: 0; }
+  .sl .sw i { position: absolute; inset: 0; background: #d9d2c6; border-radius: 99px; cursor: pointer; transition: .2s; }
+  .sl .sw i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: .2s; }
+  .sl .sw input:checked + i { background: #E8541E; } .sl .sw input:checked + i::after { left: 21px; }
+  .sl .another { display: flex; gap: 4px; } .sl select, .sl .ab { border: 1px solid var(--line); background: #fff; border-radius: 99px; padding: 5px 10px; font-size: 13px; cursor: pointer; }
+  .sl .ab { white-space: nowrap; }
+  .mp { border: 0; background: #E6F0EC; color: #104631; border-radius: 99px; padding: 3px 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; margin-left: 4px; }
+  .sl .empty { color: var(--muted); font-size: 14px; }
+  @media (max-width: 560px) { .sl .row { grid-template-columns: 44px 34px minmax(0, 1fr) auto; } .sl .another { grid-column: 3 / -1; } .sl select { min-width: 0; flex: 1; } }
+  main > * { min-width: 0; }
   @media (max-width: 820px) { main { grid-template-columns: 1fr; padding: 16px; } }
 </style>
 <link rel="stylesheet" href="/theme.css">
@@ -41,9 +58,11 @@
   <div>
     <section class="card">
       <h2>Sound effects</h2>
-      <p class="sub">No whooshes or game sounds. Ever.</p>
-      <label class="choice"><input type="radio" name="sfx" value="quiet"><div><b>None (recommended)</b><span>Just your voice and music. Clean and calm.</span></div></label>
-      <label class="choice"><input type="radio" name="sfx" value="soft"><div><b>A few soft sounds</b><span>A gentle paper or pop sound on the big moments only. Your own sounds first.</span></div></label>
+      <p class="sub">Real recorded sounds like the ones in CapCut: soft pops, swooshes, page flips. Never game sounds.</p>
+      <label class="choice"><input type="radio" name="sfx" value="modern"><div><b>Modern sounds (recommended)</b><span>A sound on the moments that matter. Change any of them below.</span></div></label>
+      <label class="choice"><input type="radio" name="sfx" value="soft"><div><b>Only a few soft ones</b><span>Paper and soft pops on the big moments only.</span></div></label>
+      <label class="choice"><input type="radio" name="sfx" value="quiet"><div><b>No sound effects</b><span>Just your voice and music.</span></div></label>
+      <div id="sl" class="sl"></div>
     </section>
     <section class="card">
       <h2>Music</h2>
@@ -51,14 +70,16 @@
       <label class="choice"><input type="radio" name="music" value="trending"><div><b>A trending sound (best)</b><span>No music in the file. When you post, pick a trending sound in Instagram or TikTok.</span></div></label>
       <label class="choice"><input type="radio" name="music" value="mine"><div><b>My own song</b><span>An mp3 you made (Suno) or have the rights to (Epidemic Sound, Artlist…).
         <label class="btn ghost" style="margin-top:8px;display:inline-block;cursor:pointer">Choose a song<input type="file" id="song" accept="audio/*" hidden></label></span></div></label>
-      <label class="choice"><input type="radio" name="music" value="builtin"><div><b>Calm built-in music</b><span>Made by Reelmate, free. Fine as a backup.</span></div></label>
+      <label class="choice"><input type="radio" name="music" value="upbeat"><div><b>Upbeat &amp; happy</b><span>Bright pop, made by Reelmate. Free and yours to post anywhere. <button class="mp" data-m="upbeat">▶ Listen</button></span></div></label>
+      <label class="choice"><input type="radio" name="music" value="groove"><div><b>Fun groove</b><span>A bouncy afro-pop beat, made by Reelmate. Free. <button class="mp" data-m="groove">▶ Listen</button></span></div></label>
+      <label class="choice"><input type="radio" name="music" value="calm"><div><b>Calm piano</b><span>Soft and gentle, made by Reelmate. Free. <button class="mp" data-m="calm">▶ Listen</button></span></div></label>
       <div class="rowx">Music volume <input type="range" id="gain" min="0.1" max="1" step="0.05" style="flex:1"></div>
     </section>
   </div>
   <aside>
     <section class="card player">
       <h2>Your reel</h2>
-      <div id="pv"><div class="empty">Press <b>Make my reel</b>. It shows up here to watch and download.</div></div>
+      <div id="pv"><div class="empty"><div>Press <b>Make my reel</b>. It shows up here to watch and download.</div></div></div>
       <div class="bar" id="bar"><i></i></div>
       <p class="msg" id="msg"></p>
       <button class="btn" id="go" style="width:100%">Make my reel</button>
@@ -74,10 +95,12 @@ const post = (u, b) => fetch(u, {method: "POST", headers: {"Content-Type": "appl
 let S = {};
 async function load() {
   S = await (await fetch(`/api/p/${slug}/sound`)).json();
-  document.querySelector(`input[name=sfx][value=${S.sound === "soft" ? "soft" : "quiet"}]`).checked = true;
-  document.querySelector(`input[name=music][value=${S.music}]`).checked = true;
+  const m = ["modern", "soft", "quiet"].includes(S.sound) ? S.sound : "modern";
+  document.querySelector(`input[name=sfx][value=${m}]`).checked = true;
+  (document.querySelector(`input[name=music][value=${S.music === "builtin" ? "calm" : S.music}]`) || {}).checked = true;
   $("gain").value = S.gain || 0.6;
   show();
+  sounds();
   if (S.job && S.job.state === "rendering") wait();
 }
 function show() {
@@ -90,14 +113,54 @@ function show() {
     $("go").textContent = "Make it again";
   }
 }
+// the sound list: every sound, at which second — play it, switch it off, or pick another
+const mmss = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}.${Math.floor((t % 1) * 10)}`;
+const esc = x => String(x).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+let SL = null, player = new Audio();
+function drawSounds() {
+  const box = $("sl");
+  if (document.querySelector("input[name=sfx]:checked").value === "quiet") { box.innerHTML = ""; return; }
+  if (!SL) { box.innerHTML = '<p class="empty">Finding the sounds…</p>'; return; }
+  if (!SL.sounds.length) { box.innerHTML = '<p class="empty">This reel has no sound effects yet.</p>'; return; }
+  const opts = SL.choices.map(c => `<option>${esc(c)}</option>`).join("");
+  box.innerHTML = `<h3>Your sounds (${SL.sounds.length})</h3>` + SL.sounds.map((r, i) => `
+    <div class="row ${r.off ? "off" : ""}">
+      <span class="tm">${mmss(r.t)}</span>
+      <button class="play" data-i="${i}" title="Play this sound">▶</button>
+      <span class="nm"><b>${esc(r.label)}${r.swapped ? " ✓" : ""}</b><small>${esc(r.moment || "")}</small></span>
+      <label class="sw" title="Sound on / off"><input type="checkbox" data-on="${i}" ${r.off ? "" : "checked"}><i></i></label>
+      <span class="another"><button class="ab" data-a="${i}" title="Swap for another sound of the same kind">Another sound</button>
+        <select data-k="${i}" title="Or choose a kind of sound"><option value="">Kind…</option>${opts}</select></span>
+    </div>`).join("");
+  box.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { player.src = "/api/sfx-play?name=" + encodeURIComponent(SL.sounds[+b.dataset.i].name); player.play(); });
+  box.querySelectorAll("[data-on]").forEach(c => c.onchange = () => edit(+c.dataset.on, {off: !c.checked}));
+  box.querySelectorAll("[data-a]").forEach(b => b.onclick = () => edit(+b.dataset.a, {label: SL.sounds[+b.dataset.a].label.replace(" ✓", "")}, true));
+  box.querySelectorAll("[data-k]").forEach(s => s.onchange = () => s.value && edit(+s.dataset.k, {label: s.value}, true));
+}
+async function sounds() { SL = null; drawSounds(); SL = await (await fetch(`/api/p/${slug}/sounds`)).json(); drawSounds(); }
+async function edit(i, body, playAfter) {
+  SL = await post(`/api/p/${slug}/sound-edit`, Object.assign({t: SL.sounds[i].t}, body));
+  drawSounds();
+  if (playAfter) { player.src = "/api/sfx-play?name=" + encodeURIComponent(SL.sounds[i].name); player.play(); }
+  $("msg").textContent = "Saved. Press Make my reel to hear it in the reel.";
+}
 async function save() {
   const sfx = document.querySelector("input[name=sfx]:checked").value;
   const music = document.querySelector("input[name=music]:checked").value;
   await post(`/api/p/${slug}/sound`, {sound: sfx, music, gain: +$("gain").value});
   $("msg").textContent = "Saved. Press Make my reel to hear it.";
 }
-document.querySelectorAll("input[name=sfx], input[name=music]").forEach(i => i.onchange = save);
+document.querySelectorAll("input[name=music]").forEach(i => i.onchange = save);
+document.querySelectorAll("input[name=sfx]").forEach(i => i.onchange = async () => { await save(); sounds(); });
 $("gain").onchange = save;
+const BEDS = {upbeat: "mood=sunny&genre=indie%20pop&tempo=116", groove: "mood=playful&genre=afrobeats&tempo=108", calm: "mood=calm&genre=soft%20piano&tempo=80"};
+document.querySelectorAll(".mp").forEach(b => b.onclick = e => {
+  e.preventDefault(); e.stopPropagation();
+  if (!player.paused && player.dataset.m === b.dataset.m) { player.pause(); b.textContent = "▶ Listen"; return; }
+  document.querySelectorAll(".mp").forEach(x => x.textContent = "▶ Listen");
+  player.dataset.m = b.dataset.m; b.textContent = "Loading…";
+  player.src = "/api/music-preview?" + BEDS[b.dataset.m]; player.play().then(() => b.textContent = "❚❚ Stop").catch(() => b.textContent = "▶ Listen");
+});
 $("song").onchange = async () => {
   const f = $("song").files[0]; if (!f) return;
   $("msg").textContent = "Adding your song…";
