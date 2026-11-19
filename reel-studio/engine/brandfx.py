@@ -60,7 +60,9 @@ def _font(ctx, role, px, weight=None):
 
 
 def _wrap(text, font, maxw):
-    words, lines, cur = str(text).split(), [], ""
+    import re
+    text = re.sub(r"(\d) (\d)", "\\1\u00a0\\2", str(text))      # "R2 000" never splits across lines
+    words, lines, cur = text.split(" "), [], ""
     for w in words:
         t = (cur + " " + w).strip()
         if font.getlength(t) <= maxw or not cur:
@@ -166,19 +168,19 @@ def _bg(ctx, spec):
 
 def _tag(ctx, price, was=None):
     u = ctx.u
-    fb = _font(ctx, "caption", 58 * u, 800)
-    fw = _font(ctx, "caption", 30 * u, 600)
-    w = int(max(fb.getlength(price), fw.getlength(was or "")) + 70 * u)
-    h = int((118 if was else 92) * u)
+    fb = _font(ctx, "caption", 84 * u, 800)
+    fw = _font(ctx, "caption", 40 * u, 600)
+    w = int(max(fb.getlength(price), fw.getlength(was or "")) + 90 * u)
+    h = int((160 if was else 124) * u)
     im = Image.new("RGBA", (w, h))
     d = ImageDraw.Draw(im)
     d.rounded_rectangle((0, 0, w - 1, h - 1), int(26 * u), fill=_rgb(ctx.col["pop"]))
     tc = (255, 255, 255, 255)
     if was:
-        d.text((w / 2, 30 * u), was, font=fw, fill=tc[:3] + (200,), anchor="mm")
+        d.text((w / 2, 40 * u), was, font=fw, fill=tc[:3] + (200,), anchor="mm")
         tw = fw.getlength(was)
-        d.line((w / 2 - tw / 2 - 4, 31 * u, w / 2 + tw / 2 + 4, 31 * u), fill=tc[:3] + (220,), width=max(2, int(3 * u)))
-        d.text((w / 2, 78 * u), price, font=fb, fill=tc, anchor="mm")
+        d.line((w / 2 - tw / 2 - 4, 41 * u, w / 2 + tw / 2 + 4, 41 * u), fill=tc[:3] + (220,), width=max(2, int(4 * u)))
+        d.text((w / 2, 104 * u), price, font=fb, fill=tc, anchor="mm")
     else:
         d.text((w / 2, h / 2), price, font=fb, fill=tc, anchor="mm")
     return _shadowed(im, int(10 * u), 0.28, int(6 * u))
@@ -202,13 +204,13 @@ def _badge(ctx, text):
 
 def _pill(ctx, text):
     u = ctx.u
-    f = _font(ctx, "caption", 36 * u, 700)
-    w, h = int(f.getlength(text) + 64 * u), int(70 * u)
+    f = _font(ctx, "caption", 46 * u, 700)
+    w, h = int(f.getlength(text) + 80 * u), int(88 * u)
     im = Image.new("RGBA", (w, h))
     d = ImageDraw.Draw(im)
     d.rounded_rectangle((0, 0, w - 1, h - 1), h // 2, fill=_rgb(ctx.col["paper"]))
-    d.ellipse((18 * u, h / 2 - 9 * u, 36 * u, h / 2 + 9 * u), fill=_rgb(ctx.col["pop"]))
-    d.text((46 * u, h / 2), text, font=f, fill=_rgb(ctx.col["ink"]), anchor="lm")
+    d.ellipse((24 * u, h / 2 - 11 * u, 46 * u, h / 2 + 11 * u), fill=_rgb(ctx.col["pop"]))
+    d.text((58 * u, h / 2), text, font=f, fill=_rgb(ctx.col["ink"]), anchor="lm")
     return _shadowed(im, int(9 * u), 0.22, int(5 * u))
 
 
@@ -258,7 +260,7 @@ def fx_product_hero(frame, p, lt, dur, spec, ctx, t):
         left = i % 2 == 0
         x = W * (0.3 if left else 0.7)
         x = min(max(x, pill.width / 2 + 24 * u), W - pill.width / 2 - 24 * u)
-        _paste(out, pill, x, H * (0.33 + 0.1 * i), k, min(1, k * 2), -3 if left else 3)
+        _paste(out, pill, x, H * (0.31 + 0.1 * i), k, min(1, k * 2), -3 if left else 3)
     # price tag + badge
     if spec.get("price"):
         k = _back(_seg(lt, float(spec.get("price_at", max(0.9, dur * 0.55))), float(spec.get("price_at", max(0.9, dur * 0.55))) + 0.35))
