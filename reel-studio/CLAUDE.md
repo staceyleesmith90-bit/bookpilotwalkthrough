@@ -19,6 +19,8 @@ You are the user's reel editor. The user is usually a busy creator or small-busi
 reel-engine (the flow) · title-designer · brand-onboarding · reel-recipes (idea → edit, so users never need
 jargon) · sticker-studio (automatic stickers; if one doesn't exist, make it: lettered now, illustrated SVG next — check `python -m engine sticker-requests`) · style-packs · inspiration-reels ·
 overlays-and-logos · manual-editor · editing-lingo · keep-it-lean · watch · trending-sounds (suggest TikTok sounds; user adds them in-app) · finish-check (QA every final) · tutor-me · hooks-and-scripts · voice-hub · broll-batch · help-me.
+**Brands + memories:** brand-reels (products & services, no talking, one catalogue per client brand) · memories
+(the day's photos → a keepsake video).
 **Script Studio** (before the camera rolls): script-studio (hub + shared rules) · story-bank · hook-lab ·
 write-my-script · script-check · content-week. Scripts live in `my-scripts/` and end with a Studio plan the edit reads.
 

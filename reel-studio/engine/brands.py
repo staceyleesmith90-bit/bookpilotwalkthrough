@@ -14,7 +14,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CUR = os.path.join(ROOT, "brand")
 ALL = os.path.join(ROOT, "brands")
 ACTIVE = os.path.join(ALL, "active.txt")
-SHARED = {"trending-sounds.json", ".env"}      # personal to the user, not to a brand: stays in brand/
+SHARED = {"trending-sounds.json", ".env", "ai.json"}   # personal to the user, not to a brand: stays in brand/
 
 
 def slug(name):
@@ -51,8 +51,8 @@ def listing():
 
 def _move_out():
     """Save brand/ into brands/<active slug>/ (keeps the shared personal files in brand/)."""
-    if not os.path.isdir(CUR) or not os.listdir(CUR):
-        return None
+    if not os.path.isdir(CUR) or not [f for f in os.listdir(CUR) if f not in SHARED]:
+        return None                                   # nothing of a brand in there (only personal files)
     name = active() or slug(_label(CUR) or "my brand")
     dst = os.path.join(ALL, name)
     if os.path.isdir(dst):

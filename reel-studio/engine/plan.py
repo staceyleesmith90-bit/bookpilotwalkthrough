@@ -576,7 +576,8 @@ def to_timeline(plan, rc=None, source=None):
                     bf = os.path.relpath(sdr, ROOT_DIR)
                 broll.append({"file": bf, "start": a, "dur": round(b_end - a, 3),
                               **({"src_in": round(src_in, 3)} if src_in else {}),
-                              **({"look": BROLL_LOOKS.get(blook, blook)} if blook else {})})
+                              **({"look": BROLL_LOOKS.get(blook, blook)} if blook else {}),
+                              **({"move": beat["move"]} if beat.get("move") else {})})   # photos: slow zoom / pan
                 if not beat.get("cut"):                # "cut": true = a straight cut (no transition, no whoosh)
                     ttype = beat.get("transition") or pack.get("transition", "whip")
                     transitions.append({"t": round(a, 3), "type": ttype, "dur": 0.3})

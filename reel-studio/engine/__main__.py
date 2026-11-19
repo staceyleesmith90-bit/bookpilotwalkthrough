@@ -30,6 +30,11 @@
   python -m engine footage <project> [<drive link | folder>]  fetch clips from Google Drive / a folder, then one
                                                  picture of every clip (renders/footage-sheet.jpg) to pick shots from
   python -m engine transcribe-folder <folder> [--force]  old reels as text → <folder>/transcript/words.json
+  python -m engine memories <project> [<drive link|folder>] --name "Sandbox day" --story "line; line"
+                                                 the day's photos + clips → a keepsake video (picks the best, in order)
+  python -m engine brand-reels                   brand reel recipes (products + services) and this brand's catalogue
+  python -m engine brand-reel <recipe> --name "<product/service>" [--clips <folder>] [--options <project name>]
+                                                 a ready plan for a brand reel nobody has to talk in
   python -m engine effects-update [check]        get new effects from the 45-effect pack (she adds them often)
   python -m engine inspire <url|file> [--name]  learn the style of a reel they love
   python -m engine brand-site <url>             colours/fonts/logo from a website
@@ -349,6 +354,37 @@ def main(argv=None):
         os.makedirs(os.path.dirname(out), exist_ok=True)
         json.dump({"clips": clips}, open(out, "w"), indent=1)
         print(f"{len(clips)} reel(s) → {out}")
+    elif c == "memories":
+        from . import memories, footage
+        if not os.path.isdir(project.path(a.arg)):
+            os.makedirs(project.path(a.arg, "source"), exist_ok=True)
+            os.makedirs(project.path(a.arg, "renders"), exist_ok=True)
+            project.save(a.arg, "project.json", {"slug": a.arg, "source": None, "brand": None})
+        if a.sheet:
+            got = footage.fetch(a.arg, a.sheet)
+            print(f"{len(got)} new photo(s)/video(s) brought in")
+        story = [x for x in (a.story or "").split(";")]
+        try:
+            plan, chosen, total = memories.build(a.arg, a.name or "Our day", story)
+        except ValueError as e:
+            print(f"Can't make it yet: {e}")
+            sys.exit(1)
+        print(f"Picked {len(chosen)} of {total} (in the order they were taken, best of each burst):")
+        for pth, when, q in chosen:
+            print(f"  {when:%d %b %H:%M}  {os.path.basename(pth)}")
+        print(f"Plan ready: projects/{a.arg}/plan.json — next: timeline + storyboard {a.arg}")
+    elif c == "brand-reels":
+        from . import brandreels
+        print(brandreels.overview())
+    elif c == "brand-reel":
+        from . import brandreels
+        try:
+            slug = brandreels.make(a.arg, a.name, a.clips, a.options)
+        except ValueError as e:
+            print(f"Can't make it yet: {e}")
+            sys.exit(1)
+        print(f"Plan ready: projects/{slug}/plan.json")
+        print(f"  next: python -m engine timeline {slug} && python -m engine storyboard {slug}")
     elif c == "effects-update":
         from .vfx45.update import update
         r = update(check_only=a.arg == "check")

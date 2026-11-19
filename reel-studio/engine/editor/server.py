@@ -197,6 +197,12 @@ class Handler(SimpleHTTPRequestHandler):
                     return self._file(pth, mimetypes.guess_type(pth)[0] or "application/octet-stream")
                 except (ValueError, FileNotFoundError):
                     return self.send_error(404)
+            if u.path == "/api/catalog":                 # this brand's products, services, reviews + the brand reel recipes
+                from .. import brandreels
+                return self._json({"catalog": brandreels.catalog(),
+                                   "recipes": [{"id": k, "kind": v[0], "label": v[1], "about": v[2]} for k, v in brandreels.RECIPES.items()]})
+            if u.path == "/api/make-job":
+                return self._json(JOBS.get("make", {"state": "idle"}))
             if u.path == "/api/ai-status":               # AI stickers: which generator, is Cloudflare connected
                 from .. import aielements
                 return self._json(aielements.status())
@@ -352,6 +358,60 @@ class Handler(SimpleHTTPRequestHandler):
                         f.write(chunk)
                         remaining -= len(chunk)
                 return self._json({"ok": True, "file": os.path.relpath(dst, project.ROOT)})
+            if u.path == "/api/catalog/add":             # add a product / service / review / question to this brand
+                from .. import brandreels
+                import shutil as _sh
+                data = self._body()
+                kind = data.get("kind")
+                if kind not in ("products", "services", "reviews", "faqs"):
+                    return self._json({"ok": False, "error": "unknown kind"}, 400)
+                item = {k: v for k, v in (data.get("item") or {}).items() if isinstance(v, (str, int, list))}
+                if kind in ("products", "services"):
+                    photos = []
+                    for ph in item.get("photos") or []:
+                        src = os.path.join(project.ROOT, ph)
+                        if os.path.isfile(src) and os.path.realpath(src).startswith(os.path.realpath(project.ROOT)):
+                            dst_dir = os.path.join(project.ROOT, "brand", "products")
+                            os.makedirs(dst_dir, exist_ok=True)
+                            dst = os.path.join(dst_dir, os.path.basename(src))
+                            _sh.copy2(src, dst)
+                            photos.append(os.path.relpath(dst, project.ROOT))
+                    item["photos"] = photos
+                    for k in ("benefits", "steps"):
+                        if isinstance(item.get(k), str):
+                            item[k] = [x.strip() for x in re.split(r"[;\n]", item[k]) if x.strip()]
+                cat = brandreels.catalog()
+                cat.setdefault(kind, []).append(item)
+                brandreels.save_catalog(cat)
+                return self._json({"ok": True, "catalog": cat})
+            if u.path in ("/api/brand-reel", "/api/memories"):   # make the plan + storyboard in the background
+                data = self._body()
+                def job(path=u.path, data=data):
+                    JOBS["make"] = {"state": "working"}
+                    try:
+                        if path == "/api/brand-reel":
+                            from .. import brandreels
+                            slug = brandreels.make(data.get("recipe"), data.get("name"))
+                        else:
+                            from .. import memories, footage
+                            slug = project.new(None, data.get("title") or "our-day")
+                            if data.get("link"):
+                                footage.fetch(slug, data["link"])
+                            for f in data.get("files") or []:      # picked in the Studio → already in the Inbox
+                                src = os.path.join(project.ROOT, f)
+                                if os.path.isfile(src):
+                                    import shutil as _sh
+                                    _sh.copy2(src, project.path(slug, "source"))
+                            story = [x for x in re.split(r"[\n.;!]+", data.get("story") or "") if x.strip()][:8]
+                            memories.build(slug, data.get("title") or "Our day", story)
+                        project.build_timeline(slug)
+                        from .. import storyboard
+                        storyboard.make(slug)
+                        JOBS["make"] = {"state": "done", "slug": slug}
+                    except Exception as e:
+                        JOBS["make"] = {"state": "error", "error": str(e)[-300:]}
+                threading.Thread(target=job, daemon=True).start()
+                return self._json({"ok": True})
             if u.path == "/api/ai-connect":              # their own Cloudflare: checked, then saved on this computer
                 from .. import aielements
                 data = self._body()

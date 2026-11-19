@@ -25,6 +25,17 @@ def _run(cmd):
 
 
 # ---------------------------------------------------------------- pass 1: base video
+def _ken_burns(move, W, H, fps, d):
+    """A still photo that slowly moves: in (push in), out (pull back), left / right (pan). Worked out at 2x size so
+    the motion is smooth, not steppy."""
+    n = max(int(d * fps), 1)
+    BW, BH = W * 2, H * 2
+    z = {"in": f"1+0.12*on/{n}", "out": f"1.12-0.12*on/{n}"}.get(move, "1.1")
+    x = {"left": f"(iw-iw/zoom)*(1-on/{n})", "right": f"(iw-iw/zoom)*on/{n}"}.get(move, "iw/2-(iw/zoom/2)")
+    return (f"scale={BW}:{BH}:force_original_aspect_ratio=increase,crop={BW}:{BH},setsar=1,"
+            f"zoompan=z='{z}':x='{x}':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={fps}")
+
+
 def build_base(tl, pack, out, scale=1.0, crf=18):
     W, H = [int(v * scale) // 2 * 2 for v in tl["size"]]
     dur = tl["duration"]
@@ -66,7 +77,12 @@ def build_base(tl, pack, out, scale=1.0, crf=18):
             inputs += ["-i", _abs(br["file"])]
         idx = len([x for x in inputs if x == "-i"]) - 1
         look = grades.filter_for(br.get("look")) if br.get("look") and not grades.filter_for(br.get("look")).startswith("split") else ""
-        fc.append(f"[{idx}:v]trim={si}:{si + d},setpts=PTS-STARTPTS+{s}/TB,{cover}{',' + look if look else ''}[br{k}]")
+        move = br.get("move") if br["file"].lower().endswith((".jpg", ".jpeg", ".png", ".webp")) else None
+        if move:                                          # zoompan makes its own timestamps: move first, then place
+            fc.append(f"[{idx}:v]{_ken_burns(move, W, H, fps, d)},trim=0:{d},setpts=PTS-STARTPTS+{s}/TB"
+                      f"{',' + look if look else ''}[br{k}]")
+        else:
+            fc.append(f"[{idx}:v]trim={si}:{si + d},setpts=PTS-STARTPTS+{s}/TB,{cover}{',' + look if look else ''}[br{k}]")
         fc.append(f"[{v}][br{k}]overlay=eof_action=pass:enable='between(t,{s},{s + d})'[vbr{k}]")
         v = f"vbr{k}"
 
@@ -731,7 +747,7 @@ def build_base_cached(tl, pack, out_dir, scale):
     keys["broll_files"] = [_file_sig(_abs(b["file"])) for b in tl.get("broll", [])]   # a photo/clip replaced in place
     keys["pack_bg"] = pack["colors"].get("bg")
     keys["scale"] = scale
-    keys["engine"] = 2      # bump when build_base changes how the same timeline looks (2: no flash frame at cuts)
+    keys["engine"] = 3      # bump when build_base changes how the same timeline looks (3: photo moves)
     path = os.path.join(out_dir, f"base-{_sig(keys)}.mp4")
     flag = path + ".voice"
     if os.path.exists(path) and os.path.exists(flag):

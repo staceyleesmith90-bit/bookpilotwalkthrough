@@ -1613,6 +1613,10 @@ from . import objectfx as _obj
 EFFECTS.update(_obj.EFFECTS); LABELS.update(_obj.LABELS); ABOUT.update(_obj.ABOUT); DUR.update(_obj.DUR)
 PERSON.update(_obj.EFFECTS)
 
+# ---------------------------------------------------------------- brand effects: products + services (engine/brandfx.py)
+from . import brandfx as _bfx
+EFFECTS.update(_bfx.EFFECTS); LABELS.update(_bfx.LABELS); ABOUT.update(_bfx.ABOUT); DUR.update(_bfx.DUR)
+
 
 # ---------------------------------------------------------------- the renderer's entry point
 def apply(frame, t, ctx):
@@ -1648,6 +1652,8 @@ def sounds(scene):
         table = _v45_sounds(scene["fx"], scene.get("spec"), dur) or table
     if scene["fx"] in _obj.EFFECTS:                    # one sound per printed / punched / stamped line
         table = _obj.sound_times(scene["fx"], scene.get("spec"), dur)
+    if scene["fx"] in _bfx.EFFECTS:
+        table = _bfx.sound_times(scene["fx"], scene.get("spec"), dur)
     for c in table:
         at, ev = c[0], c[1]
         g = c[2] if len(c) > 2 else 1.0

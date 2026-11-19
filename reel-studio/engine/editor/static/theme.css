@@ -118,3 +118,22 @@ header { background: var(--cream) !important; }
 .mark { background: none !important; box-shadow: none !important; overflow: hidden; border-radius: 12px !important; }
 .mark img { width: 44px !important; height: 44px !important; }
 .logo small { letter-spacing: .02em !important; text-transform: none !important; font-size: 12px !important; }
+
+/* new start cards + the Memories / Brand reel dialogs */
+.t5 { background: #FAD9DF !important; } .t6 { background: #D3E8E6 !important; }
+dialog.mk { border: 0; border-radius: 24px; padding: 24px; width: min(560px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); }
+dialog.mk h3 { font-size: 16px; margin: 16px 0 8px; color: var(--green); }
+dialog.mk label { display: block; font-weight: 700; font-size: 14px; margin: 12px 0 0; }
+dialog.mk input, dialog.mk textarea, dialog.mk select { width: 100%; margin-top: 6px; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; font: inherit; font-weight: 400; }
+dialog.mk .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+dialog.mk .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+dialog.mk .chip { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 700; color: var(--green); }
+dialog.mk .chip.on { background: var(--butter); border-color: var(--mustard); }
+dialog.mk .chip small { color: var(--muted); font-weight: 600; }
+dialog.mk .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+dialog.mk details { margin-top: 12px; background: var(--soft); border-radius: 16px; padding: 10px 14px; }
+dialog.mk summary { cursor: pointer; font-weight: 800; color: var(--orange); }
+dialog.mk .pick { max-height: 140px; overflow-y: auto; margin-top: 8px; }
+dialog.mk .pk { font-weight: 500 !important; margin: 4px 0 !important; display: flex !important; gap: 8px; align-items: center; }
+dialog.mk .pk input { width: auto; margin: 0; }
+@media (max-width: 600px) { dialog.mk .grid2 { grid-template-columns: 1fr; } }

@@ -117,7 +117,7 @@
   .slash { position: absolute; left: 70px; top: 40px; width: 40px; height: 60px; border-left: 3px solid #fff; opacity: .8; transform: rotate(-40deg); border-radius: 2px; }
 
   /* ---------------- home: format cards ---------------- */
-  .formats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 16px 0 26px; }
+  .formats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0 26px; }
   .fmt { display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto; align-items: center; column-gap: 14px; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 16px 16px; box-shadow: var(--shadow); transition: transform .15s, box-shadow .15s; }
   .fmt:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -16px rgba(14,22,56,.35); }
   .fmt .ic { grid-row: 1 / span 2; width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; }
@@ -326,6 +326,8 @@
       <button class="fmt t1" data-fmt="talking-head"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div><b>Talk to camera</b><span>Pauses cut and styled in your brand.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
       <button class="fmt t2" data-fmt="voiceover"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M4 10h16v10H4z"/><path d="M4 10 6 4l14 3-1 3M9 5l2 4M14 6l2 4"/></svg></div><b>Clips + voice</b><span>Your b-roll, cut to your words.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
       <button class="fmt t3" data-fmt="faceless"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="1.6"/><path d="m20 15-4-4-9 9"/></svg></div><b>Text &amp; photos</b><span>No camera needed.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
+      <button class="fmt t5" id="memBtn"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div><b>Memories</b><span>Today's photos → a keepsake video.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
+      <button class="fmt t6" id="brBtn"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></div><b>Brand reel</b><span>Products &amp; services, no talking.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
       <button class="fmt t4" data-nav="templates"><div class="ic"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></div><b>From a template</b><span>Start with a proven idea.</span><i class="go"><svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></i></button>
     </div>
     <div class="rowhead"><h2>Your recent reels</h2><button class="viewall" onclick="tab('reels')">View all <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
@@ -474,6 +476,35 @@
 <div class="toast" id="toast"></div>
 <footer>Reelmate · a Systems Pilot product · runs on your computer</footer>
 
+<dialog id="memDlg" class="mk">
+  <h2>Memories</h2>
+  <p class="sub">Your day's photos and clips become a keepsake video for your camera roll. Reelmate picks the best ones, puts them in order and drops the doubles.</p>
+  <label>What should we call it?<input id="memTitle" placeholder="Sandbox day"></label>
+  <label>Your photos and videos<input id="memLink" placeholder="Paste a Google Drive link (folder), or pick from your Uploads below"></label>
+  <div id="memPick" class="pick"></div>
+  <label>What happened today? (a few words is plenty)<textarea id="memStory" rows="4" placeholder="She found the sandpit. Wanted ALL the toys. Splash time. Boetie came to play."></textarea></label>
+  <p class="note" id="memMsg"></p>
+  <div class="row"><button class="ghost" onclick="this.closest('dialog').close()">Cancel</button><button class="cta" id="memGo">Make my memory video</button></div>
+</dialog>
+<dialog id="brDlg" class="mk">
+  <h2>Brand reel</h2>
+  <p class="sub">A reel for a product or service, in this brand's colours. Nobody has to talk.</p>
+  <h3>1. What is it for?</h3><div id="brItems" class="chips"></div>
+  <details id="brAdd"><summary>+ Add a product or service</summary>
+    <div class="grid2">
+      <label>Type<select id="brKind"><option value="products">Product</option><option value="services">Service</option></select></label>
+      <label>Name<input id="brName" placeholder="Volt X1 scooter"></label>
+      <label>Price<input id="brPrice" placeholder="R8 999"></label>
+      <label>Was (optional)<input id="brWas" placeholder="R10 999"></label>
+    </div>
+    <label>Best points or steps (one per line)<textarea id="brPoints" rows="3" placeholder="25 km range&#10;Folds in 3 seconds&#10;LED deck lights"></textarea></label>
+    <label>Photo (from your Uploads)<select id="brPhoto"><option value="">— pick a photo —</option></select></label>
+    <button class="ghost" id="brSave">Save it</button>
+  </details>
+  <h3>2. Which reel?</h3><div id="brRecipes" class="chips"></div>
+  <p class="note" id="brMsg"></p>
+  <div class="row"><button class="ghost" onclick="this.closest('dialog').close()">Cancel</button><button class="cta" id="brGo">Make it</button></div>
+</dialog>
 <dialog id="wz">
   <div class="wz-head"><div class="dots" id="dots"></div><button class="x" id="wzClose" aria-label="Close">✕</button></div>
   <div class="wz-body" id="wzBody"></div>
@@ -915,6 +946,65 @@ async function openPosts(slug, rebuild) {
     <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><a class="cta" href="/api/p/${slug}/posts/posts.zip" download>Download all</a>
       <button class="ghost" onclick="copyText(${esc(JSON.stringify(r.caption))})">Copy caption</button><button class="ghost" onclick="openPosts('${slug}', true)">Make them again</button></div>`;
 }
+
+// ------------------------------------------------------------ memories + brand reels
+function waitMake(msgEl, btn) {
+  btn.disabled = true;
+  const poll = async () => {
+    const j = await api("/api/make-job");
+    if (j.state === "working") { msgEl.textContent = "Working on it… picking the best moments and drawing your storyboard."; return setTimeout(poll, 2500); }
+    btn.disabled = false;
+    if (j.state === "done") location.href = "/storyboard?p=" + j.slug;
+    else msgEl.textContent = j.error || "That didn't work.";
+  };
+  setTimeout(poll, 1200);
+}
+$("#memBtn").onclick = async () => {
+  const ups = await api("/api/uploads");
+  $("#memPick").innerHTML = ups.filter(u => u.kind === "video" || u.kind === "photo").map(u =>
+    `<label class="pk"><input type="checkbox" value="inbox/${esc(u.name)}"> ${esc(u.name)}</label>`).join("") || "";
+  $("#memDlg").showModal();
+};
+$("#memGo").onclick = async () => {
+  const files = [...document.querySelectorAll("#memPick input:checked")].map(i => i.value);
+  const link = $("#memLink").value.trim();
+  if (!link && !files.length) { $("#memMsg").textContent = "Add a Google Drive link or tick some uploads."; return; }
+  await api("/api/memories", { title: $("#memTitle").value.trim() || "Our day", link, files, story: $("#memStory").value });
+  waitMake($("#memMsg"), $("#memGo"));
+};
+let BR = { item: null, recipe: null };
+async function drawBrand() {
+  const d = await api("/api/catalog"), c = d.catalog;
+  const items = [...(c.products || []).map(i => ({ ...i, kind: "product" })), ...(c.services || []).map(i => ({ ...i, kind: "service" }))];
+  $("#brItems").innerHTML = items.length ? items.map(i => `<button class="chip${BR.item === i.name ? " on" : ""}" data-it="${esc(i.name)}" data-kind="${i.kind}">${esc(i.name)} <small>${esc(i.price || "")}</small></button>`).join("")
+    : `<span class="note">Nothing yet: add your first product or service below.</span>`;
+  if (!items.length) $("#brAdd").open = true;
+  const kind = (items.find(i => i.name === BR.item) || {}).kind;
+  $("#brRecipes").innerHTML = d.recipes.filter(r => !kind || r.kind === "either" || r.kind === kind).map(r =>
+    `<button class="chip${BR.recipe === r.id ? " on" : ""}" data-rc="${r.id}" title="${esc(r.about)}">${esc(r.label)}</button>`).join("");
+  $("#brItems").querySelectorAll("[data-it]").forEach(b => b.onclick = () => { BR.item = b.dataset.it; drawBrand(); });
+  $("#brRecipes").querySelectorAll("[data-rc]").forEach(b => b.onclick = () => { BR.recipe = b.dataset.rc;
+    $("#brMsg").textContent = d.recipes.find(r => r.id === BR.recipe).about; drawBrand(); });
+}
+$("#brBtn").onclick = async () => {
+  const ups = await api("/api/uploads");
+  $("#brPhoto").innerHTML = `<option value="">— pick a photo —</option>` + ups.filter(u => u.kind === "photo").map(u => `<option value="inbox/${esc(u.name)}">${esc(u.name)}</option>`).join("");
+  await drawBrand(); $("#brDlg").showModal();
+};
+$("#brSave").onclick = async () => {
+  const kind = $("#brKind").value, name = $("#brName").value.trim();
+  if (!name) { $("#brMsg").textContent = "Give it a name first."; return; }
+  const pts = $("#brPoints").value;
+  const item = { name, price: $("#brPrice").value.trim(), was: $("#brWas").value.trim(), photos: $("#brPhoto").value ? [$("#brPhoto").value] : [] };
+  item[kind === "products" ? "benefits" : "steps"] = pts;
+  await api("/api/catalog/add", { kind, item });
+  BR.item = name; $("#brAdd").open = false; $("#brMsg").textContent = `Saved "${name}". Now pick a reel.`; drawBrand();
+};
+$("#brGo").onclick = async () => {
+  if (!BR.item || !BR.recipe) { $("#brMsg").textContent = "Pick what it's for and which reel."; return; }
+  await api("/api/brand-reel", { recipe: BR.recipe, name: BR.item });
+  waitMake($("#brMsg"), $("#brGo"));
+};
 
 // ------------------------------------------------------------ plan
 $("#planBtn").onclick = async e => { e.preventDefault(); const p = await api("/api/plan");
