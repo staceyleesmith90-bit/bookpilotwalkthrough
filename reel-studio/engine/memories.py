@@ -144,7 +144,7 @@ def build(slug, name, story=None, keep_sound=False, max_items=MAX_ITEMS):
                   "do": [f"broll:{rel(best[0])}", "scene:collage"],
                   "scene": {"overlay": True, "kicker": name, "title": ending, "title_y": 0.8, "title_px": 96, "ink": "#FFFDF8"}})
     plan = {"format": "faceless", "pack": "brand", "look": "playful", "captions": "off", "auto_stickers": False,
-            "auto_transitions": False, "logo": False, "sound": "effects", "broll_sound": 0.9 if keep_sound else 0,
+            "auto_transitions": False, "logo": False, "sound": "quiet", "broll_sound": 0.9 if keep_sound else 0,
             "music": {"gain": 0.6}, "end_card": {"enabled": False}, "transition": "dip-white",
             "cover": {"kicker": _nice_date(first), "title": name, "photo": rel(best[0]), "y": 0.78},
             "beats": beats, "memories": {"count": len(chosen), "from": len(files)}}

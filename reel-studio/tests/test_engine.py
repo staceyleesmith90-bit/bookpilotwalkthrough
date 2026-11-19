@@ -99,7 +99,7 @@ def test_every_title_template_builds_in_every_pack(pack_name):
 
 
 def test_typed_title_gets_a_click_per_character_and_faceless_titles_use_ink():
-    tl = plan.to_timeline({"format": "faceless", "pack": "bold", "beats": [
+    tl = plan.to_timeline({"format": "faceless", "pack": "bold", "sound": "full", "beats": [
         {"text": "hello", "do": ["title:typed:POV: it types itself"]}]})
     clicks = [c for c in tl["audio"]["sfx"] if ":type_key:" in c["name"]]
     assert len(clicks) >= len("POV: it types itself") - 6          # one key per letter (spaces skipped)
@@ -277,7 +277,7 @@ def test_premium_glass_items_carry_a_blur_mask():
 
 def test_sound_design_uses_one_kit_with_variety():
     from engine import sounddesign, sfx
-    tl = plan.to_timeline({"format": "faceless", "pack": "bold", "look": "premium", "beats": [
+    tl = plan.to_timeline({"format": "faceless", "pack": "bold", "look": "premium", "sound": "full", "beats": [
         {"text": "Stop editing for hours", "do": ["takeover", "badge:TIP #1"]},
         {"text": "Tip one", "do": ["takeover", "transition:whip"]}]})
     names = [c["name"] for c in tl["audio"]["sfx"]]

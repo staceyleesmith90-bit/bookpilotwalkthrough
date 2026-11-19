@@ -179,7 +179,7 @@ def build(recipe, name=None, clips=None, cat=None):
 
     cta = biz.get("cta") or "Shop now · link in bio"
     plan = {"format": "faceless", "pack": "brand", "look": "clean", "captions": "off", "auto_stickers": False,
-            "auto_transitions": False, "logo": True, "sound": "effects", "broll_sound": 0,
+            "auto_transitions": False, "logo": True, "sound": "quiet", "broll_sound": 0,
             "music": {"generate": {"mood": ["confident"], "genre": ["indie pop"], "tempo": "112", "energy": "steady"}, "gain": 0.6},
             "end_card": {"enabled": True, "cta": cta},
             "cover": {"kicker": RECIPES[recipe][1], "title": nm, **({"photo": photo} if photo else {}), "y": 0.8},

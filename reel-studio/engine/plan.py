@@ -867,7 +867,10 @@ def to_timeline(plan, rc=None, source=None):
         cues.append((0.0, "swish", 0.35))
     # outro: brand end screen (logo, name, handle, call to action)
     cta_text = next((d.split(":", 1)[1] for b in plan.get("beats", []) for d in b.get("do", []) if d.startswith("cta:")), None)
-    if plan.get("sound") in ("music", "none", "typewriter", "motion", "effects"):
+    # sound effects are OFF unless asked for: "quiet" (default) = music + voice only, no whooshes or game-like sounds
+    sound_mode = plan.get("sound") or "quiet"
+    plan = dict(plan, sound=sound_mode)
+    if sound_mode in ("quiet", "soft", "music", "none", "typewriter", "motion", "effects"):
         plan = dict(plan, end_card=dict({"sound": False}, **(plan.get("end_card") or {})))
     tl["end_card"] = dict({"title": pack.get("label", ""), "handle": pack.get("handle", ""),
                            "cta": cta_text or "Follow for more", "enabled": True}, **(plan.get("end_card") or {}))
@@ -880,9 +883,9 @@ def to_timeline(plan, rc=None, source=None):
     kit = plan.get("sound_kit") or sounddesign.KIT_FOR_LOOK.get(look, sounddesign.DEFAULT_KIT)
     sounddesign.vary_entrances(tl["items"])
     cues = sounddesign.design(tl, cues, kit)
-    if plan.get("sound") in ("music", "none"):   # like editorial reels: voice + music bed (+ b-roll's own sound), no effects
+    if plan.get("sound") in ("music", "none", "quiet"):   # voice + music bed (+ b-roll's own sound), no effects at all
         cues = []
-    if plan.get("sound") not in ("music", "none"):
+    if plan.get("sound") not in ("music", "none", "quiet"):
         from . import motiongfx, scenefx
         mg_cues = []                             # motion graphics: every move gets its own interface sound
         for it in tl["items"]:
@@ -918,6 +921,8 @@ def to_timeline(plan, rc=None, source=None):
             n_lead = len(it.get("lead", "").split())
             cues += [sounddesign.cue("type_key", it["start"] + 0.08 * j, 900 + 10 * k + j, kit, 0.22) for j in range(n_lead)]
             cues.append(sounddesign.cue("type_key", it["start"] + 0.4, 950 + k, kit, 0.3))
+    if plan.get("sound") == "soft":              # a few gentle RECORDED sounds only, never whooshes / zooms / synths
+        cues = sounddesign.soften(cues)
     tl["sound_kit"] = kit
     tl["audio"] = {"sfx": [{"t": round(t, 3), "name": n, "gain": g} for t, n, g in sorted(cues)],
                    "music": plan.get("music"), "sfx_gain": 0.6,

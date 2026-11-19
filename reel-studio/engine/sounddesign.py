@@ -501,3 +501,32 @@ def no_repeats(cues):
             last_file[ev] = f
         out.append((t, name, g))
     return out
+
+
+# ---------------------------------------------------------------- "soft": the only effects mode besides off
+GENTLE = {"text_in", "sticker_in", "page", "pill_in", "tick", "word_pop", "select", "sparkle", "money", "writing",
+          "camera", "shutter", "type_key", "type_end", "typing", "cta", "notify"}
+
+
+def soften(cues, gap=1.2, gain=0.55):
+    """Keep only gentle, RECORDED sounds (paper, soft pops, a camera click…): never whooshes, swishes, zooms, risers,
+    booms, slams or anything drawn by code — those are what make AI edits sound like a racing game. At most one
+    sound every `gap` seconds, and quieter."""
+    out, last = [], -9.0
+    for t, name, g in sorted(cues):
+        if not name.startswith("sd:"):
+            continue
+        event = name.split(":")[2]
+        if event not in GENTLE:
+            continue
+        try:
+            src = source_file(name)[0]
+        except Exception:
+            continue
+        if str(src).startswith("s:"):              # a synth stand-in: skip
+            continue
+        if t - last < gap:
+            continue
+        out.append((t, name, g * gain))
+        last = t
+    return out

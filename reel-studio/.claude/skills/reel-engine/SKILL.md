@@ -106,7 +106,7 @@ e.g. "it's on my face" → move it there and press Save.
 4. **Style plan.** Choose the reel's **recipe** (`reel-recipes` skill) from what they said and
    what the video is. Write `projects/<p>/plan.json` (format below) — a few lines, not a
    frame-by-frame spec. Default look is **clean**: plain footage most of the time, quiet
-   single-word captions, soft real sounds, and ONE special treatment per moment (a takeover,
+   single-word captions, NO sound effects (music + voice only), and ONE special treatment per moment (a takeover,
    a pop-up, an animation window) — never several at once. Then
    `python -m engine styleplan <project>` and show that table as it is (beat → line → what
    happens). Ask: "Build it, or change anything?" Apply changes in plain words ("beat 1:
@@ -188,6 +188,14 @@ look. Write `projects/<p>/posts.json` first. Business reels: tips layout (cover,
 (babies, family, milestones, trips): `"style": "memory"` — big real photos, polaroids with washi tape and script
 words, no logos / page numbers / buttons. Each slide picks its own `photo` (image or `clip.mp4@2.5`) and `layout`
 (photo · polaroid · collage). Use their nicest shots only, in their language.
+
+## Sound (the owner's rule: no game-like sounds)
+Default is `"sound": "quiet"` (or leave it out): music + voice only, NO sound effects — no whooshes, swishes,
+zooms, risers, booms. Those make AI edits sound like a racing game. Only if the person asks for sounds:
+`"sound": "soft"` = a few gentle recorded sounds (paper, a soft pop, a camera click), at most one every 1.2 s,
+their own sounds first. The older modes ("full" = a sound on every move, "motion", "effects", "typewriter") only when they ask for that exact feel.
+Music: best is a trending sound added in Instagram/TikTok (hand over `final-for-trending-sound.mp4`) or their own
+track (Suno, a song they have the rights to, Epidemic Sound). The built-in composer is the fallback; say so.
 
 ## App-style motion graphics + their sounds (studied from creators who edit with their own AI app)
 - On any beat: `"do": ["mg:<kind>"]`, `"mg": {...}`. Kinds: **pills** (labels pop in, tilted), **window** (an
