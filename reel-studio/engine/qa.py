@@ -190,7 +190,8 @@ def check_render(video, tl=None):
             problems.append(f"loudness {lufs:.0f} LUFS (should be about -14)")
     if peak is not None and peak > -0.5:
         problems.append(f"audio peaks at {peak:.1f} dBFS (may distort)")
-    heard = voice_check(video)
+    talks = not (tl and (tl.get("format") == "faceless" or not tl.get("source")))   # memories / brand reels: no voice by design
+    heard = voice_check(video) if talks else None
     if heard is True:
         notes.append("voice audible (checked by listening to the finished file)")
     elif heard is False:

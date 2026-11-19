@@ -118,7 +118,7 @@ def do_render(slug, preview=False):
         if not cover.spec_of(load(slug, "timeline.json") or {}):   # the render already made a designed cover
             render.thumbnail(path(slug, "timeline.json"), path(slug, "renders", "cover.jpg"))
         from . import qa
-        notes, problems = qa.check_render(out)
+        notes, problems = qa.check_render(out, load(slug, "timeline.json") or {})
         tl = load(slug, "timeline.json") or {}
         save(slug, "renders/qa.json", {"did": qa.summary(tl), "checks": notes, "problems": problems})
     return out
