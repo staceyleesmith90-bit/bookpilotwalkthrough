@@ -972,19 +972,19 @@ $("#memGo").onclick = async () => {
   await api("/api/memories", { title: $("#memTitle").value.trim() || "Our day", link, files, story: $("#memStory").value });
   waitMake($("#memMsg"), $("#memGo"));
 };
-let BR = { item: null, recipe: null };
+let BRX = { item: null, recipe: null };
 async function drawBrand() {
   const d = await api("/api/catalog"), c = d.catalog;
   const items = [...(c.products || []).map(i => ({ ...i, kind: "product" })), ...(c.services || []).map(i => ({ ...i, kind: "service" }))];
-  $("#brItems").innerHTML = items.length ? items.map(i => `<button class="chip${BR.item === i.name ? " on" : ""}" data-it="${esc(i.name)}" data-kind="${i.kind}">${esc(i.name)} <small>${esc(i.price || "")}</small></button>`).join("")
+  $("#brItems").innerHTML = items.length ? items.map(i => `<button class="chip${BRX.item === i.name ? " on" : ""}" data-it="${esc(i.name)}" data-kind="${i.kind}">${esc(i.name)} <small>${esc(i.price || "")}</small></button>`).join("")
     : `<span class="note">Nothing yet: add your first product or service below.</span>`;
   if (!items.length) $("#brAdd").open = true;
-  const kind = (items.find(i => i.name === BR.item) || {}).kind;
+  const kind = (items.find(i => i.name === BRX.item) || {}).kind;
   $("#brRecipes").innerHTML = d.recipes.filter(r => !kind || r.kind === "either" || r.kind === kind).map(r =>
-    `<button class="chip${BR.recipe === r.id ? " on" : ""}" data-rc="${r.id}" title="${esc(r.about)}">${esc(r.label)}</button>`).join("");
-  $("#brItems").querySelectorAll("[data-it]").forEach(b => b.onclick = () => { BR.item = b.dataset.it; drawBrand(); });
-  $("#brRecipes").querySelectorAll("[data-rc]").forEach(b => b.onclick = () => { BR.recipe = b.dataset.rc;
-    $("#brMsg").textContent = d.recipes.find(r => r.id === BR.recipe).about; drawBrand(); });
+    `<button class="chip${BRX.recipe === r.id ? " on" : ""}" data-rc="${r.id}" title="${esc(r.about)}">${esc(r.label)}</button>`).join("");
+  $("#brItems").querySelectorAll("[data-it]").forEach(b => b.onclick = () => { BRX.item = b.dataset.it; drawBrand(); });
+  $("#brRecipes").querySelectorAll("[data-rc]").forEach(b => b.onclick = () => { BRX.recipe = b.dataset.rc;
+    $("#brMsg").textContent = d.recipes.find(r => r.id === BRX.recipe).about; drawBrand(); });
 }
 $("#brBtn").onclick = async () => {
   const ups = await api("/api/uploads");
@@ -998,11 +998,11 @@ $("#brSave").onclick = async () => {
   const item = { name, price: $("#brPrice").value.trim(), was: $("#brWas").value.trim(), photos: $("#brPhoto").value ? [$("#brPhoto").value] : [] };
   item[kind === "products" ? "benefits" : "steps"] = pts;
   await api("/api/catalog/add", { kind, item });
-  BR.item = name; $("#brAdd").open = false; $("#brMsg").textContent = `Saved "${name}". Now pick a reel.`; drawBrand();
+  BRX.item = name; $("#brAdd").open = false; $("#brMsg").textContent = `Saved "${name}". Now pick a reel.`; drawBrand();
 };
 $("#brGo").onclick = async () => {
-  if (!BR.item || !BR.recipe) { $("#brMsg").textContent = "Pick what it's for and which reel."; return; }
-  await api("/api/brand-reel", { recipe: BR.recipe, name: BR.item });
+  if (!BRX.item || !BRX.recipe) { $("#brMsg").textContent = "Pick what it's for and which reel."; return; }
+  await api("/api/brand-reel", { recipe: BRX.recipe, name: BRX.item });
   waitMake($("#brMsg"), $("#brGo"));
 };
 

@@ -137,3 +137,4 @@ dialog.mk .pick { max-height: 140px; overflow-y: auto; margin-top: 8px; }
 dialog.mk .pk { font-weight: 500 !important; margin: 4px 0 !important; display: flex !important; gap: 8px; align-items: center; }
 dialog.mk .pk input { width: auto; margin: 0; }
 @media (max-width: 600px) { dialog.mk .grid2 { grid-template-columns: 1fr; } }
+.note:empty { display: none !important; }
