@@ -1,13 +1,13 @@
-"""Reel Studio extension: the local MCP server Claude Desktop (one-click .mcpb) or Codex talks to.
+"""Reelmate extension: the local MCP server Claude Desktop (one-click .mcpb) or Codex talks to.
 
 Everything runs on the customer's own computer:
-  - their videos, brand and finished reels live in their Reel Studio folder (default
-    Documents/Reel Studio) — nothing is uploaded or stored anywhere else;
+  - their videos, brand and finished reels live in their Reelmate folder (default
+    Documents/Reelmate) — nothing is uploaded or stored anywhere else;
   - the thinking happens in THEIR Claude / Codex plan; this server only runs the editing engine;
   - a monthly licence key (from their Systems Pilot account) unlocks the tools.
 
 The engine is the same `python -m engine …` used everywhere else; it is copied from the extension
-into the Reel Studio folder on first run and after every update (their own files are kept).
+into the Reelmate folder on first run and after every update (their own files are kept).
 """
 import glob, json, os, platform, shutil, subprocess, sys, threading, time, uuid, webbrowser
 
@@ -26,7 +26,7 @@ def _home():
     h = os.environ.get("REEL_HOME", "").strip()
     if not h or "${" in h:
         docs = os.path.join(os.path.expanduser("~"), "Documents")
-        h = os.path.join(docs if os.path.isdir(docs) else os.path.expanduser("~"), "Reel Studio")
+        h = os.path.join(docs if os.path.isdir(docs) else os.path.expanduser("~"), "Reelmate")
     return os.path.abspath(os.path.expanduser(h))
 
 
@@ -45,7 +45,7 @@ def _version(root):
 
 
 def ensure_home():
-    """Create the Reel Studio folder and install/update the engine in it (never touching their files)."""
+    """Create the Reelmate folder and install/update the engine in it (never touching their files)."""
     os.makedirs(HOME, exist_ok=True)
     for d in ("inbox", "projects", "brand", "brands", "out"):
         os.makedirs(os.path.join(HOME, d), exist_ok=True)
@@ -117,17 +117,17 @@ def _tail(text, n=4000):
     return text if len(text) <= n else "…" + text[-n:]
 
 
-mcp = FastMCP("Reel Studio", instructions=(
-    "You are the user's reel editor (Reel Studio by Systems Pilot). Call reel_guide first in every new chat "
+mcp = FastMCP("Reelmate", instructions=(
+    "You are the user's reel editor (Reelmate by Systems Pilot). Call reel_guide first in every new chat "
     "and follow it exactly. Run engine steps with reel_command (the playbooks write them as "
     "`python -m engine <command> …` — pass the command and its arguments). Long steps return a job id: "
     "check with reel_job. The user is not technical: one friendly question at a time, no jargon. Their files "
-    "stay on their computer in their Reel Studio folder; videos to edit go in its Inbox (reel_inbox opens it)."))
+    "stay on their computer in their Reelmate folder; videos to edit go in its Inbox (reel_inbox opens it)."))
 
 
 @mcp.tool()
 def reel_guide(topic: str = "") -> str:
-    """The Reel Studio playbook. No topic: the overview + the editing flow. A topic (e.g. 'brand-onboarding',
+    """The Reelmate playbook. No topic: the overview + the editing flow. A topic (e.g. 'brand-onboarding',
     'reel-engine', 'inspiration-reels', 'finish-check', 'title-designer', 'trending-sounds', 'help-me') returns
     that playbook. Read it before doing that kind of task."""
     ensure_home()
@@ -142,15 +142,15 @@ def reel_guide(topic: str = "") -> str:
         rp = os.path.join(sk, "reel-engine", "SKILL.md")
         body += "\n\n---\n" + open(rp, encoding="utf-8").read()
         body += "\n\nPlaybooks: " + ", ".join(sorted(os.listdir(sk)))
-    note = ("\n\n[Running in the Reel Studio extension: wherever this says `python -m engine X …`, call "
+    note = ("\n\n[Running in the Reelmate extension: wherever this says `python -m engine X …`, call "
             "reel_command with command='X' and the rest as args. Files: reel_read / reel_write (paths relative "
-            f"to the Reel Studio folder: {HOME}). New videos: reel_inbox.]")
+            f"to the Reelmate folder: {HOME}). New videos: reel_inbox.]")
     return body + note
 
 
 @mcp.tool()
 def reel_command(command: str, args: list[str] | None = None) -> str:
-    """Run a Reel Studio engine step, e.g. command='roughcut', args=['my-reel'];
+    """Run a Reelmate engine step, e.g. command='roughcut', args=['my-reel'];
     command='new', args=['inbox/video.mp4', '--name', 'my-reel']; command='render', args=['my-reel'].
     Long steps (rough cut, render, CapCut export…) return a job id — check it with reel_job."""
     blocked = _gate()
@@ -214,13 +214,13 @@ def reel_job(job_id: str) -> str:
 def _inside(rel):
     p = os.path.abspath(os.path.join(HOME, rel))
     if not (p == HOME or p.startswith(HOME + os.sep)):
-        raise ValueError("Only files inside the Reel Studio folder.")
+        raise ValueError("Only files inside the Reelmate folder.")
     return p
 
 
 @mcp.tool()
 def reel_read(path: str) -> str:
-    """Read a text file in the Reel Studio folder, e.g. 'projects/my-reel/roughcut.json' or 'brand/brand.json'."""
+    """Read a text file in the Reelmate folder, e.g. 'projects/my-reel/roughcut.json' or 'brand/brand.json'."""
     blocked = _gate()
     if blocked:
         return blocked
@@ -234,7 +234,7 @@ def reel_read(path: str) -> str:
 
 @mcp.tool()
 def reel_write(path: str, content: str) -> str:
-    """Write a text file (plan.json, brand settings, notes) inside projects/ or brand/ of the Reel Studio folder."""
+    """Write a text file (plan.json, brand settings, notes) inside projects/ or brand/ of the Reelmate folder."""
     blocked = _gate()
     if blocked:
         return blocked
@@ -261,7 +261,7 @@ def _open(path):
 
 @mcp.tool()
 def reel_inbox(open_folder: bool = False) -> str:
-    """Videos ready to edit: the Reel Studio Inbox plus videos from the last 3 days in Downloads and Desktop.
+    """Videos ready to edit: the Reelmate Inbox plus videos from the last 3 days in Downloads and Desktop.
     open_folder=True opens the Inbox so the user can drop videos in."""
     blocked = _gate()
     if blocked:
@@ -287,7 +287,7 @@ def reel_inbox(open_folder: bool = False) -> str:
 
 @mcp.tool()
 def reel_open(what: str) -> str:
-    """Open something for the user: 'studio' (the Reel Studio app), 'folder' (their Reel Studio folder),
+    """Open something for the user: 'studio' (the Reelmate app), 'folder' (their Reelmate folder),
     or a file/folder path inside it (e.g. 'projects/my-reel/renders/final.mp4' plays the reel with sound)."""
     blocked = _gate()
     if blocked and what != "folder":
@@ -307,13 +307,13 @@ def reel_open(what: str) -> str:
 
 @mcp.tool()
 def reel_licence() -> str:
-    """Check the Reel Studio subscription."""
+    """Check the Reelmate licence."""
     ok, msg = licence.status(HOME)
     return ("✓ " if ok else "✗ ") + msg
 
 
 def _auto_update():
-    """Once a day: if a newer Reel Studio is out and the subscription is active, install it quietly.
+    """Once a day: if a newer Reelmate is out and the licence is paid, install it quietly.
     Their brands, reels and uploads are never touched (engine/update.py keeps them)."""
     try:
         env = dict(ENV, REEL_EXTENSION_VERSION=_version(APP))

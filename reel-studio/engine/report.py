@@ -1,7 +1,7 @@
 """A short problem report the user can email to support — nothing private in it.
 
 No footage, no transcripts, no brand files, no licence key: only versions, what's installed,
-the computer type, and the last error lines Reel Studio logged.
+the computer type, and the last error lines Reelmate logged.
 """
 import glob, io, os, platform, re, time
 from contextlib import redirect_stdout
@@ -28,7 +28,7 @@ def write():
         errs += [f"[{os.path.basename(os.path.dirname(os.path.dirname(f)))}] " + l for l in lines
                  if re.search(r"error|traceback|failed", l, re.I)][-8:]
     ver = open(os.path.join(ROOT, "VERSION"), encoding="utf-8").read().strip()
-    text = (f"Reel Studio problem report — {time.strftime('%Y-%m-%d %H:%M')}\n"
+    text = (f"Reelmate problem report — {time.strftime('%Y-%m-%d %H:%M')}\n"
             f"Version {ver} · {platform.system()} {platform.release()} · {platform.machine()} · Python {platform.python_version()}\n\n"
             f"What's installed:\n{buf.getvalue()}\nRecent errors:\n" + ("\n".join(errs) or "(none logged)") +
             "\n\nWhat happened (in your words):\n\n")

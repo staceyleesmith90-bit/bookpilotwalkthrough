@@ -1,7 +1,7 @@
-# Reel Studio AI elements service
+# Reelmate AI elements service
 
-Lets every Reel Studio customer generate their reel's custom sticker sets with **no account or key of their
-own**: the studio calls this small service on the Reel Studio owner's Cloudflare account, which runs
+Lets every Reelmate customer generate their reel's custom sticker sets with **no account or key of their
+own**: the studio calls this small service on the Reelmate owner's Cloudflare account, which runs
 FLUX.1 schnell (Apache 2.0, commercial use OK) on Workers AI.
 
 **Cost:** 10,000 free neurons a day, then about $0.011 per 1,000 neurons. One sticker sheet (1024 px, 4 steps)

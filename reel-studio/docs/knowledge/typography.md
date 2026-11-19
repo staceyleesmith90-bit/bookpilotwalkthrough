@@ -50,5 +50,5 @@ owns a licence for. Never extract fonts from CapCut, Canva or other apps.
   keep 2–3 reusable movements and repeat them — consistency looks designed.
 - Highlight 1 word per line: colour, box, or script — different brand colours for different
   keywords keep long videos lively. Emojis optional, sparingly.
-Reel Studio styles: pop · duo · rainbow · boxed · popin · stack (+ karaoke, highlight, bounce,
+Reelmate styles: pop · duo · rainbow · boxed · popin · stack (+ karaoke, highlight, bounce,
 elegant…). `"weight"` in captions picks Medium/SemiBold/Bold/ExtraBold.

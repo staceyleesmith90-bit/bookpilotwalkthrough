@@ -13,7 +13,7 @@ Decide, show a plain-language plan, let them approve, build.
 skill before editing anything. Keep usage lean — follow `keep-it-lean`.
 
 ## The Studio app (the user's main screen)
-`python -m engine studio` opens Reel Studio in their browser: home, a step-by-step
+`python -m engine studio` opens Reelmate in their browser: home, a step-by-step
 questionnaire for each new reel, a title gallery in their brand, their brand card, and their
 reels. The questionnaire saves `projects/<p>/brief.json` and runs the rough cut locally.
 When the user says **"my reel <name> is ready"**: read `brief.json` (format, idea, topic,

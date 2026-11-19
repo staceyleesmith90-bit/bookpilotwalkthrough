@@ -1,4 +1,4 @@
-# Making Reel Studio a monthly subscription
+# Making Reelmate a monthly subscription
 
 ## The problem
 Anything installed on a buyer's computer can be copied. Claude Code has no built-in way to
@@ -15,7 +15,7 @@ Three models, from least to most control:
 | 3. Fully hosted web app | Upload in a browser (works on phones), your servers edit and render, Claude runs via your API account | Strongest | Server + Claude API per reel (plan cents per reel) | High |
 
 ## Recommended path
-1. **Now – launch (model 2):** Reel Studio (local engine) + "Reel Studio Cloud" (your server):
+1. **Now – launch (model 2):** Reelmate (local engine) + "Reelmate Cloud" (your server):
    - Subscription + licence keys through **Lemon Squeezy** (handles global VAT/tax, subscriptions,
      licence-key API, cancellations) or Stripe.
    - The engine asks the cloud for: new templates and caption/sticker/sound packs (monthly drops),
@@ -45,7 +45,7 @@ Three models, from least to most control:
 - So her real recurring income is the membership; the engine is the door opener.
 
 ## Our version (same proven shape, better product)
-- **Reel Studio (one-off or first month)** + **Reel Studio Club (monthly)**: updates the moment
+- **Reelmate (one-off or first month)** + **Reelmate Club (monthly)**: updates the moment
   they ship, new templates/sounds/effects each month, request-a-feature board, monthly live
   session, tutorials, community. Founding-member price locked while subscribed.
 - Our edges to lead with: works on **Windows AND Mac**, works with **Claude AND ChatGPT Codex**,

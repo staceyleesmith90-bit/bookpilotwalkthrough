@@ -1,4 +1,4 @@
-/* Reel Studio theme — "Spring" (from the owner's mock-up): cream pages, a soft mint menu with a coloured
+/* Reelmate theme — "Spring" (from the owner's mock-up): cream pages, a soft mint menu with a coloured
    tile behind every icon, a mustard pill on the page you're on, deep green buttons, and headings where
    every letter takes the next spring colour (theme.js).
    Loaded LAST by every Studio page, so the whole app changes from this one file.
@@ -115,3 +115,6 @@ header { background: var(--cream) !important; }
   .top { border-right: 0; border-bottom: 1px solid #D5E4DD; }
   nav button .ico { width: 30px !important; height: 30px !important; padding: 6px; }
 }
+.mark { background: none !important; box-shadow: none !important; overflow: hidden; border-radius: 12px !important; }
+.mark img { width: 44px !important; height: 44px !important; }
+.logo small { letter-spacing: .02em !important; text-transform: none !important; font-size: 12px !important; }

@@ -1,7 +1,7 @@
 #!/bin/bash
-# Reel Studio installer for Mac — double-click this file.
+# Reelmate installer for Mac — double-click this file.
 cd "$(dirname "$0")/.."
-echo "Setting up Reel Studio (by Systems Pilot)…"
+echo "Setting up Reelmate (by Systems Pilot)…"
 if ! command -v brew >/dev/null 2>&1; then
   echo "Installing Homebrew (Apple's popular free package manager)…"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -17,5 +17,5 @@ PY="$(brew --prefix)/bin/python3.12"
 ./.venv/bin/python scripts/fetch_icons.py >/dev/null 2>&1 || true
 ./.venv/bin/python -m engine setup-check
 echo ""
-echo "✅ Done. Double-click 'Reel Studio.command' to open the app."
+echo "✅ Done. Double-click 'Reelmate.command' to open the app."
 read -n 1 -s -r -p "Press any key to close."

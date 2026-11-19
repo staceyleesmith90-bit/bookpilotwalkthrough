@@ -1,4 +1,4 @@
-"""HyperFrames effects (HeyGen, Apache-2.0) inside Reel Studio.
+"""HyperFrames effects (HeyGen, Apache-2.0) inside Reelmate.
 
 HyperFrames components are small web pages animated by a GSAP timeline. We open one in the hidden
 browser (the same one that draws animation windows), swap in the reel's own words, timings and

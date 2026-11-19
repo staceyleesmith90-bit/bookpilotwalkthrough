@@ -81,7 +81,7 @@ function draw(t){
   const k = D.kind, a = D.args;
   if (k === 'app') {
     const p = E((t - 0.5) / Math.max(dur - 1.6, 0.8)); const pct = Math.round(p * 100); const done = pct >= 100;
-    w.innerHTML = chrome(D.app || 'Reel Studio') + `<div class="body"><div class="thumb"><div class="play"></div></div>
+    w.innerHTML = chrome(D.app || 'Reelmate') + `<div class="body"><div class="thumb"><div class="play"></div></div>
       <div class="track"><div class="fill" style="width:${pct}%"></div></div>
       <div class="row"><span>${done ? (a[1] || 'Ready to post') : (a[0] || 'Exporting') + '…'}</span>
       <span class="pill ${done ? 'done' : ''}" style="transform:scale(${done ? back((t - (0.5 + Math.max(dur - 1.6, 0.8))) / 0.3) : 1})">${done ? 'Done ✓' : pct + '%'}</span></div></div>`;

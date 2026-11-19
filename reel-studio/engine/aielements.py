@@ -10,7 +10,7 @@ proxy adds them for the host):
   cloudflare    Workers AI, FLUX.1 schnell — free daily allowance with a free account (needs "account_id")
   gemini        Google's Gemini image model — free tier with a free API key ("model" optional)
   huggingface   FLUX.1 schnell on HF inference — small free monthly credits
-  reelstudio    Reel Studio's own service (cloud/elements-worker, on the owner's Cloudflare) — customers need nothing
+  reelstudio    Reelmate's own service (cloud/elements-worker, on the owner's Cloudflare) — customers need nothing
   local         FLUX.1 schnell on this computer via stable-diffusion.cpp (MIT) — free + unlimited, needs ~10 GB
   hfspace       the public FLUX.1 schnell demo (Hugging Face Space) — free with no account from a home connection
                 (small daily quota; shared cloud computers get none)
@@ -164,10 +164,10 @@ def generate(text, out, provider=None, size=1024, seed=None):
         img, ct = _post(f"https://router.huggingface.co/hf-inference/models/{model}", {"inputs": text}, {})
         if "json" in ct:
             raise RuntimeError(img.decode()[:300])
-    elif provider == "reelstudio":               # Reel Studio's own service (cloud/elements-worker): no account
+    elif provider == "reelstudio":               # Reelmate's own service (cloud/elements-worker): no account
         url = cfg.get("url", "").rstrip("/")     # needed by the customer, their licence key is enough
         if not url:
-            raise RuntimeError("The Reel Studio elements service isn't switched on yet (cloud/elements-worker).")
+            raise RuntimeError("The Reelmate elements service isn't switched on yet (cloud/elements-worker).")
         req = urllib.request.Request(url + "/v1/elements", data=json.dumps({"prompt": text, "size": size,
                                      **({"seed": seed} if seed is not None else {})}).encode(),
                                      headers={"Content-Type": "application/json",

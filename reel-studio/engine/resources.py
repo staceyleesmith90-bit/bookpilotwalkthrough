@@ -3,8 +3,8 @@
 Shown in the Studio (Free resources tab). Each entry says what it's good for and the one licence
 rule that matters. Two kinds:
   "yours"  — free for the user to download and use in their own reels (drop files in the inbox).
-             Their licences do NOT allow us to bundle or bulk-download them into Reel Studio.
-  "open"   — CC0 / public domain or open licence: fine to bundle (some are already in Reel Studio).
+             Their licences do NOT allow us to bundle or bulk-download them into Reelmate.
+  "open"   — CC0 / public domain or open licence: fine to bundle (some are already in Reelmate).
 Checked October 2026 — licences change; the link is always the source of truth.
 """
 

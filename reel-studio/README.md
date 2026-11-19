@@ -1,4 +1,4 @@
-# Reel Studio · by Systems Pilot
+# Reelmate · by Systems Pilot
 
 **Claude becomes your reel editor, in your brand.** Film on your phone, drop the clip in,
 and Claude cuts the pauses and retakes, adds captions, big text moments, stickers, sound
@@ -34,7 +34,7 @@ look like templates: every look comes from the user's own brand.
 | **Review page** | Every line with its length: keep/remove, notes (💬), attachments (📎), goal length. |
 | **Style plan** | Claude picks the edit from your idea (tips, story, before/after…) and explains it in plain words. |
 | **Automatic stickers** | On-topic stickers timed to your words, in your brand colours: doodle, flat, retro, neon, emoji or badges. |
-| **Stickers that don't exist yet? It makes them.** | If a sticker isn't in the library and isn't auto-detected, Reel Studio **creates your own**: instantly as a custom lettered sticker in your brand font and colours, then Claude draws a proper illustrated version that's added to the library for every future reel. You never hear "we don't have that one." |
+| **Stickers that don't exist yet? It makes them.** | If a sticker isn't in the library and isn't auto-detected, Reelmate **creates your own**: instantly as a custom lettered sticker in your brand font and colours, then Claude draws a proper illustrated version that's added to the library for every future reel. You never hear "we don't have that one." |
 | **Your fonts, everywhere** | Google Fonts are fetched automatically, and you can **upload your own font** (.ttf/.otf, e.g. a bought or custom font). Stickers use fonts that match your brand automatically, or pick a font for sticker lettering and for badges/stamps (even per sticker). |
 | **Trending sounds** | Save what's trending on TikTok (one click to TikTok's own list), Claude suggests the best match per reel, and every render includes a *for-trending-sound* version (voice + effects, no music) so you add the sound in TikTok. Business-safe filter included. |
 | **Text that always fits** | Hooks, takeovers, bubbles and captions auto-size; nothing overflows or hides under app buttons. |
@@ -55,8 +55,8 @@ look like templates: every look comes from the user's own brand.
 ![Starter looks for users without a brand](docs/images/starter-looks.jpg)
 
 ## Install
-**Mac:** double-click `install/install-mac.command`, then `install/Reel Studio.command` to open.
-**Windows:** right-click `install/install-windows.ps1` → Run with PowerShell, then double-click `install/Reel Studio.bat`.
+**Mac:** double-click `install/install-mac.command`, then `install/Reelmate.command` to open.
+**Windows:** right-click `install/install-windows.ps1` → Run with PowerShell, then double-click `install/Reelmate.bat`.
 
 Manual install:
 ```bash

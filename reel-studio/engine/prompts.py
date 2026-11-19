@@ -2,7 +2,7 @@
 
 Nobody should have to learn how to prompt. The Studio shows these as cards with a Copy button; Claude
 also offers them as tap answers. Placeholders in [brackets] are the only part to change.
-Written for Reel Studio (our own words).
+Written for Reelmate (our own words).
 """
 
 LIBRARY = [

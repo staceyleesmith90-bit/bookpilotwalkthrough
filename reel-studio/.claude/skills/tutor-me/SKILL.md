@@ -20,5 +20,5 @@ footage, audio or on-screen text. The output is a lesson + an original idea in t
    - **Emotion + value:** what the viewer gets (laugh, learn, feel seen, save-worthy).
    - **CTA:** what action they asked for and why it works.
 3. **Your version:** 3 original hook ideas for THEIR niche in THEIR voice (read brand/voice.md),
-   plus which Reel Studio template/recipe fits (`python -m engine templates`).
+   plus which Reelmate template/recipe fits (`python -m engine templates`).
 4. Offer: "Want me to save this lesson?" → append a 5-line summary to brand/voice/lessons.md.

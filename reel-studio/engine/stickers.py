@@ -375,7 +375,7 @@ REQUESTS = os.path.join(LIB, "requests.json")
 
 
 def custom_sticker(text, pack, px=300, colour_key="pop", font=None):
-    """Never 'no sticker': when a concept isn't in the library, Reel Studio makes one on the spot —
+    """Never 'no sticker': when a concept isn't in the library, Reelmate makes one on the spot —
     the word hand-lettered in the brand's script font, die-cut, with a little sparkle — and logs the
     concept so Claude draws a proper illustrated sticker for next time (library/stickers/requests.json)."""
     from . import titles

@@ -1,4 +1,4 @@
-"""Monthly subscription check for Reel Studio (runs on the customer's computer).
+"""Licence check for Reelmate (bought once, yours for good) (runs on the customer's computer).
 
 The key comes from the extension settings (REEL_LICENSE_KEY). It's checked against the Systems
 Pilot licence service at most once a day; an active subscription is remembered for 7 days so a
@@ -30,8 +30,8 @@ def status(home, key=None, now=None):
     key = (key if key is not None else os.environ.get("REEL_LICENSE_KEY", "")).strip()
     now = now or time.time()
     if (not key or key.startswith("${")) and not os.environ.get("REEL_TESTER_UNTIL"):
-        return False, ("No licence key yet. Open Claude → Settings → Extensions → Reel Studio and paste "
-                       "the key from your Reel Studio account.")
+        return False, ("No licence key yet. Open Claude → Settings → Extensions → Reelmate and paste "
+                       "the key from your Reelmate account.")
     if os.environ.get("REEL_DEV") == "1" and key == "DEV":
         return True, "Developer mode."
     until = os.environ.get("REEL_TESTER_UNTIL", "")         # private tester builds only (never sold)
@@ -48,23 +48,24 @@ def status(home, key=None, now=None):
         pass
     same_key = cache.get("key_hash") == hashlib.sha256(key.encode()).hexdigest()
     if same_key and cache.get("valid") and now - cache.get("checked", 0) < CHECK_EVERY:
-        return True, cache.get("message") or "Subscription active."
+        return True, cache.get("message") or "Reelmate is yours — updates included."
     try:
         req = urllib.request.Request(LICENSE_URL, data=json.dumps({"key": key, "machine": machine_id()}).encode(),
                                      headers={"Content-Type": "application/json"})
         res = json.loads(urllib.request.urlopen(req, timeout=8).read().decode())
         valid = bool(res.get("valid"))
-        msg = res.get("message") or ("Subscription active." if valid else
-                                     "Your Reel Studio subscription isn't active. Renew it in your account to keep editing.")
+        msg = res.get("message") or ("Reelmate is yours — updates included." if valid else
+                                     "This Reelmate key isn't active. Check it on your welcome page or contact support.")
         try:
             os.makedirs(home, exist_ok=True)
             json.dump({"key_hash": hashlib.sha256(key.encode()).hexdigest(), "valid": valid, "checked": now,
-                       "message": msg, "renews": res.get("renews")}, open(_cache_path(home), "w", encoding="utf-8"))
+                       "message": msg, "renews": res.get("renews"), "plan": res.get("plan")}, open(_cache_path(home), "w", encoding="utf-8"))
         except Exception:
             pass
         return valid, msg
     except Exception:
         # offline / service hiccup: honour a recent good check
-        if same_key and cache.get("valid") and now - cache.get("checked", 0) < GRACE:
-            return True, "Subscription active (checked recently; offline right now)."
-        return False, "Couldn't check your subscription. Connect to the internet and try again."
+        grace = 365 * 86400 if cache.get("plan") == "lifetime" else GRACE   # bought once: offline is fine for a year
+        if same_key and cache.get("valid") and now - cache.get("checked", 0) < grace:
+            return True, "Reelmate is yours (checked earlier; offline right now)."
+        return False, "Couldn't check your Reelmate key. Connect to the internet once and try again."

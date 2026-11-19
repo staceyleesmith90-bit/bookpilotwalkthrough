@@ -145,7 +145,7 @@ def hand_back(slug, name=None):
     draft = _read(folder)
     if draft is None:
         return ("Your CapCut version keeps its project file locked, so I can't read the changes directly. "
-                "Easy way round: in CapCut press Export, save the video into your Reel Studio inbox, and say "
+                "Easy way round: in CapCut press Export, save the video into your Reelmate inbox, and say "
                 "\"continue from my CapCut video\".")
     kept = kept_ranges(draft)
     if not kept:

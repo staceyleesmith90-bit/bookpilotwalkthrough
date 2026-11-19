@@ -1354,7 +1354,7 @@ EFFECTS = {"orbit": fx_orbit, "chat_takeover": fx_chat_takeover, "frame_escape":
 
 # ---------------------------------------------------------------- the 45-effect pack (engine/vfx45, MIT)
 # 45 starter effects by Vibha Ramprakash (github.com/Vibha-Ramprakash/claude-video-effects), run inside
-# Reel Studio: same frame-by-frame stage, our person cut-out, YuNet face tracking, brand sounds (the pack
+# Reelmate: same frame-by-frame stage, our person cut-out, YuNet face tracking, brand sounds (the pack
 # itself has none), plans and the Studio page. Our name -> (their name, label, what it does, default options).
 V45 = {
     "noise": ("noise", "The Noise", "Reels pile up behind your head.", {}),

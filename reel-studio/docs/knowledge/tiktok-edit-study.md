@@ -31,7 +31,7 @@ only — no assets copied.
 - Edit-heavy videos carry 2–4 sound events per second (pops, clicks, swipes, whooshes tied to
   each element); a specific transition is paired with a specific sound.
 
-## Built into Reel Studio from this study
+## Built into Reelmate from this study
 - `"captions": "kinetic"` — designed layouts (stack / script / italic / side) that rotate and
   land in different zones, clear of faces; words appear as spoken; key word ticks.
 - Framed-card layout (speaker on a rounded card over a blurred copy) and pop-up product cards

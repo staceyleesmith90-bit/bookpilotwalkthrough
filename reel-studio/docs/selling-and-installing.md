@@ -1,4 +1,4 @@
-# Selling Reel Studio: how buyers get it and install it
+# Selling Reelmate: how buyers get it and install it
 
 ## Does it work "on Claude"?
 Yes, in **Claude Code** (part of the paid Claude Pro / Max plans), specifically the **Claude
@@ -33,7 +33,7 @@ Recommendation: start with the **zip download** (easiest for creators), add GitH
    right-click → Open → Open.) Wait until it says "All set".
 3. Install the **Claude desktop app** (claude.ai/download) and sign in.
 4. In Claude, open the **Code** tab → choose the `reel-studio` folder → say **"hi"**.
-   Claude runs the brand interview. After that, double-click **Reel Studio.command** any time
+   Claude runs the brand interview. After that, double-click **Reelmate.command** any time
    to open the Studio.
 
 **Windows**
@@ -42,7 +42,7 @@ Recommendation: start with the **zip download** (easiest for creators), add GitH
    Wait until it says "All set".
 3. Install the **Claude desktop app** and sign in.
 4. Claude → **Code** tab → choose the `reel-studio` folder → say **"hi"**. Afterwards,
-   double-click **Reel Studio.bat** to open the Studio.
+   double-click **Reelmate.bat** to open the Studio.
 
 ## Before you sell (checklist)
 - ☐ Test the installer once on a real Mac and a real Windows PC (I could only test on Linux).

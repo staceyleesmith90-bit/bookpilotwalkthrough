@@ -20,7 +20,7 @@ async def main():
                 txt = res.content[0].text if res.content else ""
                 print(f"--- {name} {args.get('command','')}: {txt[:300]!r}")
                 if name == "reel_licence": assert txt.startswith("✓"), txt
-                if name == "reel_guide": assert "Reel Studio" in txt, txt[:200]
+                if name == "reel_guide": assert "Reelmate" in txt, txt[:200]
                 if name == "reel_read": assert "Only files inside" in txt, txt
                 if name == "reel_write": assert "Only files in projects" in txt, txt
 asyncio.run(main())

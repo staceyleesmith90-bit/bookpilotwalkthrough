@@ -1,6 +1,6 @@
 ---
 name: help-me
-description: Answer "how do I…" questions about Reel Studio with short, exact steps, and handle "set me up" and "update me". Use when the user asks how to do something in Reel Studio, is stuck, says "set me up", "update me", or "what can you do".
+description: Answer "how do I…" questions about Reelmate with short, exact steps, and handle "set me up" and "update me". Use when the user asks how to do something in Reelmate, is stuck, says "set me up", "update me", or "what can you do".
 ---
 
 # Help

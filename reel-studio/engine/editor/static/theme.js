@@ -1,4 +1,4 @@
-// Reel Studio theme: big headings get one spring colour per letter (the colours live in theme.css).
+// Reelmate theme: big headings get one spring colour per letter (the colours live in theme.css).
 (function () {
   const PICK = ".hero h1, .rowhead h2, .logo b, .fmt b, section > h2, header h1";
   function paint(el) {

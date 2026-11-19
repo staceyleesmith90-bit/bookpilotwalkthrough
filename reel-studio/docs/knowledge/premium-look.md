@@ -29,6 +29,6 @@ deliberately playful.
 ## Captions
 - Short lines (≤ 17 characters), bold, outlined, 1 keyword per line in the brand colour.
 
-## In Reel Studio
+## In Reelmate
 Default `look: premium` → sticker_style `glass`, badges `glass`, custom words → serif word,
 treatments `callout:LABEL|sub@x,y`. Playful brands: `"look": "playful"` (brand's own sticker style).

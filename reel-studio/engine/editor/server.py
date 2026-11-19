@@ -169,7 +169,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._file(os.path.join(project.ROOT, "library", "samples", "hero-phone.jpg"), "image/jpeg")
             if u.path == "/api/hero-card":
                 return self._file(os.path.join(project.ROOT, "library", "samples", "hero-photo.jpg"), "image/jpeg")
-            if u.path == "/api/plan":                 # subscription status (from the extension's daily licence check)
+            if u.path == "/api/plan":                 # licence status (from the extension's daily licence check)
                 import time as _t
                 info = {}
                 try:
@@ -835,7 +835,7 @@ def title_preview(qs):
 
 def _sample_frame():
     """A real picture to preview looks on: a frame from their newest video if they have one,
-    otherwise a real photo that ships with Reel Studio (library/samples)."""
+    otherwise a real photo that ships with Reelmate (library/samples)."""
     import glob, subprocess
     vids = [p for p in glob.glob(os.path.join(project.ROOT, "projects", "*", "source", "*"))
             + glob.glob(os.path.join(project.ROOT, "inbox", "*"))
@@ -892,7 +892,7 @@ def caption_preview(style, pack_name=None):
 def serve(port=8765, open_browser=True, slug=None):
     srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     url = f"http://localhost:{port}/" + (f"editor?p={slug}" if slug else "")
-    print(f"Reel Studio editor running at {url}  (Ctrl+C to stop)")
+    print(f"Reelmate editor running at {url}  (Ctrl+C to stop)")
     if open_browser:
         import webbrowser
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()

@@ -1,9 +1,9 @@
-# Market research: what reel-editing products promise (and how Reel Studio answers)
+# Market research: what reel-editing products promise (and how Reelmate answers)
 
 Notes from a competitor's launch live (a Claude Code "reels editing engine", $97 / $67 launch,
 7-day window, ~45 min setup, CapCut-based). Ideas only — no content copied.
 
-| What buyers are promised there | Reel Studio |
+| What buyers are promised there | Reelmate |
 |---|---|
 | Brand style from a Canva design / website / preset packs | ✅ website, logo/mood board, **Canva/Figma style guide** (brand-onboarding route E), 7 presets |
 | Works in other languages (Spanish captions, hooks) | ✅ transcription + captions in the spoken language; hooks written in it. UI is English (roadmap: Spanish UI) |
@@ -20,7 +20,7 @@ Notes from a competitor's launch live (a Claude Code "reels editing engine", $97
 | Custom animated explainers (e.g. app-connection animations) | roadmap: motion-graphics cards |
 | Notion content pipeline, carousels | roadmap / separate products |
 
-Where Reel Studio goes further: finished video without CapCut, premium glass/callout graphics,
+Where Reelmate goes further: finished video without CapCut, premium glass/callout graphics,
 auto director (stabilise, face-framed zooms), measured noise clean-up, colour correction,
 automatic quality check, trending-sound suggestions, template library, built-in free music,
 drag-and-drop editor.

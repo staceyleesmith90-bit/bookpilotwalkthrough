@@ -1,4 +1,4 @@
-/* Reel Studio chat box: type a change, Claude makes it and renders a preview.
+/* Reelmate chat box: type a change, Claude makes it and renders a preview.
    Include with <script src="/chat.js"></script> on any page that has ?p=<project>. */
 (function () {
   const slug = new URLSearchParams(location.search).get("p");
@@ -50,7 +50,7 @@
     }
     btn.disabled = d.status.state === "working";
     hint.textContent = d.available ? "Claude changes this reel and renders a quick preview." :
-      "Claude Code isn't running here — your request is saved and done next time you open Reel Studio.";
+      "Claude Code isn't running here — your request is saved and done next time you open Reelmate.";
     clearTimeout(timer);
     if (d.status.state === "working") timer = setTimeout(load, 1500);
   }

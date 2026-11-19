@@ -1,7 +1,7 @@
 """Trending sounds assistant (TikTok / Instagram).
 
 TikTok doesn't offer a public API for trending sounds, and trending songs can't be downloaded
-into a reel — they're licensed to be used *inside* TikTok. So Reel Studio does the legal thing:
+into a reel — they're licensed to be used *inside* TikTok. So Reelmate does the legal thing:
   1. keeps a short list of trending sounds (brand/trending-sounds.json) — added by the user from
      TikTok's Creative Center, or by Claude from public "trending sounds this week" articles;
   2. suggests the best match for each reel (mood, tempo, business-safe);

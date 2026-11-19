@@ -1,6 +1,6 @@
 ---
 name: hook-lab
-description: Script Studio. Writes 8 hooks for one reel idea in the user's voice — each with its spoken first line, the first picture and a cover line — from Reel Studio's 12 hook shapes, and marks 2 very different ones to test. Use for "hooks for…", "how should I start this reel", "give me a hook", "hook lab".
+description: Script Studio. Writes 8 hooks for one reel idea in the user's voice — each with its spoken first line, the first picture and a cover line — from Reelmate's 12 hook shapes, and marks 2 very different ones to test. Use for "hooks for…", "how should I start this reel", "give me a hook", "hook lab".
 ---
 
 # Hook lab

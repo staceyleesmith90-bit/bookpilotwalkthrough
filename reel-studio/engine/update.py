@@ -1,4 +1,4 @@
-"""'Update me' — get the latest Reel Studio without touching the user's own stuff.
+"""'Update me' — get the latest Reelmate without touching the user's own stuff.
 
 Keeps: brand/ (brand, logo, fonts, voice hub), projects/, inbox/, out/, downloaded models and
 emoji cache. Replaces everything else (engine, skills, library, docs).
@@ -35,7 +35,7 @@ def check():
         return None
     key = lambda v: [int(x) for x in v.split(".") if x.isdigit()]
     if key(latest) > key(local_version()):
-        return f"✨ Reel Studio {latest} is available (you have {local_version()}). Say \"update me\"."
+        return f"✨ Reelmate {latest} is available (you have {local_version()}). Say \"update me\"."
     return None
 
 
@@ -67,8 +67,8 @@ def _apply_zip(data):
 
 
 def auto_update(key=None, machine=None, force=False, feed=None):
-    """The automatic update (runs quietly when Reel Studio starts, at most once a day).
-    Asks the update feed for the newest version; with an active subscription downloads and installs it.
+    """The automatic update (runs quietly when Reelmate starts, at most once a day).
+    Asks the update feed for the newest version; with a paid licence downloads and installs it.
     -> a one-line message, or None when there's nothing to do. Never raises."""
     import hashlib, time
     feed = (feed or _config().get("feed") or FEED).rstrip("/")
@@ -81,7 +81,7 @@ def auto_update(key=None, machine=None, force=False, feed=None):
         if not rel.get("version") or _vkey(rel["version"]) <= _vkey(local_version()):
             return None
         if _vkey(rel.get("min_extension", "0")) > _vkey(os.environ.get("REEL_EXTENSION_VERSION", "999")):
-            return (f"Reel Studio {rel['version']} needs the new installer: download it from your account page "
+            return (f"Reelmate {rel['version']} needs the new installer: download it from your account page "
                     "and double-click it (your brands and reels stay as they are).")
         key = key or os.environ.get("REEL_LICENSE_KEY", "")
         if not machine:                                   # same id the licence check registers (extension/src/licence.py)
@@ -96,7 +96,7 @@ def auto_update(key=None, machine=None, force=False, feed=None):
         _apply_zip(data)
         note = {"version": rel["version"], "from": old, "notes": rel.get("notes", ""), "when": time.time()}
         json.dump(note, open(WHATSNEW, "w", encoding="utf-8"), indent=1)
-        return f"Updated Reel Studio {old} → {rel['version']}. {rel.get('notes', '')}".strip()
+        return f"Updated Reelmate {old} → {rel['version']}. {rel.get('notes', '')}".strip()
     except Exception:
         return None
 

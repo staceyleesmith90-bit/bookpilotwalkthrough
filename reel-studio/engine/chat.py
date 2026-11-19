@@ -1,10 +1,10 @@
 """The Studio chat box: type a change ("make NEVER bigger and put it behind me") and Claude does it.
 
 The Studio runs on the person's computer next to Claude Code, so a message is handed to Claude Code
-(`claude -p`) working inside Reel Studio, on that one reel: it follows the same skills and rules,
+(`claude -p`) working inside Reelmate, on that one reel: it follows the same skills and rules,
 changes the plan / timeline, renders a preview and answers in a sentence or two. One conversation per
 reel (it remembers earlier requests). No Claude Code on this machine -> the request is saved in
-projects/<p>/chat-inbox.json and done the next time Claude opens Reel Studio (`python -m engine chat-inbox`).
+projects/<p>/chat-inbox.json and done the next time Claude opens Reelmate (`python -m engine chat-inbox`).
 """
 import json, os, shutil, subprocess, threading, time
 
@@ -12,12 +12,12 @@ from . import project
 
 ROOT = project.ROOT
 JOBS = {}                                      # slug -> {"state", "steps": [...], "reply"}
-PROMPT = """You are Reel Studio's editor, working ONLY on the reel in projects/{slug}/ (read CLAUDE.md and the
+PROMPT = """You are Reelmate's editor, working ONLY on the reel in projects/{slug}/ (read CLAUDE.md and the
 reel-engine skill if you need them). The person typed this in the Studio chat box:
 
 "{message}"
 
-Make exactly that change, the Reel Studio way: edit projects/{slug}/plan.json (or timeline.json for small
+Make exactly that change, the Reelmate way: edit projects/{slug}/plan.json (or timeline.json for small
 tweaks), rebuild with `python -m engine timeline {slug}` only if you changed the plan, then render a quick
 preview with `python -m engine render {slug} --preview`. Never touch other projects or their original
 files. Then answer in one or two short, friendly sentences (no code, no file names) saying what you
@@ -67,7 +67,7 @@ def send(slug, message):
         q = json.load(open(inbox)) if os.path.exists(inbox) else []
         q.append({"message": message, "t": time.time()})
         json.dump(q, open(inbox, "w"), indent=1, ensure_ascii=False)
-        reply = "Saved. Claude will make this change the next time you open Reel Studio in Claude Code."
+        reply = "Saved. Claude will make this change the next time you open Reelmate in Claude Code."
         h["messages"].append({"role": "claude", "text": reply, "t": time.time()})
         _save(slug, h)
         JOBS[slug] = {"state": "done", "steps": [], "reply": reply}

@@ -1,4 +1,4 @@
-"""Reel Studio engine."""
+"""Reelmate engine."""
 import atexit, os, shutil, tempfile, time
 
 # Every working file the engine makes goes in one folder per run, removed when the run ends, so reels never

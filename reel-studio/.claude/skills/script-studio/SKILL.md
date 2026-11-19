@@ -1,11 +1,11 @@
 ---
 name: script-studio
-description: Reel Studio's Script Studio — everything BEFORE the camera rolls: ideas, hooks, scripts, a week of reels. Use for "what can Script Studio do", "help me plan what to film", "I don't know what to post", or whenever another script skill needs the shared rules (where files live, the story bank, how scripts hand over to the edit). Routes to story-bank, hook-lab, write-my-script, script-check and content-week.
+description: Reelmate's Script Studio — everything BEFORE the camera rolls: ideas, hooks, scripts, a week of reels. Use for "what can Script Studio do", "help me plan what to film", "I don't know what to post", or whenever another script skill needs the shared rules (where files live, the story bank, how scripts hand over to the edit). Routes to story-bank, hook-lab, write-my-script, script-check and content-week.
 ---
 
 # Script Studio
 
-Reel Studio edits what they film. Script Studio makes sure what they film is worth editing. It thinks like
+Reelmate edits what they film. Script Studio makes sure what they film is worth editing. It thinks like
 a director, not a copywriter: every script already knows what the studio will put on screen (effects,
 AI elements, b-roll, the cover), so the edit is half-planned before they press record.
 

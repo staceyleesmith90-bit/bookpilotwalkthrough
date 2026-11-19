@@ -57,6 +57,6 @@ identical sample back-to-back; SFX sit under the voice; carve a pocket in the mu
 1–4 kHz so the voice sits on top (don't just turn the music down); ease music in with a riser
 and end on a hit or a reverb tail, never a hard stop.
 
-In Reel Studio: `engine/sounddesign.py` does all of this automatically. Kits: clean · luxe
+In Reelmate: `engine/sounddesign.py` does all of this automatically. Kits: clean · luxe
 (premium look) · playful · digital (bold). Plan keys: `"sound_kit"`, `sfx:<name>` for one-offs.
 Samples: Kenney CC0 packs (library/sfx/kenney) + synthesised whooshes/risers/hits.

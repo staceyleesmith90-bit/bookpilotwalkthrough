@@ -10,7 +10,7 @@ license: MIT
 user-invocable: true
 ---
 
-> **In Reel Studio:** for learning a reel's *style*, use the `inspiration-reels` skill first — it
+> **In Reelmate:** for learning a reel's *style*, use the `inspiration-reels` skill first — it
 > is much cheaper (one contact sheet). Use this full `watch` pipeline only for deep studies
 > the user asks for, or for breaking down a specific effect (`--start/--end`, see
 > docs/knowledge/studying-apps.md). The Obsidian/vault steps below are optional; skip them

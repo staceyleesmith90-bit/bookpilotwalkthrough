@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reelmate quick start</title>
+<style>
+  @font-face { font-family: "DynaPuff"; src: url("../library/fonts/DynaPuff-Variable.ttf"); font-weight: 400 700; }
+  @font-face { font-family: "Nunito"; src: url("../library/fonts/Nunito-Variable.ttf"); font-weight: 200 1000; }
+  :root { --green: #104631; --orange: #E8541E; --teal: #1F6E73; --rose: #E86F8A; --mustard: #E9A21F; --leaf: #2E7D4F;
+          --cream: #FDF6EB; --mint: #E6F0EC; --peach: #FCEFD6; --butter: #FFEDC3; --sky: #E1EEF2; --ink: #17392B; --muted: #5E6B63; }
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--cream); color: var(--ink); font: 15px/1.5 "Nunito", system-ui, sans-serif; }
+  .page { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 16mm 15mm 12mm; display: flex; flex-direction: column; gap: 9mm; }
+  h1, h2, h3 { font-family: "DynaPuff", "Nunito", sans-serif; font-weight: 600; margin: 0; }
+  header { display: flex; align-items: center; gap: 16px; }
+  header img { width: 64px; height: 64px; border-radius: 16px; }
+  header h1 { font-size: 40px; line-height: 1; }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 16px; }
+  .rainbow span:nth-child(6n+1) { color: var(--green); } .rainbow span:nth-child(6n+2) { color: var(--orange); }
+  .rainbow span:nth-child(6n+3) { color: var(--teal); } .rainbow span:nth-child(6n+4) { color: var(--rose); }
+  .rainbow span:nth-child(6n+5) { color: var(--mustard); } .rainbow span:nth-child(6n+6) { color: var(--leaf); }
+  h2 { font-size: 22px; color: var(--green); margin-bottom: 4mm; }
+  .need { display: flex; gap: 10px; flex-wrap: wrap; }
+  .need span { background: var(--mint); border-radius: 999px; padding: 6px 14px; font-weight: 700; color: var(--green); font-size: 14px; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .step { border-radius: 18px; padding: 14px 14px 12px; }
+  .step b { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #fff; font: 600 18px "DynaPuff";
+            color: var(--orange); margin-bottom: 8px; }
+  .step h3 { font-size: 17px; margin-bottom: 4px; }
+  .step p { margin: 0; font-size: 13.5px; color: var(--ink); }
+  .s1 { background: var(--peach); } .s2 { background: var(--mint); } .s3 { background: var(--butter); } .s4 { background: var(--sky); }
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .mode { border: 2px solid var(--mint); border-radius: 18px; padding: 12px 14px; background: #FFFDF8; }
+  .mode h3 { font-size: 16px; margin-bottom: 3px; }
+  .mode p { margin: 0; font-size: 13px; color: var(--muted); }
+  .say { background: var(--green); color: #fff; border-radius: 18px; padding: 14px 18px; }
+  .say h2 { color: #fff; margin-bottom: 8px; }
+  .say ul { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; font-size: 14px; }
+  .say li::before { content: "“"; color: var(--mustard); font: 700 18px "DynaPuff"; margin-right: 4px; }
+  .say li::after { content: "”"; color: var(--mustard); font: 700 18px "DynaPuff"; margin-left: 2px; }
+  footer { margin-top: auto; display: flex; justify-content: space-between; color: var(--muted); font-size: 12.5px; border-top: 1px solid #EADFCD; padding-top: 4mm; }
+  @media print { .page { zoom: .8; min-height: 0; } }
+  @media (max-width: 760px) { .page { width: auto; min-height: 0; padding: 20px 16px; } .steps, .flow, .modes, .say ul { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <img src="../library/brand-sp/reelmate-mark-256.png" alt="">
+    <div><h1 class="rainbow">Reelmate</h1><p>Your reel-editing buddy. You film it, Reelmate edits it, with Claude.</p></div>
+  </header>
+
+  <section>
+    <h2>What you need</h2>
+    <div class="need"><span>A Mac or Windows computer</span><span>The Claude desktop app (Pro plan or higher)</span><span>Your Reelmate key (from your welcome page)</span></div>
+  </section>
+
+  <section>
+    <h2>Set up once (about 5 minutes)</h2>
+    <div class="steps">
+      <div class="step s1"><b>1</b><h3>Download</h3><p>On your welcome page, tap <strong>Download Reelmate for Claude</strong>.</p></div>
+      <div class="step s2"><b>2</b><h3>Double-click it</h3><p>Claude opens and asks to install. Tap <strong>Install</strong>, then paste your key.</p></div>
+      <div class="step s3"><b>3</b><h3>Say hi</h3><p>In Claude, say <strong>"hi Reelmate"</strong>. It sets itself up and asks a few easy questions about your look.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Every reel</h2>
+    <div class="flow">
+      <div class="step s1"><b>1</b><h3>Add your clips</h3><p>Drop them in, or paste a <strong>Google Drive</strong> link for big videos from your phone.</p></div>
+      <div class="step s2"><b>2</b><h3>Say what it is</h3><p>One line or a voice note: "Liara's first day in the sandpit".</p></div>
+      <div class="step s3"><b>3</b><h3>Tick the storyboard</h3><p>See every moment before it's built. Keep what you love, add a note.</p></div>
+      <div class="step s4"><b>4</b><h3>Get your reel</h3><p>Captions, stickers, sound and a cover, ready to post or save.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Made for</h2>
+    <div class="modes">
+      <div class="mode"><h3 class="rainbow">Creators</h3><p>Talking to camera, b-roll, tips and stories in your brand.</p></div>
+      <div class="mode"><h3 class="rainbow">Brands</h3><p>One workspace per client: products, services and offers, even when no one talks.</p></div>
+      <div class="mode"><h3 class="rainbow">Memories</h3><p>Your day's photos and clips become a keepsake video for your camera roll.</p></div>
+    </div>
+  </section>
+
+  <section class="say">
+    <h2>Just say…</h2>
+    <ul>
+      <li>edit my reel</li><li>make it like this link</li>
+      <li>use my brand colours</li><li>add cute stickers</li>
+      <li>make the text bigger</li><li>give me hooks for this</li>
+      <li>open my studio</li><li>save it for my camera roll</li>
+    </ul>
+  </section>
+
+  <footer><span>Your videos stay on your computer. One payment, yours for good, updates included.</span><span>Reelmate · by Systems Pilot</span></footer>
+</div>
+<script>
+  document.querySelectorAll(".rainbow").forEach(el => {
+    el.innerHTML = [...el.textContent].map(c => c === " " ? " " : `<span>${c}</span>`).join("");
+  });
+</script>
+</body>
+</html>

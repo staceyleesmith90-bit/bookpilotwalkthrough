@@ -1,4 +1,4 @@
-# Hook shapes (Reel Studio's own set)
+# Hook shapes (Reelmate's own set)
 
 A hook is three things at once: the **first words** (said in under 2 seconds), the **first picture** (what the
 viewer sees before a word lands) and the **cover line** (≤ 7 words on screen). Write all three; they should

@@ -5,7 +5,7 @@ description: Choose, style and draw stickers, doodles, icons, emoji and badges f
 
 # Sticker Studio
 
-## AI elements first: every reel gets its OWN set (what makes Reel Studio different)
+## AI elements first: every reel gets its OWN set (what makes Reelmate different)
 Don't settle for generic emoji when the story has things in it. Read the story, pick 4–8 elements that are
 *in it* (Liara's sandbox → sand bucket + spade, splash, baby bottle, tiny alarm clock, "mom on duty" badge),
 one style for the whole set (`paper` · `clay` · `watercolour` · `doodle` · `retro` · `realistic` · `3d`;
@@ -78,7 +78,7 @@ override one item in the timeline (`"style": "neon"`).
    for attention; none in the first second of the hook.
 4. Placement, sizing, collision-avoidance, safe zones and float/pop animation are automatic.
 
-## Never "no sticker": Reel Studio makes its own
+## Never "no sticker": Reelmate makes its own
 If a word isn't in the library, isn't an icon/emoji and isn't auto-detected, **the reel still
 gets a sticker** — nobody is ever told "we don't have that one":
 1. **Instantly (automatic, no credits):** `render("matcha", ...)` falls back to a *custom

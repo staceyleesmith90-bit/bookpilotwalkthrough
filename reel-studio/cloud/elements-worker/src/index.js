@@ -1,7 +1,7 @@
-// Reel Studio · AI elements service (Cloudflare Worker + Workers AI, FLUX.1 schnell)
+// Reelmate · AI elements service (Cloudflare Worker + Workers AI, FLUX.1 schnell)
 //
-// Runs on the Reel Studio owner's Cloudflare account, so customers draw their reels' sticker sets with no
-// account, key or setup of their own. The studio calls it with the customer's Reel Studio licence key.
+// Runs on the Reelmate owner's Cloudflare account, so customers draw their reels' sticker sets with no
+// account, key or setup of their own. The studio calls it with the customer's Reelmate licence key.
 //
 //   POST /v1/elements   {"prompt": "...", "seed": 7, "size": 1024}
 //   header  Authorization: Bearer <licence key>
@@ -30,7 +30,7 @@ export default {
     if (url.pathname !== "/v1/elements" || request.method !== "POST") return json({ error: "not found" }, 404);
 
     const key = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim();
-    if (!(await validKey(env, key))) return json({ error: "Unknown Reel Studio licence key." }, 401);
+    if (!(await validKey(env, key))) return json({ error: "Unknown Reelmate licence key." }, 401);
 
     let body;
     try {

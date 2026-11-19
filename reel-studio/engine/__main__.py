@@ -1,4 +1,4 @@
-"""Reel Studio command line. Claude runs these; users can too.
+"""Reelmate command line. Claude runs these; users can too.
 
   python -m engine setup-check                 are ffmpeg / yt-dlp / python libs installed?
   python -m engine new <video|-> [--name N]     start a project (- = script-only/faceless)
@@ -6,7 +6,7 @@
   python -m engine review <project>             open the review page
   python -m engine timeline <project>           plan.json -> timeline.json (+ plain-language plan)
   python -m engine render <project> [--preview] render video (+ cover image)
-  python -m engine studio                       open the Reel Studio app (home, questionnaire, titles)
+  python -m engine studio                       open the Reelmate app (home, questionnaire, titles)
   python -m engine editor [<project>]           open the manual timeline editor
   python -m engine music <project> [--options N] [--eleven]  music from the brief (free built-in; --eleven = paid)
   python -m engine titles                       list title templates
@@ -53,7 +53,7 @@
   python -m engine chop <file|folder> [--options SECONDS]  long clips -> best short b-roll clips
   python -m engine trial <trial.json>           hook-on-b-roll trial reels + captions map
   python -m engine learn-me <profile|reel url> [--options N]  learn the user's voice from their last N reels
-  python -m engine update                       get the latest Reel Studio (keeps your brand + projects)
+  python -m engine update                       get the latest Reelmate (keeps your brand + projects)
   python -m engine fonts                        list fonts (yours + library) and the sticker fonts in use
   python -m engine font-add <file.ttf|otf> [--role R]  use your own font (not on Google), e.g. --role sticker
   python -m engine font-use <font|auto> --role R  e.g. font-use "Satisfy" --role sticker (auto = brand match)

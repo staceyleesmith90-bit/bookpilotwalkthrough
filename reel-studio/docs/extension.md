@@ -1,16 +1,16 @@
-# Reel Studio as a one-click Claude extension (and for Codex)
+# Reelmate as a one-click Claude extension (and for Codex)
 
 **The customer's experience**
-1. Subscribe (PayFast monthly) → the welcome page shows their licence key + the download.
+1. Pay once (PayFast, no subscription) → the welcome page shows their licence key + the download.
 2. Double-click `reel-studio-<version>.mcpb` → Claude Desktop (Windows or Mac) asks to install → **Install**.
 3. Paste the licence key when asked. Done. In any Claude chat: "edit my reel", "interview me", "make it like this link".
 
 **What stays where**
-- Videos, brand, projects and finished reels: on their computer, in `Documents/Reel Studio`
+- Videos, brand, projects and finished reels: on their computer, in `Documents/Reelmate`
   (Inbox for new videos). Nothing is uploaded; we store no files.
 - Thinking: their own Claude plan. We pay no AI costs.
-- Our server: only the licence service (keys + subscription status) — `licence-service/`, a free
-  Cloudflare Worker fed by PayFast. Cancel → the key stops working at the end of the paid month.
+- Our server: only the licence service (keys, paid or not) — `licence-service/`, a free Cloudflare
+  Worker fed by PayFast. A bought key is lifetime (updates included); trial keys from /api/admin/issue {days} end.
 - First run downloads the editing tools once (Python packages, ffmpeg, the animation browser) —
   a few minutes, automatic.
 
@@ -31,5 +31,6 @@ the local editor without uploading videos to a server. Not offered (keeps the "n
 2. `npx wrangler secret put PAYFAST_MERCHANT_ID` (and PAYFAST_MERCHANT_KEY, PAYFAST_PASSPHRASE, ADMIN_TOKEN).
 3. `npx wrangler deploy`, point reelstudio.systemspilot.co.za at it (Cloudflare custom domain).
 4. Test with PAYFAST_HOST = sandbox.payfast.co.za first, then switch to www.payfast.co.za.
-5. PayPal / founders / testers: issue keys with `POST /api/admin/issue` (Bearer ADMIN_TOKEN).
+5. PayPal / EFT buyers: `POST /api/admin/issue` (Bearer ADMIN_TOKEN) → lifetime key; testers: add {"days": 14}.
+6. Set your once-off price: PRICE_ZAR in licence-service/wrangler.toml.
 Tests: `node licence-service/test.mjs`.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" href="/brand-sp/favicon.png"><title>Reel Studio · Systems Pilot</title>
+<link rel="icon" href="/brand-sp/reelmate-favicon.png"><title>Reelmate · Systems Pilot</title>
 <style>
   @font-face { font-family: "Inter"; src: url("/fonts/Inter-Variable.ttf"); font-weight: 100 900; }
   @font-face { font-family: "Poppins"; src: url("/fonts/Poppins-ExtraBold.ttf"); font-weight: 800; }
@@ -270,7 +270,7 @@
 </head>
 <body>
 <div class="top">
-  <div class="logo"><div class="mark"><img src="/brand-sp/systems-pilot-mark-256.png" alt="Systems Pilot"></div><div><b>ReelStudio</b><small>by Systems Pilot</small></div></div>
+  <div class="logo"><div class="mark"><img src="/brand-sp/reelmate-mark-256.png" alt="Reelmate"></div><div><b>Reelmate</b><small>your reel-editing buddy</small></div></div>
   <button class="newreel" id="newBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New reel <svg class="ico" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
   <nav>
     <button data-tab="home" class="on"><svg class="ico" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg> Home</button>
@@ -288,9 +288,9 @@
     <button data-tab="trash"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg> Trash</button>
   </nav>
   <span class="grow"></span>
-  <div class="plan"><b><svg class="ico" viewBox="0 0 24 24"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/></svg> Monthly plan</b>
-    <ul><li>Unlimited reels</li><li>Every effect &amp; sound</li><li>Free updates</li><li>Your files stay with you</li></ul>
-    <a href="#" id="planBtn">Manage plan</a></div>
+  <div class="plan"><b><svg class="ico" viewBox="0 0 24 24"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/></svg> Reelmate is yours</b>
+    <ul><li>One payment, no subscription</li><li>Unlimited reels</li><li>Free updates</li><li>Your files stay with you</li></ul>
+    <a href="#" id="planBtn">My licence</a></div>
 </div>
 
 <div class="bar-top">
@@ -380,13 +380,13 @@
     <div id="gradeGallery"></div>
     <h3 class="sub">Stickers</h3>
     <p class="sub">1,500+ stickers in 12 styles, glossy 3D and animated emoji, stamps and badges, all in your colours.
-      <b>Not in the library? Reel Studio creates your own:</b> instantly as a lettered sticker in your brand font,
+      <b>Not in the library? Reelmate creates your own:</b> instantly as a lettered sticker in your brand font,
       then Claude draws an illustrated one that stays in your library for every future reel.</p>
   </section>
 
   <section id="tab-sounds" class="hidden">
     <h2>Trending sounds <small>we suggest, you add it in TikTok</small></h2>
-    <p class="sub">TikTok keeps trending songs inside its app (they're licensed there), so Reel Studio never downloads them.
+    <p class="sub">TikTok keeps trending songs inside its app (they're licensed there), so Reelmate never downloads them.
       Instead: save the sounds you see trending, Claude matches the best one to each reel, and you get a
       <b>“for trending sound”</b> version of your reel (your voice + sound effects, no background music) ready to post.</p>
     <div class="pills">
@@ -412,7 +412,7 @@
     <div class="fontcard">
       <div>
         <h3 class="sub" style="margin-top:0">Sticker lettering</h3>
-        <p class="note">Used when Reel Studio makes a word sticker. Automatic picks the font that matches your brand.</p>
+        <p class="note">Used when Reelmate makes a word sticker. Automatic picks the font that matches your brand.</p>
         <select id="fStk"></select>
         <div class="fprev" id="fStkPrev">glow up ✦</div>
       </div>
@@ -446,7 +446,7 @@
         <p class="note">Free filter packs come as <b>.cube</b> files (LUTs). Add them here and they appear under <b>Looks → Filters → Yours</b> for this brand.</p>
         <label class="cta" style="display:inline-block;cursor:pointer">Choose .cube files<input type="file" id="lutFiles" accept=".cube" multiple hidden></label><p class="note" id="lutMsg"></p></div>
       <div><h3 class="sub" style="margin-top:0">B-roll, photos and GIFs</h3>
-        <p class="note">Download clips, photos or GIFs from the sites below and drop them into your <b>Inbox</b> folder (Documents → Reel Studio → inbox). Claude uses them where they fit.</p></div>
+        <p class="note">Download clips, photos or GIFs from the sites below and drop them into your <b>Inbox</b> folder (Documents → Reelmate → inbox). Claude uses them where they fit.</p></div>
     </div>
     <div class="fontcard" id="aiCard" style="margin-bottom:10px;grid-template-columns:1fr">
       <div><h3 class="sub" style="margin-top:0">AI stickers: connect your free Cloudflare</h3>
@@ -472,7 +472,7 @@
   </section>
 </main>
 <div class="toast" id="toast"></div>
-<footer>Reel Studio · a Systems Pilot product · runs on your computer</footer>
+<footer>Reelmate · a Systems Pilot product · runs on your computer</footer>
 
 <dialog id="wz">
   <div class="wz-head"><div class="dots" id="dots"></div><button class="x" id="wzClose" aria-label="Close">✕</button></div>
@@ -919,11 +919,11 @@ async function openPosts(slug, rebuild) {
 // ------------------------------------------------------------ plan
 $("#planBtn").onclick = async e => { e.preventDefault(); const p = await api("/api/plan");
   const when = p.checked ? new Date(p.checked * 1000).toLocaleString() : "";
-  $("#planBody").innerHTML = `<h3>${p.dev ? "Tester / developer copy" : p.known ? (p.active ? "Monthly plan: active" : "Monthly plan: not active") : "Monthly plan"}</h3>
-    <p class="sub">${p.dev ? "This copy isn't tied to a paid subscription." : p.known ? esc(p.message || "") + (p.renews ? ` Renews on ${esc(p.renews)}.` : "") : "Your subscription is checked once a day when you use Reel Studio in Claude."}</p>
-    ${when ? `<p class="note">Last checked: ${esc(when)}. Reel Studio keeps working offline for 7 days after a check.</p>` : ""}
-    <p class="note">Change your card, upgrade or cancel on your account page. Cancelling keeps everything you made: your reels and files stay on your computer.</p>
-    <a class="cta" href="${p.account}" target="_blank" rel="noopener" style="margin-top:14px">Open my account ↗</a>`;
+  $("#planBody").innerHTML = `<h3>${p.dev ? "Tester / developer copy" : p.known ? (p.active ? "Reelmate: yours for good" : "Reelmate: key not active") : "Your Reelmate licence"}</h3>
+    <p class="sub">${p.dev ? "This copy isn't tied to a licence key." : p.known ? esc(p.message || "") + (p.renews ? ` Trial ends on ${esc(p.renews)}.` : "") : "Reelmate checks your key now and then when you use it with Claude. One payment, no subscription."}</p>
+    ${when ? `<p class="note">Last checked: ${esc(when)}. Bought copies keep working offline.</p>` : ""}
+    <p class="note">Updates are included and arrive by themselves. Your reels and files always stay on your computer.</p>
+    <a class="cta" href="${p.account}" target="_blank" rel="noopener" style="margin-top:14px">My licence page ↗</a>`;
   $("#planDlg").showModal(); };
 
 // ------------------------------------------------------------ notifications

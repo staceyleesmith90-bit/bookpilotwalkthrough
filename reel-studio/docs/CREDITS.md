@@ -1,6 +1,6 @@
 # Credits & licences
 
-Reel Studio (a Systems Pilot product): its code, drawn stickers, sound effects, built-in music
+Reelmate (a Systems Pilot product): its code, drawn stickers, sound effects, built-in music
 composer, colour grades, captions, transitions, title designs and templates are original to
 this project.
 Third-party material it uses:

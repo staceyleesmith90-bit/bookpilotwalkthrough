@@ -6,7 +6,7 @@ description: Suggest trending TikTok/Instagram sounds for a reel and prepare a v
 # Trending sounds
 
 **Honest setup:** TikTok has no public trending-sounds API and its songs are licensed for use
-*inside* TikTok. Reel Studio never scrapes or downloads them. We **suggest**; the user adds the
+*inside* TikTok. Reelmate never scrapes or downloads them. We **suggest**; the user adds the
 sound in the app. Say this in one friendly sentence if they ask why.
 
 ## What to do

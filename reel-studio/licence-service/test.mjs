@@ -6,7 +6,7 @@ for (const s of ["", "abc", "merchant_id=10000100&amount=449.00&item_name=Reel+S
   ok(md5(s) === createHash("md5").update(s).digest("hex"), `md5(${s.slice(0, 20)})`);
 const kv = new Map(); const env = { LICENCES: { get: async k => kv.get(k) ?? null, put: async (k, v) => kv.set(k, v) },
   ADMIN_TOKEN: "t0k", MAX_MACHINES: "2", PRICE_ZAR: "449.00", PUBLIC_URL: "https://x", PAYFAST_HOST: "sandbox.payfast.co.za",
-  PAYFAST_MERCHANT_ID: "10000100", PAYFAST_MERCHANT_KEY: "46f0cd694581a", PAYFAST_PASSPHRASE: "jt7NOE43FZPn", PRODUCT: "Reel Studio monthly" };
+  PAYFAST_MERCHANT_ID: "10000100", PAYFAST_MERCHANT_KEY: "46f0cd694581a", PAYFAST_PASSPHRASE: "jt7NOE43FZPn", PRODUCT: "Reelmate" };
 const call = (path, body, auth) => worker.fetch(new Request("https://x" + path, { method: body ? "POST" : "GET",
   headers: { "content-type": "application/json", ...(auth ? { authorization: "Bearer " + auth } : {}) }, body: body && JSON.stringify(body) }), env);
 ok((await call("/api/admin/issue", { email: "a@b.c" })).status === 401, "admin needs token");
@@ -29,4 +29,10 @@ ok((await call("/api/update/download", { key: k2, machine: "m9" })).status === 2
 ok((await call("/api/update/download", { key: key, machine: "m1" })).status === 403, "revoked key gets no update");
 ok((await call("/api/update/download", { key: k2, machine: "other" })).status === 403, "unknown machine gets no update");
 const page = await (await call("/buy")).text(); ok(page.includes("sandbox.payfast.co.za/eng/process") && page.includes('name="signature"'), "checkout form");
+ok(!page.includes("subscription_type") && !page.includes('name="frequency"'), "checkout is once-off (no subscription)");
+// a bought key (no days) is lifetime: valid and gets updates, no end date
+const life = (await (await call("/api/admin/issue", { email: "l@b.c" }, "t0k")).json()).key;
+v = await (await call("/api/licence/validate", { key: life, machine: "mL" })).json();
+ok(v.valid && v.plan === "lifetime" && !v.renews, "lifetime key valid with no end date");
+ok((await call("/api/update/download", { key: life, machine: "mL" })).status === 200, "lifetime key gets updates");
 console.log("all good");
