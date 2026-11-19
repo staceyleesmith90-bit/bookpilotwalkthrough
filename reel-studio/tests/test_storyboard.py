@@ -22,3 +22,13 @@ def test_skip_graphics_keeps_only_footage():
          "skip_graphics": True}]}
     tl = to_timeline(plan, None, None)
     assert not tl.get("scenes") and len(tl["broll"]) == 1
+
+
+def test_words_typed_on_the_storyboard_go_into_the_plan():
+    beat = {"scene": {"title": "Old", "labels": [{"text": "wrong photo line"}], "items": ["a", "b"]}}
+    keys = {t["key"]: t["value"] for t in storyboard.texts_of(beat)}
+    assert keys == {"title": "Old", "labels.0": "wrong photo line", "items": "a\nb"}
+    storyboard._set_text(beat, "labels.0", "splash, splash!")
+    storyboard._set_text(beat, "items", "one\n\ntwo ")
+    storyboard._set_text(beat, "title", "New")
+    assert beat["scene"] == {"title": "New", "labels": [{"text": "splash, splash!"}], "items": ["one", "two"]}

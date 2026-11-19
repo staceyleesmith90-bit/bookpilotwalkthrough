@@ -79,6 +79,41 @@ def _describe(tl, a, b):
     return lines or ["footage only"]
 
 
+TEXT_KEYS = ("kicker", "title", "text", "name", "tagline", "price")
+
+
+def texts_of(beat):
+    """The words on one plan beat that a person may want to change: [{"key", "label", "value"}]."""
+    sp = (beat or {}).get("scene") or {}
+    out = []
+    for k in TEXT_KEYS:
+        if isinstance(sp.get(k), str) and sp.get(k):
+            out.append({"key": k, "label": {"kicker": "Small line", "title": "Big title", "text": "Words",
+                                            "name": "Name", "tagline": "Tagline", "price": "Price"}[k], "value": sp[k]})
+    for i, lab in enumerate(sp.get("labels") or []):
+        val = lab.get("text") if isinstance(lab, dict) else lab
+        out.append({"key": f"labels.{i}", "label": "Label", "value": val})
+    if sp.get("items"):
+        out.append({"key": "items", "label": "List (one per line)", "value": "\n".join(map(str, sp["items"]))})
+    return out
+
+
+def _set_text(beat, key, value):
+    sp = beat.setdefault("scene", {})
+    if key.startswith("labels."):
+        i = int(key.split(".")[1])
+        labs = sp.get("labels") or []
+        if i < len(labs):
+            if isinstance(labs[i], dict):
+                labs[i]["text"] = value
+            else:
+                labs[i] = value
+    elif key == "items":
+        sp["items"] = [x.strip() for x in value.split("\n") if x.strip()]
+    elif key in TEXT_KEYS:
+        sp[key] = value
+
+
 def _file(slug, *p):
     return project.path(slug, "renders", "storyboard", *p)
 
@@ -106,7 +141,9 @@ def make(slug):
             jpg = _file(slug, f"{n:02d}.jpg")
             subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", vid, "-frames:v", "1", "-q:v", "3", jpg], check=True)
             keep = not (plan.get("beats") and bi is not None and plan["beats"][bi].get("skip_graphics"))
+            beat = plan["beats"][bi] if (plan.get("beats") and bi is not None and bi < len(plan["beats"])) else None
             moments.append({"n": n, "start": round(a, 2), "end": round(b, 2), "beat": bi, "img": f"{n:02d}.jpg",
+                            "texts": texts_of(beat),
                             "shows": _describe(tl, a, b), "keep": old.get(n, {}).get("keep", keep),
                             "note": old.get(n, {}).get("note", "")})
     finally:
@@ -171,6 +208,9 @@ def save_choices(slug, choices):
         c = by.get(m["n"])
         if c:
             m["keep"], m["note"] = bool(c.get("keep", True)), str(c.get("note", ""))[:500]
+            for t in m.get("texts", []):                 # words typed on the storyboard page
+                if isinstance(c.get("texts"), dict) and t["key"] in c["texts"]:
+                    t["value"] = str(c["texts"][t["key"]])[:300]
     project.save(slug, "storyboard.json", sb)
     sheet(slug, sb)
     return sb
@@ -187,6 +227,11 @@ def apply(slug):
                 continue
             beat = plan["beats"][m["beat"]]
             want_skip = not m.get("keep", True)
+            before = {x["key"]: x["value"] for x in texts_of(beat)}
+            for t in m.get("texts", []):                 # their own words go straight into the reel
+                if before.get(t["key"]) != t["value"]:
+                    _set_text(beat, t["key"], t["value"])
+                    changed += 1
             if bool(beat.get("skip_graphics")) != want_skip:
                 beat["skip_graphics"] = want_skip
                 if not want_skip:

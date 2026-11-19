@@ -605,6 +605,9 @@ class Handler(SimpleHTTPRequestHandler):
                 if what == "storyboard":                # save ticks + notes; "build": apply them and render
                     from .. import storyboard
                     if data.get("redraw"):
+                        if data.get("moments"):         # "Update the words": save their typing into the plan first
+                            storyboard.save_choices(slug, data["moments"])
+                            storyboard.apply(slug)
                         def job():
                             JOBS[slug + ":storyboard"] = {"state": "drawing"}
                             try:

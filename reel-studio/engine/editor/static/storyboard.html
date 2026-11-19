@@ -36,6 +36,8 @@
   .m .body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
   .m .t { font-size: 12px; color: var(--muted); }
   .m ul { margin: 0; padding-left: 16px; font-size: 12.5px; }
+  .m .tx { display: flex; flex-direction: column; gap: 3px; font-size: 11.5px; color: var(--muted); font-weight: 700; }
+  .m .tx input, .m .tx textarea { width: 100%; border: 1.5px solid var(--line); border-radius: 10px; padding: 7px 9px; font-size: 13.5px; background: #fff; color: var(--ink); font-weight: 600; min-height: 0; }
   .m textarea { width: 100%; min-height: 52px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 7px 9px; font-size: 12.5px; background: var(--soft); }
   .bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 14px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
   .bar .msg { color: var(--muted); flex: 1; min-width: 200px; }
@@ -56,7 +58,7 @@
   <div class="intro">
     <h2 style="font-size:16px">See your reel before it's built</h2>
     <p>Each card is one moment with its text, stickers and effect already drawn on. Tap a card to switch its graphics
-      off (the footage stays). Write a note on any card ("bigger", "move the text left", "a different sticker").
+      off (the footage stays). Change any words right on the card (wrong photo? just retype it) and press <b>Update the words</b>.
       Then press <b>Build my reel</b>: only what you kept gets made.</p>
     <div class="gauge">Claude usage for this step: <b>light</b> (the pictures are drawn by the studio itself)</div>
   </div>
@@ -64,6 +66,7 @@
 </main>
 <div class="bar">
   <span class="msg" id="msg"></span>
+  <button class="btn ghost" id="words" disabled>Update the words</button>
   <button class="btn ghost" id="save">Save notes</button>
   <button class="btn" id="build">Build my reel</button>
 </div>
@@ -92,22 +95,32 @@ function card(m) {
   el.innerHTML = `<div class="pic" style="background-image:url('/api/p/${slug}/storyboard/${m.img}?v=${Date.now()}')">
       <span class="n">${m.cover ? "cover" : m.n}</span>${m.cover ? "" : `<span class="tick">✓</span>`}</div>
     <div class="body"><span class="t">${time}</span><ul>${m.shows.map(s => `<li>${s.replace(/</g, "&lt;")}</li>`).join("")}</ul>
-    ${m.cover ? "" : `<textarea placeholder="A note for this moment (optional)"></textarea>`}</div>`;
+    ${m.cover ? "" : (m.texts || []).map((t, i) => `<label class="tx"><span>${t.label}</span>${t.key === "items"
+        ? `<textarea data-ti="${i}" rows="3"></textarea>` : `<input data-ti="${i}">`}</label>`).join("")}
+    ${m.cover ? "" : `<textarea class="note" placeholder="A note for Claude (optional): 'a different sticker', 'bigger'…"></textarea>`}</div>`;
   if (!m.cover) {
     el.querySelector(".pic").onclick = () => { m.keep = !m.keep; el.classList.toggle("on", m.keep); count(); };
-    const ta = el.querySelector("textarea"); ta.value = m.note || ""; ta.oninput = () => m.note = ta.value;
+    const ta = el.querySelector("textarea.note"); ta.value = m.note || ""; ta.oninput = () => m.note = ta.value;
+    el.querySelectorAll("[data-ti]").forEach(inp => { const t = m.texts[+inp.dataset.ti]; inp.value = t.value;
+      inp.oninput = () => { t.value = inp.value; $("words").disabled = false; }; });
   }
   return el;
 }
 function count() { $("msg").textContent = `${sb.moments.filter(m => m.keep).length} of ${sb.moments.length} moments keep their graphics`; }
 async function send(build) {
-  const body = {moments: sb.moments.map(m => ({n: m.n, keep: m.keep, note: m.note || ""})), build};
+  const body = {moments: moments(), build};
   const r = await fetch(`/api/p/${slug}/storyboard`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
   const d = await r.json();
   if (!build) { $("msg").textContent = "Saved."; return; }
   if (d.notes && d.notes.length) $("msg").textContent = "Your notes went to Claude in the chat box: it makes the changes and redraws the storyboard first.";
   else { $("msg").textContent = "Building your reel… it shows up on the Studio home page when it's ready."; $("build").disabled = true; }
 }
+function moments() { return sb.moments.map(m => ({n: m.n, keep: m.keep, note: m.note || "",
+  texts: Object.fromEntries((m.texts || []).map(t => [t.key, t.value]))})); }
+$("words").onclick = async () => {
+  await fetch(`/api/p/${slug}/storyboard`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({redraw: true, moments: moments()})});
+  $("words").disabled = true; $("msg").textContent = "Putting your words in and redrawing…"; setTimeout(load, 5000);
+};
 $("save").onclick = () => send(false);
 $("build").onclick = () => send(true);
 $("redraw").onclick = async () => {
