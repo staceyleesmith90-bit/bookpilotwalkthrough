@@ -127,10 +127,11 @@ def prompt(items, style=DEFAULT_STYLE, colors=None, story=""):
         pal = " Colour palette: " + ", ".join(c for c in colors if c) + "."
     n = len(items)
     cols = 3 if n > 4 else 2
-    return (f"A sticker sheet with exactly {n} separate objects in a neat grid of {cols} columns, read left to right, "
-            f"top to bottom: " + ", then ".join(items) + ". Draw exactly these objects and nothing else — no people, "
-            f"no extra objects. Each one isolated with lots of empty space around it, nothing touching. "
-            f"Style: {look}.{pal} " + (f"Mood: {story}. " if story else "") +
+    # the style comes FIRST: image models weigh the start of a prompt most, so the look actually changes
+    return (f"Sticker sheet, style: {look}.{pal} Exactly {n} separate objects in a neat grid of {cols} columns, read left "
+            f"to right, top to bottom: " + ", then ".join(items) + ". Draw exactly these objects and nothing else — no "
+            f"people, no extra objects. Each one isolated with lots of empty space around it, nothing touching. " +
+            (f"Mood: {story}. " if story else "") +
             "Flat pure white background, no drop shadows, no numbers, no letters, no labels, no logos or brand names, no border, high detail.")
 
 
