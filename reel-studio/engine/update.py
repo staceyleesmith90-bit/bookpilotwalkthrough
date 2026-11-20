@@ -9,7 +9,7 @@ import io, json, os, shutil, subprocess, sys, urllib.request, zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KEEP = {"brand", "brands", "projects", "inbox", "out", "trash", ".git", ".venv", "venv", ".download-link"}
-LINK = os.path.join(ROOT, ".download-link")     # their own download link (from the welcome page): free updates, no key
+LINK = os.path.join(ROOT, ".download-link")     # their own download link (from the Reelmate website): free updates, no key
 KEEP_LIB = {"emoji-cache", "models"}
 
 
@@ -26,11 +26,11 @@ def download_link():
 
 
 def save_download_link(link):
-    """The link from their Reelmate welcome page. Only the purchase code in it is ever sent (for updates)."""
+    """Their Reelmate download link (from the website). Only the purchase code in it is ever sent (for updates)."""
     import re
     m = re.search(r"[a-f0-9]{32}", link or "")
     if not m:
-        raise ValueError("That doesn't look like your Reelmate link. Copy it from your welcome page.")
+        raise ValueError("That doesn't look like your Reelmate download link. Copy it from the page you downloaded Reelmate from.")
     open(LINK, "w", encoding="utf-8").write((link or "").strip())
     return True
 
@@ -99,11 +99,11 @@ def auto_update(link=None, force=False, feed=None):
         if not rel.get("version") or _vkey(rel["version"]) <= _vkey(local_version()):
             return None
         if _vkey(rel.get("min_extension", "0")) > _vkey(os.environ.get("REEL_EXTENSION_VERSION", "999")):
-            return (f"Reelmate {rel['version']} needs the new installer: download it from your welcome page link "
+            return (f"Reelmate {rel['version']} needs the new installer: download it from your download link "
                     "and double-click Install Reelmate (your brands and reels stay as they are).")
         link = link or download_link()
         if not link:
-            return (f"Reelmate {rel['version']} is out. To get updates, paste the link from your Reelmate welcome page "
+            return (f"Reelmate {rel['version']} is out. To get updates, paste your Reelmate download link "
                     "once (Studio → Updates).")
         req = urllib.request.Request(feed + "/download", data=json.dumps({"link": link}).encode(),
                                      headers={"Content-Type": "application/json"})

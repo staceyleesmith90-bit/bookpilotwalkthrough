@@ -14,7 +14,7 @@ What pro short-form editors do (see docs/knowledge/sound-design.md):
 Cue names: "sd:<kit>:<event>:<seed>[:<duration>]" (see cue()). Samples: Kenney CC0 packs in
 library/sfx/kenney/ plus sounds synthesised here (whooshes, risers, shimmer, sub hits).
 """
-import glob, hashlib, os, wave
+import glob, hashlib, json, os, wave
 import numpy as np
 
 from . import mysounds
@@ -279,6 +279,14 @@ SYNTH = {"boom": boom, "shatter": shatter, "whoosh": whoosh, "swish": swish, "zo
 
 
 # ---------------------------------------------------------------- render a cue
+def _files_for(src, kit):
+    if src.startswith("u:"):                          # uisfx: the kit's feels, one event
+        feels = KIT_FEEL.get(kit, ["soft"])
+        return [f for fe in feels for f in glob.glob(os.path.join(UISFX, fe, src[2:] + ".wav"))]
+    folder, pat = {"f:": (FOLEY, src[2:] + "-*.wav"), "o:": (CC0PACK, src[2:] + ".wav")}.get(src[:2], (KEN, src[2:] + ".wav"))
+    return glob.glob(os.path.join(folder, pat))
+
+
 def source_file(name):
     """Which sample file (or synth) a cue name resolves to — used to avoid back-to-back repeats."""
     _, kit, event, seed, *rest = name.split(":")
@@ -290,16 +298,25 @@ def source_file(name):
         return f, h, h2
     table = KITS.get(event, KITS["text_in"])
     cands = table.get(kit) or table.get("*") or next(iter(table.values()))
-    src, h = _pick(cands, seed, event)
+    first, h = _pick(cands, seed, event)
+    start = cands.index(first)
+    src, files = first, []
+    for k in range(len(cands)):                       # prefer a source earshot heard as a real recording
+        c = cands[(start + k) % len(cands)]
+        if c.startswith("s:"):
+            if k == 0:
+                src, files = c, []
+                break
+            continue
+        fs = _files_for(c, kit)
+        good = [f for f in fs if realness(f) >= 0.5]
+        if good:
+            src, files = c, good
+            break
+        if k == 0:
+            src, files = c, fs
     if src.startswith("s:"):
         return src, h, None
-    if src.startswith("u:"):                          # uisfx: the kit's feels, one event
-        feels = KIT_FEEL.get(kit, ["soft"])
-        files = [f for fe in feels for f in glob.glob(os.path.join(UISFX, fe, src[2:] + ".wav"))]
-    else:
-        folder, pat = {"f:": (FOLEY, src[2:] + "-*.wav"), "o:": (CC0PACK, src[2:] + ".wav")}.get(
-            src[:2], (KEN, src[2:] + ".wav"))
-        files = glob.glob(os.path.join(folder, pat))
     files = sorted(files)
     if not files:
         return "s:swish", h, None
@@ -545,29 +562,86 @@ NICE = {"text_in": "Soft pop (text)", "word_pop": "Tiny pop (word)", "type_key":
         "air": "Soft swoosh", "reveal": "Sparkle", "cta": "Ding", "sparkle": "Sparkle", "money": "Ding",
         "writing": "Pen", "pill_in": "Soft drop", "window_in": "Pop-up", "toggle": "Switch", "chart_grow": "Swipe",
         "tick": "Tick", "click": "Click", "notify": "Notification", "thump": "Soft thud", "camera": "Click"}
-CHOICES = {   # "choose another sound": label -> files (recorded, CC0 — library/sfx)
-    "Soft pop": ["foley/softpop-*.wav"], "Pop": ["foley/pop-*.wav"], "Tap": ["foley/tap-*.wav"],
-    "Click": ["foley/click-*.wav", "uisfx/soft/press.wav", "uisfx/studio/press.wav"],
-    "Soft swoosh": ["cc0pack/air_*.wav", "foley/swoosh-*.wav"], "Whoosh": ["foley/whoosh-*.wav"],
+CHOICES = {   # "choose another sound": label -> files (library/sfx). Real recordings (CC0) + earshot's designed bank (MIT)
+    "Soft pop": ["foley/softpop-*.wav"], "Pop": ["foley/pop-*.wav", "earshot/pro_pop-*.wav"],
+    "Modern pop": ["earshot/pro_pop_in-*.wav", "earshot/ui_pop-*.wav"],
+    "Tap": ["foley/tap-*.wav", "earshot/pro_tap-*.wav", "earshot/tap-*.wav", "earshot/knock-*.wav"],
+    "Click": ["foley/click-*.wav", "earshot/pro_click-*.wav", "earshot/pro_hover_tick-*.wav"],
+    "Soft swoosh": ["cc0pack/air_*.wav", "foley/swoosh-*.wav"], "Whoosh": ["foley/whoosh-*.wav", "earshot/pro_whoosh_big-*.wav"],
+    "Swish": ["earshot/swish-*.wav", "earshot/swipe-*.wav", "earshot/whoosh_fast-*.wav"],
     "Paper swipe": ["foley/swipe-*.wav", "foley/paper-*.wav"], "Page flip": ["foley/pageflip-*.wav"],
-    "Sparkle": ["foley/sparkle-*.wav"], "Ding": ["foley/ding-*.wav", "uisfx/soft/notification.wav"],
-    "Camera click": ["foley/shutter-*.wav"], "Marker": ["foley/marker-*.wav"], "Keyboard": ["foley/key-*.wav"],
-    "Tick": ["foley/tick-*.wav"], "Success": ["uisfx/soft/success.wav", "uisfx/dreamy/success.wav", "uisfx/glass/success.wav"],
-    "Drop": ["uisfx/soft/drop.wav", "uisfx/minimal/drop.wav", "uisfx/glass/drop.wav"],
+    "Sparkle": ["foley/sparkle-*.wav", "earshot/pro_shimmer-*.wav", "earshot/shimmer-*.wav"],
+    "Ding": ["foley/ding-*.wav", "earshot/pro_notify-*.wav"], "Chime": ["earshot/notify-*.wav", "earshot/mallet-*.wav", "earshot/pluck-*.wav"],
+    "Water drop": ["earshot/drip-*.wav"], "Switch": ["earshot/toggle-*.wav"],
+    "Camera click": ["foley/shutter-*.wav", "earshot/shutter-*.wav"], "Marker": ["foley/marker-*.wav"],
+    "Keyboard": ["foley/key-*.wav", "earshot/pro_typing_key-*.wav"], "Tick": ["foley/tick-*.wav"],
 }
+# what each kind should sound like — scripts/sound_audit.py asks earshot to rank every kind's files by this,
+# so "Another sound" goes from the best match down (saved in library/sfx/audit.json → "_order")
+KIND_QUERY = {"Soft pop": "a soft gentle pop", "Pop": "a crisp pop", "Modern pop": "a rounded modern interface pop",
+              "Tap": "a soft wooden tap", "Click": "a soft clean click", "Soft swoosh": "a soft airy swoosh",
+              "Whoosh": "a smooth cinematic whoosh", "Swish": "a quick bright swish", "Paper swipe": "a paper swipe",
+              "Page flip": "a page turning", "Sparkle": "a magical sparkle shimmer", "Ding": "a pleasant notification ding",
+              "Chime": "a soft chime note", "Water drop": "a water drop", "Switch": "a light switch toggle",
+              "Camera click": "a camera shutter click", "Marker": "a marker pen writing", "Keyboard": "a keyboard key press",
+              "Tick": "a soft tick"}
 SFX_DIR = os.path.join(ROOT, "library", "sfx")
 # a sound-list name -> the kind of sound "Another sound" swaps it for
 CHOICE_FOR = {"Soft pop (text)": "Soft pop", "Tiny pop (word)": "Soft pop", "Keyboard key": "Keyboard", "Typing": "Keyboard",
               "Done tick": "Tick", "Marker": "Marker", "Glass tap": "Tap", "Sticker pop": "Pop", "Pen": "Marker",
-              "Soft drop": "Drop", "Pop-up": "Drop", "Switch": "Click", "Swipe": "Paper swipe", "Notification": "Ding",
+              "Soft drop": "Modern pop", "Pop-up": "Modern pop", "Switch": "Switch", "Swipe": "Paper swipe", "Notification": "Ding",
               "Soft thud": "Tap"}
+
+
+_AUDIT = {}
+
+
+def audit():
+    """What earshot heard in each library sound (library/sfx/audit.json, made by scripts/sound_audit.py)."""
+    if "a" not in _AUDIT:
+        try:
+            _AUDIT["a"] = json.load(open(os.path.join(SFX_DIR, "audit.json"), encoding="utf-8"))
+        except Exception:
+            _AUDIT["a"] = {}
+    return _AUDIT["a"]
+
+
+def realness(path):
+    """1 = a real recording / pro-produced, 0 = sounds made by code. Unknown files count as real."""
+    rel = os.path.relpath(path, SFX_DIR).replace(os.sep, "/") if os.path.isabs(str(path)) else str(path)
+    a = audit().get(rel)
+    if not a or a.get("designed"):
+        return 1.0
+    return a.get("real", 1.0)
+
+
+def hit_of(name):
+    """Seconds from the start of a sound to where it gets loud — the mix starts it that much early so it lands on time."""
+    try:
+        if name.startswith("file:"):
+            rel = name[5:]
+        elif name.startswith("sd:"):
+            src = source_file(name)[0]
+            if str(src).startswith("s:") or not os.path.isabs(str(src)):
+                return 0.0
+            rel = os.path.relpath(src, SFX_DIR).replace(os.sep, "/")
+        else:
+            return 0.0
+        return min(float((audit().get(rel) or {}).get("hit", 0.0)), 0.3)
+    except Exception:
+        return 0.0
 
 
 def choice_files(label):
     out = []
     for pat in CHOICES.get(label, []):
         out += sorted(glob.glob(os.path.join(SFX_DIR, pat)))
-    return [os.path.relpath(f, SFX_DIR) for f in out]
+    out = [os.path.relpath(f, SFX_DIR).replace(os.sep, "/") for f in out]
+    out = [f for f in out if realness(f) >= 0.4]              # never the code-made, game-like ones
+    order = (audit().get("_order") or {}).get(label)          # earshot's best match first
+    if order:
+        out.sort(key=lambda f: order.index(f) if f in order else len(order))
+    return out
 
 
 def _recorded(name):
@@ -575,7 +649,7 @@ def _recorded(name):
         src = source_file(name)[0]
     except Exception:
         return False
-    return not str(src).startswith("s:") and not str(src).startswith(KEN)
+    return not str(src).startswith("s:") and not str(src).startswith(KEN) and realness(src) >= 0.5
 
 
 def modern(cues, gap=0.7, gain=0.8):
@@ -591,8 +665,17 @@ def modern(cues, gap=0.7, gain=0.8):
                 continue
             parts[2] = MODERN_SWAP[ev]
             name = ":".join(parts[:4])
-        if not _recorded(name) or t - last < gap:
+        if t - last < gap:
             continue
+        if not _recorded(name):                    # earshot heard it as code-made: try other takes of the same kind
+            base = parts[:4]
+            for k in range(1, 9):
+                alt = ":".join(base[:3] + [str(int(base[3]) + 101 * k)])
+                if _recorded(alt):
+                    name = alt
+                    break
+            else:
+                continue
         out.append((t, name, g * gain))
         last = t
     return out

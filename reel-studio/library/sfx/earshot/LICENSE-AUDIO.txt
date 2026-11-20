@@ -1,0 +1,3 @@
+Sounds in this folder were rendered from the earshot sound bank (sounds stored as code), by Leon Lin,
+MIT License — https://github.com/Leonxlnx/earshot (v0.4.1). Rendered with `earshot sfx render <id>`.
+The file name is the bank id with "/" replaced by "-".

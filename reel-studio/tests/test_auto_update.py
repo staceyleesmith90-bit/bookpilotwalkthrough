@@ -45,7 +45,7 @@ def test_auto_update_installs_and_keeps_user_files(tmp_path, monkeypatch):
     srv = http.server.HTTPServer(("127.0.0.1", 0), H)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     feed = f"http://127.0.0.1:{srv.server_port}"
-    assert "welcome page" in update.auto_update(force=True, feed=feed)              # no link saved yet: says how
+    assert "download link" in update.auto_update(force=True, feed=feed)              # no link saved yet: says how
     assert update.auto_update(link=BAD, force=True, feed=feed) is None              # not a paid purchase
     assert (app / "VERSION").read_text() == "1.0.0"
     update.save_download_link(GOOD)                                              # pasted once in the Studio

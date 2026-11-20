@@ -1012,7 +1012,7 @@ $("#planBtn").onclick = async e => { e.preventDefault(); const p = await api("/a
     <p class="sub">You paid once. No key, no subscription, and your reels and files always stay on your computer.</p>
     <p class="note">You have version <b>${esc(p.version || "")}</b>. ${p.latest ? esc(p.latest) : "That's the newest one."}</p>
     ${p.link_saved ? `<p class="note">✓ Free updates are on: Reelmate updates itself.</p>`
-      : `<p class="note"><b>Turn on free updates (once):</b> paste the link from your Reelmate welcome page (the page you downloaded Reelmate from).</p>
+      : `<p class="note"><b>Turn on free updates (once):</b> paste your Reelmate download link (from the page you downloaded Reelmate from).</p>
          <input type="text" id="upLink" placeholder="https://…/welcome?ref=…" style="width:100%">
          <button class="cta" id="upSave" style="margin-top:10px">Save my link</button><p class="note" id="upMsg"></p>`}`;
   const sv = $("#upSave");

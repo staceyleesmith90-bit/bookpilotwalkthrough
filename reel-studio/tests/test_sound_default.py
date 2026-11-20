@@ -63,3 +63,23 @@ def test_soft_keeps_only_gentle_recorded_sounds():
     events = [n.split(":")[2] for _, n, _ in kept]
     assert "whoosh" not in events and "zoom_in" not in events and "riser" not in events
     assert all(b[0] - a[0] >= 1.2 for a, b in zip(kept, kept[1:]))
+
+
+def test_earshot_audit_keeps_game_like_sounds_out():
+    a = sounddesign.audit()
+    assert len(a) > 400 and "_order" in a
+    for label in sounddesign.CHOICES:              # every kind has choices, none of them code-made
+        files = sounddesign.choice_files(label)
+        assert files, label
+        assert all(sounddesign.realness(f) >= 0.4 for f in files), label
+    order = a["_order"]["Pop"]
+    assert sounddesign.choice_files("Pop")[0] == next(f for f in order if f in sounddesign.choice_files("Pop"))
+
+
+def test_sounds_are_started_early_so_the_hit_lands_on_the_moment():
+    import json, os
+    a = sounddesign.audit()
+    late = max((k for k in a if k.startswith("foley/") and a[k]["hit"] > 0.05), key=lambda k: a[k]["hit"], default=None)
+    if late:
+        assert 0.05 < sounddesign.hit_of("file:" + late) <= 0.3
+    assert sounddesign.hit_of("sd:clean:riser:1") == 0.0          # synths: no file, no shift

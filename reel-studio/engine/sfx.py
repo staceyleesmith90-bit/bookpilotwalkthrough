@@ -142,8 +142,10 @@ def write_wav(path, x, peak=0.8):
 def mix_cues(cues, duration):
     """cues: list of (time_s, name, gain). Returns a mono track `duration` long."""
     out = np.zeros(int((duration + 2) * SR))
+    from .sounddesign import hit_of
     for t0, name, gain in cues:
         x = load(name)
+        t0 = max(t0 - hit_of(name), 0.0)            # start early by the sound's own lead-in: the hit lands on the moment
         x = x / (np.abs(x).max() + 1e-9) * gain
         s0 = max(int(t0 * SR), 0)
         e = min(s0 + len(x), len(out))

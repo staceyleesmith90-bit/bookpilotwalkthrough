@@ -1,0 +1,4102 @@
+{
+"_order": {
+"Camera click": [
+"foley/shutter-238958-1.wav",
+"foley/shutter-61059-0.wav",
+"foley/shutter-238958-2.wav",
+"foley/shutter-431588-0.wav",
+"foley/shutter-455511-0.wav",
+"foley/shutter-232130-0.wav",
+"earshot/shutter-snap.wav",
+"foley/shutter-238958-0.wav",
+"earshot/shutter-mirror.wav",
+"earshot/shutter-dslr.wav",
+"earshot/shutter-quick.wav",
+"earshot/shutter-film.wav"
+],
+"Chime": [
+"earshot/notify-m5.wav",
+"earshot/pluck-kalimba_soft.wav",
+"earshot/mallet-celesta.wav",
+"earshot/notify-m2.wav",
+"earshot/notify-m0.wav",
+"earshot/pluck-kalimba_ring.wav",
+"earshot/notify-mid_wood.wav",
+"earshot/mallet-up4.wav",
+"earshot/notify-m1.wav",
+"earshot/mallet-glock.wav",
+"earshot/mallet-flourish.wav",
+"earshot/notify-m4.wav",
+"earshot/pluck-kalimba.wav",
+"earshot/notify-m3.wav",
+"earshot/notify-mid_tine.wav",
+"earshot/mallet-pluck.wav",
+"earshot/mallet-marimba.wav"
+],
+"Click": [
+"foley/click-678248-0.wav",
+"foley/click-213004-0.wav",
+"foley/click-683099-0.wav",
+"earshot/pro_hover_tick-soft.wav",
+"earshot/pro_click-snap.wav",
+"earshot/pro_hover_tick-glass.wav",
+"earshot/pro_click-glass.wav",
+"foley/click-347544-0.wav",
+"foley/click-534104-1.wav",
+"foley/click-347544-2.wav",
+"earshot/pro_click-soft.wav",
+"foley/click-347544-1.wav",
+"earshot/pro_click-tink.wav",
+"earshot/pro_hover_tick-detent.wav",
+"earshot/pro_hover_tick-air.wav",
+"foley/click-448086-0.wav",
+"earshot/pro_click-mouse.wav",
+"foley/click-534104-0.wav",
+"earshot/pro_hover_tick-ping.wav"
+],
+"Ding": [
+"foley/ding-361564-0.wav",
+"foley/ding-335908-0.wav",
+"foley/ding-116779-0.wav",
+"foley/ding-571513-0.wav",
+"foley/ding-266947-0.wav",
+"earshot/pro_notify-ding_1822.wav",
+"foley/ding-452379-0.wav",
+"foley/ding-353232-0.wav",
+"earshot/pro_notify-ding_1930.wav",
+"earshot/pro_notify-ding_2167.wav",
+"foley/ding-434627-0.wav",
+"earshot/pro_notify-ding_2045.wav",
+"foley/ding-243701-0.wav",
+"foley/ding-521332-0.wav",
+"foley/ding-406243-0.wav",
+"earshot/pro_notify-ding_2296.wav",
+"foley/ding-515643-0.wav",
+"foley/ding-263620-0.wav"
+],
+"Keyboard": [
+"foley/key-378085-0.wav",
+"foley/key-734201-0.wav",
+"foley/key-766639-0.wav",
+"earshot/pro_typing_key-double.wav",
+"foley/key-570754-0.wav",
+"earshot/pro_typing_key-glass.wav",
+"foley/key-622060-1.wav",
+"earshot/pro_typing_key-blip.wav",
+"earshot/pro_typing_key-tick.wav",
+"foley/key-622060-0.wav",
+"earshot/pro_typing_key-soft.wav",
+"earshot/pro_typing_key-crackle.wav"
+],
+"Marker": [
+"foley/marker-257518-0.wav",
+"foley/marker-211247-0.wav",
+"foley/marker-277312-0.wav",
+"foley/marker-761665-0.wav",
+"foley/marker-428338-0.wav",
+"foley/marker-326961-0.wav"
+],
+"Modern pop": [
+"earshot/ui_pop-blip.wav",
+"earshot/ui_pop-fall.wav",
+"earshot/ui_pop-soft.wav",
+"earshot/ui_pop-wide.wav",
+"earshot/ui_pop-step.wav",
+"earshot/ui_pop-boop.wav",
+"earshot/pro_pop_in-knock.wav",
+"earshot/pro_pop_in-double.wav",
+"earshot/pro_pop_in-airy.wav",
+"earshot/pro_pop_in-round.wav",
+"earshot/pro_pop_in-deep.wav"
+],
+"Page flip": [
+"foley/pageflip-429724-0.wav",
+"foley/pageflip-136778-0.wav",
+"foley/pageflip-457767-0.wav",
+"foley/pageflip-397548-0.wav",
+"foley/pageflip-188485-0.wav",
+"foley/pageflip-346835-0.wav"
+],
+"Paper swipe": [
+"foley/paper-147283-0.wav",
+"foley/paper-147282-0.wav",
+"foley/paper-147285-0.wav",
+"foley/paper-147281-0.wav",
+"foley/paper-147286-0.wav",
+"foley/paper-147284-0.wav",
+"foley/swipe-515625-0.wav",
+"foley/swipe-72191-0.wav",
+"foley/swipe-72190-0.wav",
+"foley/swipe-72189-0.wav",
+"foley/swipe-60007-0.wav",
+"foley/swipe-240640-0.wav"
+],
+"Pop": [
+"foley/pop-401542-0.wav",
+"earshot/pro_pop-bloop.wav",
+"foley/pop-221091-0.wav",
+"foley/pop-319107-0.wav",
+"foley/pop-506546-0.wav",
+"foley/pop-467951-0.wav",
+"earshot/pro_pop-chirp.wav",
+"foley/pop-447910-0.wav",
+"earshot/pro_pop-boop.wav",
+"earshot/pro_pop-double.wav",
+"earshot/pro_pop-thup.wav",
+"earshot/pro_pop-tink.wav"
+],
+"Soft pop": [
+"foley/softpop-267952-0.wav",
+"foley/softpop-267952-1.wav",
+"foley/softpop-267952-2.wav",
+"foley/softpop-245646-0.wav",
+"foley/softpop-776443-0.wav",
+"foley/softpop-19284-0.wav",
+"foley/softpop-166191-0.wav",
+"foley/softpop-202230-0.wav"
+],
+"Soft swoosh": [
+"foley/swoosh-60004-0.wav",
+"foley/swoosh-127197-0.wav",
+"foley/swoosh-169867-0.wav",
+"foley/swoosh-683101-0.wav",
+"cc0pack/air_02.wav",
+"foley/swoosh-389590-0.wav",
+"cc0pack/air_01.wav",
+"cc0pack/air_03.wav",
+"foley/swoosh-173272-0.wav"
+],
+"Sparkle": [
+"earshot/shimmer-m4.wav",
+"earshot/pro_shimmer-m0.wav",
+"earshot/shimmer-m0.wav",
+"earshot/shimmer-m1.wav",
+"earshot/shimmer-m3.wav",
+"earshot/shimmer-m2.wav",
+"earshot/pro_shimmer-m1.wav",
+"earshot/shimmer-m5.wav",
+"earshot/pro_shimmer-m2.wav",
+"earshot/pro_shimmer-m3.wav",
+"earshot/pro_shimmer-m4.wav",
+"foley/sparkle-562292-0.wav",
+"foley/sparkle-457306-0.wav",
+"foley/sparkle-462095-0.wav",
+"foley/sparkle-578803-0.wav"
+],
+"Swish": [
+"earshot/swish-zing.wav",
+"earshot/whoosh_fast-whistle.wav",
+"earshot/swish-blade.wav",
+"earshot/swish-cane.wav",
+"earshot/swish-bright.wav",
+"earshot/whoosh_fast-tight.wav",
+"earshot/whoosh_fast-heavy.wav",
+"earshot/swish-stick.wav",
+"earshot/whoosh_fast-reverse.wav",
+"earshot/whoosh_fast-crisp.wav",
+"earshot/swipe-glide.wav",
+"earshot/whoosh_fast-whip.wav",
+"earshot/swish-flick.wav",
+"earshot/whoosh_fast-sleeve.wav",
+"earshot/swish-soft.wav",
+"earshot/swipe-paper.wav",
+"earshot/swipe-flick.wav",
+"earshot/swipe-cloth.wav",
+"earshot/swipe-velvet.wav"
+],
+"Switch": [
+"earshot/toggle-rocker.wav",
+"earshot/toggle-on.wav",
+"earshot/toggle-micro.wav",
+"earshot/toggle-latch.wav",
+"earshot/toggle-off.wav"
+],
+"Tap": [
+"earshot/knock-wood.wav",
+"earshot/tap-glass.wav",
+"earshot/tap-finger.wav",
+"foley/tap-149034-2.wav",
+"earshot/tap-soft.wav",
+"earshot/tap-table.wav",
+"earshot/tap-knuckle.wav",
+"foley/tap-149034-1.wav",
+"foley/tap-149034-0.wav",
+"earshot/knock-snap.wav",
+"earshot/pro_tap-glass.wav",
+"earshot/pro_tap-soft.wav",
+"earshot/pro_tap-finger.wav",
+"earshot/pro_tap-double.wav",
+"foley/tap-348242-0.wav",
+"earshot/knock-plastic.wav",
+"foley/tap-851556-0.wav",
+"earshot/pro_tap-knock.wav",
+"earshot/knock-double.wav",
+"foley/tap-416288-0.wav",
+"earshot/knock-desk.wav",
+"foley/tap-528561-0.wav",
+"foley/tap-833628-0.wav",
+"foley/tap-213925-0.wav",
+"foley/tap-833628-1.wav"
+],
+"Tick": [
+"foley/tick-211203-0.wav",
+"foley/tick-668355-0.wav",
+"foley/tick-564507-0.wav",
+"foley/tick-810939-0.wav",
+"foley/tick-547305-0.wav",
+"foley/tick-547305-1.wav"
+],
+"Water drop": [
+"earshot/drip-drop.wav",
+"earshot/drip-bubble.wav",
+"earshot/drip-plink.wav",
+"earshot/drip-tiny.wav",
+"earshot/drip-bloop.wav"
+],
+"Whoosh": [
+"earshot/pro_whoosh_big-swell.wav",
+"earshot/pro_whoosh_big-reverse.wav",
+"earshot/pro_whoosh_big-tonal.wav",
+"foley/whoosh-243400-0.wav",
+"earshot/pro_whoosh_big-long.wav",
+"earshot/pro_whoosh_big-windy.wav",
+"earshot/pro_whoosh_big-gritty.wav",
+"foley/whoosh-171255-0.wav",
+"foley/whoosh-60013-0.wav",
+"foley/whoosh-449645-0.wav",
+"foley/whoosh-346373-0.wav",
+"foley/whoosh-427823-0.wav",
+"foley/whoosh-59989-0.wav",
+"foley/whoosh-701104-0.wav",
+"foley/whoosh-332003-0.wav"
+]
+},
+"cc0pack/air_01.wav": {
+"designed": false,
+"hit": 0.008,
+"real": 0.967,
+"sounds": "a spray can hissing"
+},
+"cc0pack/air_02.wav": {
+"designed": false,
+"hit": 0.029,
+"real": 0.834,
+"sounds": "a spray can hissing"
+},
+"cc0pack/air_03.wav": {
+"designed": false,
+"hit": 0.041,
+"real": 0.962,
+"sounds": "a spray can hissing"
+},
+"cc0pack/glass_01.wav": {
+"designed": false,
+"hit": 0.012,
+"real": 0.964,
+"sounds": "a glass ting"
+},
+"cc0pack/glass_02.wav": {
+"designed": false,
+"hit": 0.052,
+"real": 0.951,
+"sounds": "ice cubes in a glass"
+},
+"cc0pack/glass_03.wav": {
+"designed": false,
+"hit": 0.065,
+"real": 0.984,
+"sounds": "ice cubes in a glass"
+},
+"cc0pack/glass_04.wav": {
+"designed": false,
+"hit": 0.019,
+"real": 0.759,
+"sounds": "a triangle hit"
+},
+"cc0pack/glass_05.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.943,
+"sounds": "ice cubes in a glass"
+},
+"cc0pack/glass_06.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.968,
+"sounds": "a triangle hit"
+},
+"cc0pack/hit_01.wav": {
+"designed": false,
+"hit": 0.029,
+"real": 0.943,
+"sounds": "a punchy impact hit"
+},
+"cc0pack/hit_02.wav": {
+"designed": false,
+"hit": 0.029,
+"real": 0.918,
+"sounds": "a punchy impact hit"
+},
+"cc0pack/hit_03.wav": {
+"designed": false,
+"hit": 0.007,
+"real": 0.93,
+"sounds": "a snare hit"
+},
+"cc0pack/metal_hit_01.wav": {
+"designed": false,
+"hit": 0.027,
+"real": 0.989,
+"sounds": "a door slam"
+},
+"cc0pack/metal_hit_02.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.971,
+"sounds": "a soft key release click"
+},
+"cc0pack/switch_01.wav": {
+"designed": false,
+"hit": 0.009,
+"real": 0.967,
+"sounds": "a snare hit"
+},
+"cc0pack/switch_02.wav": {
+"designed": false,
+"hit": 0.016,
+"real": 0.971,
+"sounds": "a punchy impact hit"
+},
+"cc0pack/wood_hit_01.wav": {
+"designed": false,
+"hit": 0.041,
+"real": 0.984,
+"sounds": "a punchy impact hit"
+},
+"cc0pack/wood_hit_02.wav": {
+"designed": false,
+"hit": 0.011,
+"real": 0.984,
+"sounds": "a punchy impact hit"
+},
+"cc0pack/wood_hit_03.wav": {
+"designed": false,
+"hit": 0.019,
+"real": 0.863,
+"sounds": "a snare hit"
+},
+"earshot/drip-bloop.wav": {
+"designed": true,
+"hit": 0.01,
+"real": 0.101,
+"sounds": "a snare hit"
+},
+"earshot/drip-bubble.wav": {
+"designed": true,
+"hit": 0.007,
+"real": 0.161,
+"sounds": "a wooden block hit"
+},
+"earshot/drip-drop.wav": {
+"designed": true,
+"hit": 0.016,
+"real": 0.166,
+"sounds": "a snare hit"
+},
+"earshot/drip-plink.wav": {
+"designed": true,
+"hit": 0.015,
+"real": 0.133,
+"sounds": "a success chime"
+},
+"earshot/drip-tiny.wav": {
+"designed": true,
+"hit": 0.004,
+"real": 0.218,
+"sounds": "a snare hit"
+},
+"earshot/knock-desk.wav": {
+"designed": true,
+"hit": 0.014,
+"real": 0.27,
+"sounds": "a snare hit"
+},
+"earshot/knock-double.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.018,
+"sounds": "a wooden block hit"
+},
+"earshot/knock-plastic.wav": {
+"designed": true,
+"hit": 0.049,
+"real": 0.143,
+"sounds": "a soft key release click"
+},
+"earshot/knock-snap.wav": {
+"designed": true,
+"hit": 0.039,
+"real": 0.636,
+"sounds": "a single mechanical keyboard key press"
+},
+"earshot/knock-wood.wav": {
+"designed": true,
+"hit": 0.013,
+"real": 0.639,
+"sounds": "a wooden block hit"
+},
+"earshot/mallet-celesta.wav": {
+"designed": true,
+"hit": 0.004,
+"real": 0.045,
+"sounds": "a success chime"
+},
+"earshot/mallet-flourish.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.057,
+"sounds": "a success chime"
+},
+"earshot/mallet-glock.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.047,
+"sounds": "a success chime"
+},
+"earshot/mallet-marimba.wav": {
+"designed": true,
+"hit": 0.002,
+"real": 0.246,
+"sounds": "a glass ting"
+},
+"earshot/mallet-pluck.wav": {
+"designed": true,
+"hit": 0.027,
+"real": 0.127,
+"sounds": "a success chime"
+},
+"earshot/mallet-up4.wav": {
+"designed": true,
+"hit": 0.003,
+"real": 0.049,
+"sounds": "a success chime"
+},
+"earshot/notify-m0.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.477,
+"sounds": "a kalimba note"
+},
+"earshot/notify-m1.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.666,
+"sounds": "a kalimba note"
+},
+"earshot/notify-m2.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.587,
+"sounds": "a kalimba note"
+},
+"earshot/notify-m3.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.609,
+"sounds": "a kalimba note"
+},
+"earshot/notify-m4.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.34,
+"sounds": "a kalimba note"
+},
+"earshot/notify-m5.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.172,
+"sounds": "a kalimba note"
+},
+"earshot/notify-mid_tine.wav": {
+"designed": true,
+"hit": 0.017,
+"real": 0.509,
+"sounds": "a triangle hit"
+},
+"earshot/notify-mid_wood.wav": {
+"designed": true,
+"hit": 0.016,
+"real": 0.177,
+"sounds": "a triangle hit"
+},
+"earshot/pluck-kalimba.wav": {
+"designed": true,
+"hit": 0.005,
+"real": 0.928,
+"sounds": "a kalimba note"
+},
+"earshot/pluck-kalimba_ring.wav": {
+"designed": true,
+"hit": 0.004,
+"real": 0.885,
+"sounds": "a kalimba note"
+},
+"earshot/pluck-kalimba_soft.wav": {
+"designed": true,
+"hit": 0.005,
+"real": 0.88,
+"sounds": "a kalimba note"
+},
+"earshot/pro_click-glass.wav": {
+"designed": true,
+"hit": 0.002,
+"real": 0.138,
+"sounds": "a triangle hit"
+},
+"earshot/pro_click-mouse.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.068,
+"sounds": "a snare hit"
+},
+"earshot/pro_click-snap.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.222,
+"sounds": "a soft key release click"
+},
+"earshot/pro_click-soft.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.102,
+"sounds": "a snare hit"
+},
+"earshot/pro_click-tink.wav": {
+"designed": true,
+"hit": 0.002,
+"real": 0.18,
+"sounds": "an error buzz"
+},
+"earshot/pro_hover_tick-air.wav": {
+"designed": true,
+"hit": 0.0,
+"real": 0.076,
+"sounds": "an error buzz"
+},
+"earshot/pro_hover_tick-detent.wav": {
+"designed": true,
+"hit": 0.0,
+"real": 0.325,
+"sounds": "an error buzz"
+},
+"earshot/pro_hover_tick-glass.wav": {
+"designed": true,
+"hit": 0.0,
+"real": 0.239,
+"sounds": "an error buzz"
+},
+"earshot/pro_hover_tick-ping.wav": {
+"designed": true,
+"hit": 0.0,
+"real": 0.043,
+"sounds": "an error buzz"
+},
+"earshot/pro_hover_tick-soft.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.671,
+"sounds": "a soft key release click"
+},
+"earshot/pro_notify-ding_1822.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.114,
+"sounds": "a triangle hit"
+},
+"earshot/pro_notify-ding_1930.wav": {
+"designed": true,
+"hit": 0.006,
+"real": 0.073,
+"sounds": "a success chime"
+},
+"earshot/pro_notify-ding_2045.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.053,
+"sounds": "a glass ting"
+},
+"earshot/pro_notify-ding_2167.wav": {
+"designed": true,
+"hit": 0.005,
+"real": 0.11,
+"sounds": "a triangle hit"
+},
+"earshot/pro_notify-ding_2296.wav": {
+"designed": true,
+"hit": 0.002,
+"real": 0.254,
+"sounds": "a triangle hit"
+},
+"earshot/pro_pop-bloop.wav": {
+"designed": true,
+"hit": 0.003,
+"real": 0.464,
+"sounds": "a bubble pop"
+},
+"earshot/pro_pop-boop.wav": {
+"designed": true,
+"hit": 0.0,
+"real": 0.064,
+"sounds": "a kick drum"
+},
+"earshot/pro_pop-chirp.wav": {
+"designed": true,
+"hit": 0.032,
+"real": 0.114,
+"sounds": "a snare hit"
+},
+"earshot/pro_pop-double.wav": {
+"designed": true,
+"hit": 0.0,
+"real": 0.174,
+"sounds": "bubbles underwater"
+},
+"earshot/pro_pop-thup.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.466,
+"sounds": "a punchy impact hit"
+},
+"earshot/pro_pop-tink.wav": {
+"designed": true,
+"hit": 0.0,
+"real": 0.239,
+"sounds": "a wooden block hit"
+},
+"earshot/pro_pop_in-airy.wav": {
+"designed": true,
+"hit": 0.009,
+"real": 0.677,
+"sounds": "a punchy impact hit"
+},
+"earshot/pro_pop_in-deep.wav": {
+"designed": true,
+"hit": 0.012,
+"real": 0.859,
+"sounds": "a punchy impact hit"
+},
+"earshot/pro_pop_in-double.wav": {
+"designed": true,
+"hit": 0.007,
+"real": 0.449,
+"sounds": "a kick drum"
+},
+"earshot/pro_pop_in-knock.wav": {
+"designed": true,
+"hit": 0.008,
+"real": 0.081,
+"sounds": "a punchy impact hit"
+},
+"earshot/pro_pop_in-round.wav": {
+"designed": true,
+"hit": 0.011,
+"real": 0.952,
+"sounds": "a punchy impact hit"
+},
+"earshot/pro_shimmer-m0.wav": {
+"designed": true,
+"hit": 0.693,
+"real": 0.696,
+"sounds": "a magic sparkle chime"
+},
+"earshot/pro_shimmer-m1.wav": {
+"designed": true,
+"hit": 0.346,
+"real": 0.685,
+"sounds": "ice cubes in a glass"
+},
+"earshot/pro_shimmer-m2.wav": {
+"designed": true,
+"hit": 0.717,
+"real": 0.147,
+"sounds": "a success chime"
+},
+"earshot/pro_shimmer-m3.wav": {
+"designed": true,
+"hit": 0.029,
+"real": 0.2,
+"sounds": "a success chime"
+},
+"earshot/pro_shimmer-m4.wav": {
+"designed": true,
+"hit": 0.834,
+"real": 0.674,
+"sounds": "bubbles underwater"
+},
+"earshot/pro_tap-double.wav": {
+"designed": true,
+"hit": 0.006,
+"real": 0.307,
+"sounds": "a kick drum"
+},
+"earshot/pro_tap-finger.wav": {
+"designed": true,
+"hit": 0.008,
+"real": 0.125,
+"sounds": "a kick drum"
+},
+"earshot/pro_tap-glass.wav": {
+"designed": true,
+"hit": 0.005,
+"real": 0.14,
+"sounds": "a snare hit"
+},
+"earshot/pro_tap-knock.wav": {
+"designed": true,
+"hit": 0.006,
+"real": 0.29,
+"sounds": "a kick drum"
+},
+"earshot/pro_tap-soft.wav": {
+"designed": true,
+"hit": 0.01,
+"real": 0.23,
+"sounds": "a punchy impact hit"
+},
+"earshot/pro_typing_key-blip.wav": {
+"designed": true,
+"hit": 0.004,
+"real": 0.575,
+"sounds": "a soft key release click"
+},
+"earshot/pro_typing_key-crackle.wav": {
+"designed": true,
+"hit": 0.003,
+"real": 0.065,
+"sounds": "an error buzz"
+},
+"earshot/pro_typing_key-double.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.862,
+"sounds": "a soft key release click"
+},
+"earshot/pro_typing_key-glass.wav": {
+"designed": true,
+"hit": 0.004,
+"real": 0.839,
+"sounds": "a soft key release click"
+},
+"earshot/pro_typing_key-soft.wav": {
+"designed": true,
+"hit": 0.007,
+"real": 0.557,
+"sounds": "a ratchet clicking"
+},
+"earshot/pro_typing_key-tick.wav": {
+"designed": true,
+"hit": 0.003,
+"real": 0.796,
+"sounds": "a ratchet clicking"
+},
+"earshot/pro_whoosh_big-gritty.wav": {
+"designed": true,
+"hit": 0.239,
+"real": 0.292,
+"sounds": "a fast whoosh"
+},
+"earshot/pro_whoosh_big-long.wav": {
+"designed": true,
+"hit": 0.374,
+"real": 0.631,
+"sounds": "a fast whoosh"
+},
+"earshot/pro_whoosh_big-reverse.wav": {
+"designed": true,
+"hit": 0.642,
+"real": 0.769,
+"sounds": "a fast whoosh"
+},
+"earshot/pro_whoosh_big-swell.wav": {
+"designed": true,
+"hit": 0.296,
+"real": 0.769,
+"sounds": "a fast whoosh"
+},
+"earshot/pro_whoosh_big-tonal.wav": {
+"designed": true,
+"hit": 0.301,
+"real": 0.584,
+"sounds": "a fast whoosh"
+},
+"earshot/pro_whoosh_big-windy.wav": {
+"designed": true,
+"hit": 0.245,
+"real": 0.795,
+"sounds": "a fast whoosh"
+},
+"earshot/shimmer-m0.wav": {
+"designed": true,
+"hit": 0.077,
+"real": 0.42,
+"sounds": "a magic sparkle chime"
+},
+"earshot/shimmer-m1.wav": {
+"designed": true,
+"hit": 0.002,
+"real": 0.567,
+"sounds": "a magic sparkle chime"
+},
+"earshot/shimmer-m2.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.568,
+"sounds": "a magic sparkle chime"
+},
+"earshot/shimmer-m3.wav": {
+"designed": true,
+"hit": 0.003,
+"real": 0.25,
+"sounds": "a success chime"
+},
+"earshot/shimmer-m4.wav": {
+"designed": true,
+"hit": 0.6,
+"real": 0.693,
+"sounds": "a magic sparkle chime"
+},
+"earshot/shimmer-m5.wav": {
+"designed": true,
+"hit": 0.223,
+"real": 0.483,
+"sounds": "a success chime"
+},
+"earshot/shutter-dslr.wav": {
+"designed": true,
+"hit": 0.039,
+"real": 0.635,
+"sounds": "a box lid closing"
+},
+"earshot/shutter-film.wav": {
+"designed": true,
+"hit": 0.096,
+"real": 0.408,
+"sounds": "a wooden block hit"
+},
+"earshot/shutter-mirror.wav": {
+"designed": true,
+"hit": 0.028,
+"real": 0.905,
+"sounds": "a box lid closing"
+},
+"earshot/shutter-quick.wav": {
+"designed": true,
+"hit": 0.021,
+"real": 0.623,
+"sounds": "a wooden block hit"
+},
+"earshot/shutter-snap.wav": {
+"designed": true,
+"hit": 0.058,
+"real": 0.859,
+"sounds": "a can opening"
+},
+"earshot/swipe-cloth.wav": {
+"designed": true,
+"hit": 0.142,
+"real": 0.98,
+"sounds": "a fast whoosh"
+},
+"earshot/swipe-flick.wav": {
+"designed": true,
+"hit": 0.105,
+"real": 0.921,
+"sounds": "a punchy impact hit"
+},
+"earshot/swipe-glide.wav": {
+"designed": true,
+"hit": 0.174,
+"real": 0.949,
+"sounds": "a fast whoosh"
+},
+"earshot/swipe-paper.wav": {
+"designed": true,
+"hit": 0.116,
+"real": 0.923,
+"sounds": "a fast whoosh"
+},
+"earshot/swipe-velvet.wav": {
+"designed": true,
+"hit": 0.245,
+"real": 0.967,
+"sounds": "a punchy impact hit"
+},
+"earshot/swish-blade.wav": {
+"designed": true,
+"hit": 0.048,
+"real": 0.966,
+"sounds": "a fast whoosh"
+},
+"earshot/swish-bright.wav": {
+"designed": true,
+"hit": 0.126,
+"real": 0.266,
+"sounds": "a fast whoosh"
+},
+"earshot/swish-cane.wav": {
+"designed": true,
+"hit": 0.068,
+"real": 0.965,
+"sounds": "a fast whoosh"
+},
+"earshot/swish-flick.wav": {
+"designed": true,
+"hit": 0.106,
+"real": 0.824,
+"sounds": "a box lid closing"
+},
+"earshot/swish-soft.wav": {
+"designed": true,
+"hit": 0.064,
+"real": 0.801,
+"sounds": "a fast whoosh"
+},
+"earshot/swish-stick.wav": {
+"designed": true,
+"hit": 0.08,
+"real": 0.95,
+"sounds": "a fast whoosh"
+},
+"earshot/swish-zing.wav": {
+"designed": true,
+"hit": 0.054,
+"real": 0.92,
+"sounds": "a fast whoosh"
+},
+"earshot/tap-finger.wav": {
+"designed": true,
+"hit": 0.002,
+"real": 0.896,
+"sounds": "a punchy impact hit"
+},
+"earshot/tap-glass.wav": {
+"designed": true,
+"hit": 0.002,
+"real": 0.543,
+"sounds": "a punchy impact hit"
+},
+"earshot/tap-knuckle.wav": {
+"designed": true,
+"hit": 0.003,
+"real": 0.81,
+"sounds": "a punchy impact hit"
+},
+"earshot/tap-soft.wav": {
+"designed": true,
+"hit": 0.003,
+"real": 0.966,
+"sounds": "a punchy impact hit"
+},
+"earshot/tap-table.wav": {
+"designed": true,
+"hit": 0.002,
+"real": 0.496,
+"sounds": "a punchy impact hit"
+},
+"earshot/toggle-latch.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.523,
+"sounds": "a quick swipe"
+},
+"earshot/toggle-micro.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.375,
+"sounds": "a single mechanical keyboard key press"
+},
+"earshot/toggle-off.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.933,
+"sounds": "a snare hit"
+},
+"earshot/toggle-on.wav": {
+"designed": true,
+"hit": 0.001,
+"real": 0.511,
+"sounds": "a crisp interface click"
+},
+"earshot/toggle-rocker.wav": {
+"designed": true,
+"hit": 0.003,
+"real": 0.489,
+"sounds": "a crisp interface click"
+},
+"earshot/ui_pop-blip.wav": {
+"designed": true,
+"hit": 0.01,
+"real": 0.017,
+"sounds": "a wooden block hit"
+},
+"earshot/ui_pop-boop.wav": {
+"designed": true,
+"hit": 0.017,
+"real": 0.802,
+"sounds": "a fast whoosh"
+},
+"earshot/ui_pop-fall.wav": {
+"designed": true,
+"hit": 0.014,
+"real": 0.072,
+"sounds": "a snare hit"
+},
+"earshot/ui_pop-soft.wav": {
+"designed": true,
+"hit": 0.019,
+"real": 0.048,
+"sounds": "an error buzz"
+},
+"earshot/ui_pop-step.wav": {
+"designed": true,
+"hit": 0.018,
+"real": 0.076,
+"sounds": "a snare hit"
+},
+"earshot/ui_pop-wide.wav": {
+"designed": true,
+"hit": 0.034,
+"real": 0.139,
+"sounds": "a snare hit"
+},
+"earshot/whoosh_fast-crisp.wav": {
+"designed": true,
+"hit": 0.124,
+"real": 0.76,
+"sounds": "a fast whoosh"
+},
+"earshot/whoosh_fast-heavy.wav": {
+"designed": true,
+"hit": 0.125,
+"real": 0.734,
+"sounds": "a fast whoosh"
+},
+"earshot/whoosh_fast-reverse.wav": {
+"designed": true,
+"hit": 0.286,
+"real": 0.844,
+"sounds": "a fast whoosh"
+},
+"earshot/whoosh_fast-sleeve.wav": {
+"designed": true,
+"hit": 0.146,
+"real": 0.767,
+"sounds": "a fast whoosh"
+},
+"earshot/whoosh_fast-tight.wav": {
+"designed": true,
+"hit": 0.143,
+"real": 0.961,
+"sounds": "a fast whoosh"
+},
+"earshot/whoosh_fast-whip.wav": {
+"designed": true,
+"hit": 0.028,
+"real": 0.176,
+"sounds": "a record scratch"
+},
+"earshot/whoosh_fast-whistle.wav": {
+"designed": true,
+"hit": 0.172,
+"real": 0.741,
+"sounds": "a fast whoosh"
+},
+"foley/click-213004-0.wav": {
+"designed": false,
+"hit": 0.017,
+"real": 0.99,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/click-347544-0.wav": {
+"designed": false,
+"hit": 0.014,
+"real": 0.927,
+"sounds": "a soft key release click"
+},
+"foley/click-347544-1.wav": {
+"designed": false,
+"hit": 0.016,
+"real": 0.964,
+"sounds": "a soft key release click"
+},
+"foley/click-347544-2.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.956,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/click-448086-0.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.911,
+"sounds": "a soft key release click"
+},
+"foley/click-534104-0.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.724,
+"sounds": "a scroll wheel tick"
+},
+"foley/click-534104-1.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.487,
+"sounds": "a scroll wheel tick"
+},
+"foley/click-678248-0.wav": {
+"designed": false,
+"hit": 0.015,
+"real": 0.966,
+"sounds": "a soft key release click"
+},
+"foley/click-683099-0.wav": {
+"designed": false,
+"hit": 0.019,
+"real": 0.42,
+"sounds": "a soft key release click"
+},
+"foley/ding-116779-0.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.992,
+"sounds": "a bicycle bell"
+},
+"foley/ding-243701-0.wav": {
+"designed": false,
+"hit": 0.062,
+"real": 0.807,
+"sounds": "a kalimba note"
+},
+"foley/ding-263620-0.wav": {
+"designed": false,
+"hit": 0.368,
+"real": 0.98,
+"sounds": "a small object dropping on a table"
+},
+"foley/ding-266947-0.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.951,
+"sounds": "a wine glass ring"
+},
+"foley/ding-335908-0.wav": {
+"designed": false,
+"hit": 0.015,
+"real": 0.49,
+"sounds": "a kalimba note"
+},
+"foley/ding-353232-0.wav": {
+"designed": false,
+"hit": 0.02,
+"real": 0.885,
+"sounds": "a small bell"
+},
+"foley/ding-361564-0.wav": {
+"designed": false,
+"hit": 0.02,
+"real": 0.904,
+"sounds": "a doorbell"
+},
+"foley/ding-406243-0.wav": {
+"designed": false,
+"hit": 0.026,
+"real": 0.907,
+"sounds": "a bicycle bell"
+},
+"foley/ding-434627-0.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.986,
+"sounds": "a triangle hit"
+},
+"foley/ding-452379-0.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.959,
+"sounds": "a triangle hit"
+},
+"foley/ding-515643-0.wav": {
+"designed": false,
+"hit": 0.014,
+"real": 0.939,
+"sounds": "a glass ting"
+},
+"foley/ding-521332-0.wav": {
+"designed": false,
+"hit": 0.027,
+"real": 0.757,
+"sounds": "a glass ting"
+},
+"foley/ding-571513-0.wav": {
+"designed": false,
+"hit": 0.02,
+"real": 0.485,
+"sounds": "a success chime"
+},
+"foley/key-378085-0.wav": {
+"designed": false,
+"hit": 0.012,
+"real": 0.992,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/key-570754-0.wav": {
+"designed": false,
+"hit": 0.019,
+"real": 0.986,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/key-622060-0.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.877,
+"sounds": "a light switch flicked"
+},
+"foley/key-622060-1.wav": {
+"designed": false,
+"hit": 0.015,
+"real": 0.9,
+"sounds": "a soft key release click"
+},
+"foley/key-734201-0.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.972,
+"sounds": "a spacebar press"
+},
+"foley/key-766639-0.wav": {
+"designed": false,
+"hit": 0.032,
+"real": 0.977,
+"sounds": "a soft key release click"
+},
+"foley/marker-211247-0.wav": {
+"designed": false,
+"hit": 0.487,
+"real": 0.993,
+"sounds": "a record scratch"
+},
+"foley/marker-257518-0.wav": {
+"designed": false,
+"hit": 0.116,
+"real": 0.984,
+"sounds": "a record scratch"
+},
+"foley/marker-277312-0.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.996,
+"sounds": "a record scratch"
+},
+"foley/marker-326961-0.wav": {
+"designed": false,
+"hit": 0.033,
+"real": 0.995,
+"sounds": "a stick swung fast through the air"
+},
+"foley/marker-428338-0.wav": {
+"designed": false,
+"hit": 0.105,
+"real": 0.996,
+"sounds": "a quick swipe"
+},
+"foley/marker-761665-0.wav": {
+"designed": false,
+"hit": 0.062,
+"real": 0.992,
+"sounds": "a record scratch"
+},
+"foley/pageflip-136778-0.wav": {
+"designed": false,
+"hit": 0.622,
+"real": 0.972,
+"sounds": "paper rustling"
+},
+"foley/pageflip-188485-0.wav": {
+"designed": false,
+"hit": 0.085,
+"real": 0.995,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/pageflip-346835-0.wav": {
+"designed": false,
+"hit": 0.23,
+"real": 0.987,
+"sounds": "a quick swipe"
+},
+"foley/pageflip-397548-0.wav": {
+"designed": false,
+"hit": 0.187,
+"real": 0.978,
+"sounds": "a page turning"
+},
+"foley/pageflip-429724-0.wav": {
+"designed": false,
+"hit": 0.301,
+"real": 0.986,
+"sounds": "a page turning"
+},
+"foley/pageflip-457767-0.wav": {
+"designed": false,
+"hit": 0.082,
+"real": 0.892,
+"sounds": "a page turning"
+},
+"foley/paper-147281-0.wav": {
+"designed": false,
+"hit": 0.189,
+"real": 0.8,
+"sounds": "a spray can hissing"
+},
+"foley/paper-147282-0.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.897,
+"sounds": "a quick swipe"
+},
+"foley/paper-147283-0.wav": {
+"designed": false,
+"hit": 0.403,
+"real": 0.874,
+"sounds": "a drawer closing"
+},
+"foley/paper-147284-0.wav": {
+"designed": false,
+"hit": 0.263,
+"real": 0.809,
+"sounds": "a body falling on the ground"
+},
+"foley/paper-147285-0.wav": {
+"designed": false,
+"hit": 0.126,
+"real": 0.849,
+"sounds": "a swoosh passing by"
+},
+"foley/paper-147286-0.wav": {
+"designed": false,
+"hit": 0.25,
+"real": 0.884,
+"sounds": "a body falling on the ground"
+},
+"foley/pop-221091-0.wav": {
+"designed": false,
+"hit": 0.017,
+"real": 0.71,
+"sounds": "a mouth pop"
+},
+"foley/pop-319107-0.wav": {
+"designed": false,
+"hit": 0.015,
+"real": 0.885,
+"sounds": "a mouth pop"
+},
+"foley/pop-401542-0.wav": {
+"designed": false,
+"hit": 0.019,
+"real": 0.713,
+"sounds": "a mouth pop"
+},
+"foley/pop-447910-0.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.774,
+"sounds": "a mouth pop"
+},
+"foley/pop-467951-0.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.875,
+"sounds": "a mouth pop"
+},
+"foley/pop-506546-0.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.913,
+"sounds": "a mouth pop"
+},
+"foley/shutter-232130-0.wav": {
+"designed": false,
+"hit": 0.056,
+"real": 0.938,
+"sounds": "a door slam"
+},
+"foley/shutter-238958-0.wav": {
+"designed": false,
+"hit": 0.015,
+"real": 0.242,
+"sounds": "an alarm clock beeping"
+},
+"foley/shutter-238958-1.wav": {
+"designed": false,
+"hit": 0.035,
+"real": 0.975,
+"sounds": "a camera shutter click"
+},
+"foley/shutter-238958-2.wav": {
+"designed": false,
+"hit": 0.033,
+"real": 0.967,
+"sounds": "a camera shutter click"
+},
+"foley/shutter-431588-0.wav": {
+"designed": false,
+"hit": 0.09,
+"real": 0.952,
+"sounds": "a camera shutter click"
+},
+"foley/shutter-455511-0.wav": {
+"designed": false,
+"hit": 0.011,
+"real": 0.961,
+"sounds": "a camera shutter click"
+},
+"foley/shutter-61059-0.wav": {
+"designed": false,
+"hit": 0.032,
+"real": 0.982,
+"sounds": "a camera shutter click"
+},
+"foley/softpop-166191-0.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.474,
+"sounds": "a snare hit"
+},
+"foley/softpop-19284-0.wav": {
+"designed": false,
+"hit": 0.022,
+"real": 0.68,
+"sounds": "bubbles underwater"
+},
+"foley/softpop-202230-0.wav": {
+"designed": false,
+"hit": 0.015,
+"real": 0.737,
+"sounds": "a wooden block hit"
+},
+"foley/softpop-245646-0.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.752,
+"sounds": "a bubble pop"
+},
+"foley/softpop-267952-0.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.974,
+"sounds": "a mouth pop"
+},
+"foley/softpop-267952-1.wav": {
+"designed": false,
+"hit": 0.011,
+"real": 0.932,
+"sounds": "a mouth pop"
+},
+"foley/softpop-267952-2.wav": {
+"designed": false,
+"hit": 0.014,
+"real": 0.938,
+"sounds": "a mouth pop"
+},
+"foley/softpop-776443-0.wav": {
+"designed": false,
+"hit": 0.017,
+"real": 0.953,
+"sounds": "a mouth pop"
+},
+"foley/sparkle-457306-0.wav": {
+"designed": false,
+"hit": 0.012,
+"real": 0.11,
+"sounds": "a magic sparkle chime"
+},
+"foley/sparkle-462095-0.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.093,
+"sounds": "a success chime"
+},
+"foley/sparkle-562292-0.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.555,
+"sounds": "a success chime"
+},
+"foley/sparkle-578803-0.wav": {
+"designed": false,
+"hit": 0.022,
+"real": 0.071,
+"sounds": "a success chime"
+},
+"foley/swipe-240640-0.wav": {
+"designed": false,
+"hit": 0.061,
+"real": 0.943,
+"sounds": "a whip pan transition"
+},
+"foley/swipe-515625-0.wav": {
+"designed": false,
+"hit": 0.05,
+"real": 0.893,
+"sounds": "a fast whoosh"
+},
+"foley/swipe-60007-0.wav": {
+"designed": false,
+"hit": 0.046,
+"real": 0.987,
+"sounds": "a fast whoosh"
+},
+"foley/swipe-72189-0.wav": {
+"designed": false,
+"hit": 0.022,
+"real": 0.985,
+"sounds": "a stick swung fast through the air"
+},
+"foley/swipe-72190-0.wav": {
+"designed": false,
+"hit": 0.052,
+"real": 0.987,
+"sounds": "a stick swung fast through the air"
+},
+"foley/swipe-72191-0.wav": {
+"designed": false,
+"hit": 0.033,
+"real": 0.989,
+"sounds": "a fast whoosh"
+},
+"foley/swoosh-127197-0.wav": {
+"designed": false,
+"hit": 0.064,
+"real": 0.957,
+"sounds": "a fast whoosh"
+},
+"foley/swoosh-169867-0.wav": {
+"designed": false,
+"hit": 0.462,
+"real": 0.276,
+"sounds": "bubbles underwater"
+},
+"foley/swoosh-173272-0.wav": {
+"designed": false,
+"hit": 0.374,
+"real": 0.947,
+"sounds": "a snare hit"
+},
+"foley/swoosh-389590-0.wav": {
+"designed": false,
+"hit": 0.065,
+"real": 0.991,
+"sounds": "a fast whoosh"
+},
+"foley/swoosh-60004-0.wav": {
+"designed": false,
+"hit": 0.061,
+"real": 0.983,
+"sounds": "a fast whoosh"
+},
+"foley/swoosh-683101-0.wav": {
+"designed": false,
+"hit": 0.036,
+"real": 0.979,
+"sounds": "a fast whoosh"
+},
+"foley/tap-149034-0.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.705,
+"sounds": "a punchy impact hit"
+},
+"foley/tap-149034-1.wav": {
+"designed": false,
+"hit": 0.019,
+"real": 0.798,
+"sounds": "a punchy impact hit"
+},
+"foley/tap-149034-2.wav": {
+"designed": false,
+"hit": 0.015,
+"real": 0.98,
+"sounds": "a punchy impact hit"
+},
+"foley/tap-213925-0.wav": {
+"designed": false,
+"hit": 0.011,
+"real": 0.308,
+"sounds": "a snare hit"
+},
+"foley/tap-348242-0.wav": {
+"designed": false,
+"hit": 0.007,
+"real": 0.838,
+"sounds": "a punchy impact hit"
+},
+"foley/tap-416288-0.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.935,
+"sounds": "ice cubes in a glass"
+},
+"foley/tap-528561-0.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.797,
+"sounds": "ice cubes in a glass"
+},
+"foley/tap-833628-0.wav": {
+"designed": false,
+"hit": 0.071,
+"real": 0.442,
+"sounds": "a wooden block hit"
+},
+"foley/tap-833628-1.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.427,
+"sounds": "an error buzz"
+},
+"foley/tap-851556-0.wav": {
+"designed": false,
+"hit": 0.021,
+"real": 0.29,
+"sounds": "an enter key press"
+},
+"foley/tick-211203-0.wav": {
+"designed": false,
+"hit": 0.011,
+"real": 0.903,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/tick-547305-0.wav": {
+"designed": false,
+"hit": 0.014,
+"real": 0.039,
+"sounds": "a wooden block hit"
+},
+"foley/tick-547305-1.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.188,
+"sounds": "a wooden block hit"
+},
+"foley/tick-564507-0.wav": {
+"designed": false,
+"hit": 0.02,
+"real": 0.994,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/tick-668355-0.wav": {
+"designed": false,
+"hit": 0.016,
+"real": 0.897,
+"sounds": "an enter key press"
+},
+"foley/tick-810939-0.wav": {
+"designed": false,
+"hit": 0.04,
+"real": 0.73,
+"sounds": "a soft key release click"
+},
+"foley/typing-341832-0.wav": {
+"designed": false,
+"hit": 0.373,
+"real": 0.994,
+"sounds": "a squishy wet squelch"
+},
+"foley/typing-348238-0.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.981,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/typing-348239-0.wav": {
+"designed": false,
+"hit": 0.016,
+"real": 0.979,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/typing-564229-0.wav": {
+"designed": false,
+"hit": 0.205,
+"real": 0.705,
+"sounds": "a scroll wheel tick"
+},
+"foley/typing-764661-0.wav": {
+"designed": false,
+"hit": 0.808,
+"real": 0.685,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/typing-813214-0.wav": {
+"designed": false,
+"hit": 0.017,
+"real": 0.989,
+"sounds": "a single mechanical keyboard key press"
+},
+"foley/whoosh-171255-0.wav": {
+"designed": false,
+"hit": 0.267,
+"real": 0.517,
+"sounds": "a spray can hissing"
+},
+"foley/whoosh-243400-0.wav": {
+"designed": false,
+"hit": 0.26,
+"real": 0.961,
+"sounds": "a soft air whoosh"
+},
+"foley/whoosh-332003-0.wav": {
+"designed": false,
+"hit": 0.179,
+"real": 0.821,
+"sounds": "a fast whoosh"
+},
+"foley/whoosh-346373-0.wav": {
+"designed": false,
+"hit": 0.036,
+"real": 0.995,
+"sounds": "a fast whoosh"
+},
+"foley/whoosh-427823-0.wav": {
+"designed": false,
+"hit": 0.059,
+"real": 0.984,
+"sounds": "a fast whoosh"
+},
+"foley/whoosh-449645-0.wav": {
+"designed": false,
+"hit": 0.064,
+"real": 0.638,
+"sounds": "a reverse cymbal swell"
+},
+"foley/whoosh-59989-0.wav": {
+"designed": false,
+"hit": 0.029,
+"real": 0.975,
+"sounds": "a fast whoosh"
+},
+"foley/whoosh-60013-0.wav": {
+"designed": false,
+"hit": 0.045,
+"real": 0.987,
+"sounds": "a fast whoosh"
+},
+"foley/whoosh-701104-0.wav": {
+"designed": false,
+"hit": 0.125,
+"real": 0.833,
+"sounds": "a fast whoosh"
+},
+"kenney/casino-card-place-1.wav": {
+"designed": false,
+"hit": 0.085,
+"real": 0.991,
+"sounds": "a spray can hissing"
+},
+"kenney/casino-card-place-2.wav": {
+"designed": false,
+"hit": 0.152,
+"real": 0.988,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/casino-card-place-3.wav": {
+"designed": false,
+"hit": 0.257,
+"real": 0.995,
+"sounds": "scissors cutting"
+},
+"kenney/casino-card-place-4.wav": {
+"designed": false,
+"hit": 0.318,
+"real": 0.99,
+"sounds": "a camera shutter click"
+},
+"kenney/casino-card-slide-1.wav": {
+"designed": false,
+"hit": 0.045,
+"real": 0.976,
+"sounds": "a punchy impact hit"
+},
+"kenney/casino-card-slide-2.wav": {
+"designed": false,
+"hit": 0.066,
+"real": 0.996,
+"sounds": "a box lid closing"
+},
+"kenney/casino-card-slide-3.wav": {
+"designed": false,
+"hit": 0.081,
+"real": 0.99,
+"sounds": "a box lid closing"
+},
+"kenney/casino-card-slide-4.wav": {
+"designed": false,
+"hit": 0.104,
+"real": 0.996,
+"sounds": "a spray can hissing"
+},
+"kenney/casino-card-slide-5.wav": {
+"designed": false,
+"hit": 0.122,
+"real": 0.991,
+"sounds": "a page turning"
+},
+"kenney/casino-card-slide-6.wav": {
+"designed": false,
+"hit": 0.144,
+"real": 0.997,
+"sounds": "a box lid closing"
+},
+"kenney/casino-card-slide-7.wav": {
+"designed": false,
+"hit": 0.324,
+"real": 0.998,
+"sounds": "a box lid closing"
+},
+"kenney/casino-card-slide-8.wav": {
+"designed": false,
+"hit": 0.259,
+"real": 0.994,
+"sounds": "a quick swipe"
+},
+"kenney/casino-chip-lay-1.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.987,
+"sounds": "lego bricks clicking"
+},
+"kenney/casino-chip-lay-2.wav": {
+"designed": false,
+"hit": 0.08,
+"real": 0.982,
+"sounds": "a soft key release click"
+},
+"kenney/casino-chip-lay-3.wav": {
+"designed": false,
+"hit": 0.043,
+"real": 0.977,
+"sounds": "a punchy impact hit"
+},
+"kenney/digital-highUp.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.572,
+"sounds": "a finger squeaking on glass"
+},
+"kenney/digital-pepSound1.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.413,
+"sounds": "bubbles underwater"
+},
+"kenney/digital-pepSound2.wav": {
+"designed": false,
+"hit": 0.083,
+"real": 0.696,
+"sounds": "bubbles underwater"
+},
+"kenney/digital-pepSound3.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.66,
+"sounds": "bubbles underwater"
+},
+"kenney/digital-pepSound4.wav": {
+"designed": false,
+"hit": 0.042,
+"real": 0.515,
+"sounds": "a kalimba note"
+},
+"kenney/digital-pepSound5.wav": {
+"designed": false,
+"hit": 0.101,
+"real": 0.825,
+"sounds": "a finger squeaking on glass"
+},
+"kenney/digital-phaserUp1.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.371,
+"sounds": "an error buzz"
+},
+"kenney/digital-phaserUp2.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.092,
+"sounds": "an error buzz"
+},
+"kenney/digital-phaserUp3.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.179,
+"sounds": "an error buzz"
+},
+"kenney/digital-phaserUp4.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.081,
+"sounds": "a snare hit"
+},
+"kenney/digital-phaserUp5.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.021,
+"sounds": "an error buzz"
+},
+"kenney/digital-phaserUp6.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.048,
+"sounds": "an error buzz"
+},
+"kenney/digital-phaserUp7.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.242,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp1.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.239,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp10.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.15,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp11.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.057,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp12.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.381,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp2.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.186,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp3.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.277,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp4.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.073,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp5.wav": {
+"designed": false,
+"hit": 0.058,
+"real": 0.429,
+"sounds": "a notification ding"
+},
+"kenney/digital-powerUp6.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.041,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp7.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.213,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp8.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.139,
+"sounds": "a success chime"
+},
+"kenney/digital-powerUp9.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.103,
+"sounds": "a success chime"
+},
+"kenney/digital-threeTone1.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.616,
+"sounds": "a success chime"
+},
+"kenney/digital-threeTone2.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.633,
+"sounds": "a success chime"
+},
+"kenney/digital-twoTone1.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.568,
+"sounds": "a kalimba note"
+},
+"kenney/digital-twoTone2.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.678,
+"sounds": "a kalimba note"
+},
+"kenney/digital-zap1.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.103,
+"sounds": "a success chime"
+},
+"kenney/digital-zap2.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.079,
+"sounds": "an error buzz"
+},
+"kenney/digital-zapThreeToneDown.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.207,
+"sounds": "a success chime"
+},
+"kenney/digital-zapThreeToneUp.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.163,
+"sounds": "a success chime"
+},
+"kenney/digital-zapTwoTone.wav": {
+"designed": false,
+"hit": 0.008,
+"real": 0.179,
+"sounds": "a success chime"
+},
+"kenney/digital-zapTwoTone2.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.371,
+"sounds": "a success chime"
+},
+"kenney/impact-impactBell_heavy_000.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.042,
+"sounds": "a snare hit"
+},
+"kenney/impact-impactBell_heavy_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.031,
+"sounds": "a snare hit"
+},
+"kenney/impact-impactBell_heavy_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.049,
+"sounds": "a snare hit"
+},
+"kenney/impact-impactBell_heavy_003.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.07,
+"sounds": "a snare hit"
+},
+"kenney/impact-impactBell_heavy_004.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.561,
+"sounds": "a wooden block hit"
+},
+"kenney/impact-impactGlass_light_000.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.095,
+"sounds": "a wooden block hit"
+},
+"kenney/impact-impactGlass_light_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.088,
+"sounds": "a wooden block hit"
+},
+"kenney/impact-impactGlass_light_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.091,
+"sounds": "a wooden block hit"
+},
+"kenney/impact-impactGlass_light_003.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.157,
+"sounds": "a wooden block hit"
+},
+"kenney/impact-impactGlass_light_004.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.026,
+"sounds": "a wooden block hit"
+},
+"kenney/impact-impactPlate_light_000.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.895,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactPlate_light_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.745,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactPlate_light_002.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.954,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactPlate_light_003.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.829,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactPlate_light_004.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.877,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactPunch_medium_000.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.958,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactPunch_medium_001.wav": {
+"designed": false,
+"hit": 0.017,
+"real": 0.991,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactPunch_medium_002.wav": {
+"designed": false,
+"hit": 0.024,
+"real": 0.984,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactPunch_medium_003.wav": {
+"designed": false,
+"hit": 0.02,
+"real": 0.966,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactPunch_medium_004.wav": {
+"designed": false,
+"hit": 0.023,
+"real": 0.981,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactSoft_heavy_000.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.096,
+"sounds": "a kick drum"
+},
+"kenney/impact-impactSoft_heavy_001.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.161,
+"sounds": "a kick drum"
+},
+"kenney/impact-impactSoft_heavy_002.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.065,
+"sounds": "a kick drum"
+},
+"kenney/impact-impactSoft_heavy_003.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.021,
+"sounds": "a kick drum"
+},
+"kenney/impact-impactSoft_heavy_004.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.079,
+"sounds": "a kick drum"
+},
+"kenney/impact-impactSoft_medium_000.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.395,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactSoft_medium_001.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.147,
+"sounds": "a kick drum"
+},
+"kenney/impact-impactSoft_medium_002.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.187,
+"sounds": "a punchy impact hit"
+},
+"kenney/impact-impactSoft_medium_003.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.182,
+"sounds": "a kick drum"
+},
+"kenney/impact-impactSoft_medium_004.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.297,
+"sounds": "a punchy impact hit"
+},
+"kenney/interface-bong_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.011,
+"sounds": "a wooden block hit"
+},
+"kenney/interface-click_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.369,
+"sounds": "a punchy impact hit"
+},
+"kenney/interface-click_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.5,
+"sounds": "an error buzz"
+},
+"kenney/interface-click_003.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.5,
+"sounds": "an error buzz"
+},
+"kenney/interface-click_004.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.5,
+"sounds": "an error buzz"
+},
+"kenney/interface-click_005.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.5,
+"sounds": "an error buzz"
+},
+"kenney/interface-confirmation_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.061,
+"sounds": "a success chime"
+},
+"kenney/interface-confirmation_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.02,
+"sounds": "a success chime"
+},
+"kenney/interface-confirmation_003.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.012,
+"sounds": "a success chime"
+},
+"kenney/interface-confirmation_004.wav": {
+"designed": false,
+"hit": 0.081,
+"real": 0.051,
+"sounds": "a success chime"
+},
+"kenney/interface-drop_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.014,
+"sounds": "a crisp interface click"
+},
+"kenney/interface-drop_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.046,
+"sounds": "a bubble pop"
+},
+"kenney/interface-drop_003.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.059,
+"sounds": "a cork pop"
+},
+"kenney/interface-drop_004.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.01,
+"sounds": "a bubble pop"
+},
+"kenney/interface-glass_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.144,
+"sounds": "a glass ting"
+},
+"kenney/interface-glass_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.087,
+"sounds": "a kalimba note"
+},
+"kenney/interface-glass_003.wav": {
+"designed": false,
+"hit": 0.031,
+"real": 0.034,
+"sounds": "an error buzz"
+},
+"kenney/interface-glass_004.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.777,
+"sounds": "a triangle hit"
+},
+"kenney/interface-glass_005.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.063,
+"sounds": "a kalimba note"
+},
+"kenney/interface-glass_006.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.048,
+"sounds": "a wooden block hit"
+},
+"kenney/interface-glitch_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.5,
+"sounds": "an error buzz"
+},
+"kenney/interface-glitch_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.949,
+"sounds": "a punchy impact hit"
+},
+"kenney/interface-glitch_003.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.5,
+"sounds": "an error buzz"
+},
+"kenney/interface-glitch_004.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.412,
+"sounds": "an error buzz"
+},
+"kenney/interface-maximize_001.wav": {
+"designed": false,
+"hit": 0.141,
+"real": 0.01,
+"sounds": "an error buzz"
+},
+"kenney/interface-maximize_002.wav": {
+"designed": false,
+"hit": 0.137,
+"real": 0.015,
+"sounds": "bubbles underwater"
+},
+"kenney/interface-maximize_003.wav": {
+"designed": false,
+"hit": 0.127,
+"real": 0.142,
+"sounds": "a quick swipe"
+},
+"kenney/interface-maximize_004.wav": {
+"designed": false,
+"hit": 0.223,
+"real": 0.03,
+"sounds": "a crisp interface click"
+},
+"kenney/interface-maximize_005.wav": {
+"designed": false,
+"hit": 0.435,
+"real": 0.014,
+"sounds": "a digital glitch"
+},
+"kenney/interface-maximize_006.wav": {
+"designed": false,
+"hit": 0.058,
+"real": 0.182,
+"sounds": "bubbles underwater"
+},
+"kenney/interface-maximize_007.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.062,
+"sounds": "a chat message pop"
+},
+"kenney/interface-maximize_008.wav": {
+"designed": false,
+"hit": 0.136,
+"real": 0.134,
+"sounds": "an error buzz"
+},
+"kenney/interface-maximize_009.wav": {
+"designed": false,
+"hit": 0.009,
+"real": 0.043,
+"sounds": "a success chime"
+},
+"kenney/interface-minimize_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.014,
+"sounds": "an error buzz"
+},
+"kenney/interface-minimize_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.036,
+"sounds": "an error buzz"
+},
+"kenney/interface-minimize_003.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.089,
+"sounds": "a digital glitch"
+},
+"kenney/interface-minimize_004.wav": {
+"designed": false,
+"hit": 0.028,
+"real": 0.017,
+"sounds": "an error buzz"
+},
+"kenney/interface-minimize_005.wav": {
+"designed": false,
+"hit": 0.024,
+"real": 0.029,
+"sounds": "a digital glitch"
+},
+"kenney/interface-minimize_006.wav": {
+"designed": false,
+"hit": 0.161,
+"real": 0.109,
+"sounds": "bubbles underwater"
+},
+"kenney/interface-minimize_007.wav": {
+"designed": false,
+"hit": 0.142,
+"real": 0.03,
+"sounds": "an error buzz"
+},
+"kenney/interface-minimize_008.wav": {
+"designed": false,
+"hit": 0.042,
+"real": 0.099,
+"sounds": "an error buzz"
+},
+"kenney/interface-minimize_009.wav": {
+"designed": false,
+"hit": 0.072,
+"real": 0.023,
+"sounds": "a police siren"
+},
+"kenney/interface-open_001.wav": {
+"designed": false,
+"hit": 0.088,
+"real": 0.128,
+"sounds": "a record scratch"
+},
+"kenney/interface-open_002.wav": {
+"designed": false,
+"hit": 0.174,
+"real": 0.028,
+"sounds": "an error buzz"
+},
+"kenney/interface-open_003.wav": {
+"designed": false,
+"hit": 0.181,
+"real": 0.033,
+"sounds": "a digital glitch"
+},
+"kenney/interface-open_004.wav": {
+"designed": false,
+"hit": 0.276,
+"real": 0.083,
+"sounds": "a record scratch"
+},
+"kenney/interface-pluck_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.023,
+"sounds": "a wooden block hit"
+},
+"kenney/interface-pluck_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.148,
+"sounds": "a wooden block hit"
+},
+"kenney/interface-scroll_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.163,
+"sounds": "a punchy impact hit"
+},
+"kenney/interface-scroll_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.079,
+"sounds": "a digital glitch"
+},
+"kenney/interface-scroll_003.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.096,
+"sounds": "a snare hit"
+},
+"kenney/interface-scroll_004.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.108,
+"sounds": "a soft key release click"
+},
+"kenney/interface-scroll_005.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.051,
+"sounds": "a snare hit"
+},
+"kenney/interface-select_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.303,
+"sounds": "an error buzz"
+},
+"kenney/interface-select_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.061,
+"sounds": "an error buzz"
+},
+"kenney/interface-select_003.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.084,
+"sounds": "a digital glitch"
+},
+"kenney/interface-select_004.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.09,
+"sounds": "a crisp interface click"
+},
+"kenney/interface-select_005.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.116,
+"sounds": "a crisp interface click"
+},
+"kenney/interface-select_006.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.302,
+"sounds": "bubbles underwater"
+},
+"kenney/interface-select_007.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.746,
+"sounds": "ice cubes in a glass"
+},
+"kenney/interface-select_008.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.587,
+"sounds": "a triangle hit"
+},
+"kenney/interface-switch_001.wav": {
+"designed": false,
+"hit": 0.107,
+"real": 0.027,
+"sounds": "a crisp interface click"
+},
+"kenney/interface-switch_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.103,
+"sounds": "a wooden block hit"
+},
+"kenney/interface-switch_003.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.027,
+"sounds": "a kalimba note"
+},
+"kenney/interface-switch_004.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.316,
+"sounds": "a soft key release click"
+},
+"kenney/interface-switch_005.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.214,
+"sounds": "a punchy impact hit"
+},
+"kenney/interface-switch_006.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.168,
+"sounds": "a digital glitch"
+},
+"kenney/interface-switch_007.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.258,
+"sounds": "bubbles underwater"
+},
+"kenney/interface-tick_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.5,
+"sounds": "an error buzz"
+},
+"kenney/interface-tick_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.534,
+"sounds": "an error buzz"
+},
+"kenney/interface-tick_004.wav": {
+"designed": false,
+"hit": 0.031,
+"real": 0.116,
+"sounds": "an error buzz"
+},
+"kenney/interface-toggle_001.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.095,
+"sounds": "a success chime"
+},
+"kenney/interface-toggle_002.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.143,
+"sounds": "an error buzz"
+},
+"kenney/interface-toggle_003.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.251,
+"sounds": "a record scratch"
+},
+"kenney/interface-toggle_004.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.04,
+"sounds": "an error buzz"
+},
+"kenney/ui-click1.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.984,
+"sounds": "a soft key release click"
+},
+"kenney/ui-click2.wav": {
+"designed": false,
+"hit": 0.009,
+"real": 0.687,
+"sounds": "a punchy impact hit"
+},
+"kenney/ui-click3.wav": {
+"designed": false,
+"hit": 0.024,
+"real": 0.952,
+"sounds": "a soft key release click"
+},
+"kenney/ui-click4.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.674,
+"sounds": "a wooden block hit"
+},
+"kenney/ui-click5.wav": {
+"designed": false,
+"hit": 0.008,
+"real": 0.697,
+"sounds": "an error buzz"
+},
+"kenney/ui-rollover1.wav": {
+"designed": false,
+"hit": 0.058,
+"real": 0.974,
+"sounds": "a snare hit"
+},
+"kenney/ui-rollover2.wav": {
+"designed": false,
+"hit": 0.017,
+"real": 0.964,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/ui-rollover3.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.904,
+"sounds": "a snare hit"
+},
+"kenney/ui-rollover4.wav": {
+"designed": false,
+"hit": 0.019,
+"real": 0.674,
+"sounds": "an error buzz"
+},
+"kenney/ui-rollover5.wav": {
+"designed": false,
+"hit": 0.021,
+"real": 0.889,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/ui-rollover6.wav": {
+"designed": false,
+"hit": 0.026,
+"real": 0.94,
+"sounds": "an error buzz"
+},
+"kenney/ui-switch1.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.964,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch10.wav": {
+"designed": false,
+"hit": 0.007,
+"real": 0.925,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/ui-switch11.wav": {
+"designed": false,
+"hit": 0.03,
+"real": 0.955,
+"sounds": "a wooden block hit"
+},
+"kenney/ui-switch12.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.799,
+"sounds": "a soft key release click"
+},
+"kenney/ui-switch13.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.913,
+"sounds": "a soft key release click"
+},
+"kenney/ui-switch14.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.859,
+"sounds": "a soft key release click"
+},
+"kenney/ui-switch15.wav": {
+"designed": false,
+"hit": 0.083,
+"real": 0.992,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch16.wav": {
+"designed": false,
+"hit": 0.152,
+"real": 0.993,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/ui-switch17.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.985,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch18.wav": {
+"designed": false,
+"hit": 0.077,
+"real": 0.997,
+"sounds": "a soft key release click"
+},
+"kenney/ui-switch19.wav": {
+"designed": false,
+"hit": 0.122,
+"real": 0.998,
+"sounds": "an enter key press"
+},
+"kenney/ui-switch2.wav": {
+"designed": false,
+"hit": 0.008,
+"real": 0.927,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/ui-switch20.wav": {
+"designed": false,
+"hit": 0.161,
+"real": 0.954,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch21.wav": {
+"designed": false,
+"hit": 0.171,
+"real": 0.925,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch22.wav": {
+"designed": false,
+"hit": 0.097,
+"real": 0.96,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch23.wav": {
+"designed": false,
+"hit": 0.023,
+"real": 0.981,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch24.wav": {
+"designed": false,
+"hit": 0.102,
+"real": 0.963,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch25.wav": {
+"designed": false,
+"hit": 0.039,
+"real": 0.976,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch26.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.988,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch27.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.991,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch28.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.986,
+"sounds": "a soft key release click"
+},
+"kenney/ui-switch29.wav": {
+"designed": false,
+"hit": 0.113,
+"real": 0.962,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch3.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.952,
+"sounds": "a ratchet clicking"
+},
+"kenney/ui-switch30.wav": {
+"designed": false,
+"hit": 0.125,
+"real": 0.989,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch31.wav": {
+"designed": false,
+"hit": 0.15,
+"real": 0.993,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch32.wav": {
+"designed": false,
+"hit": 0.127,
+"real": 0.964,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch33.wav": {
+"designed": false,
+"hit": 0.166,
+"real": 0.984,
+"sounds": "a soft key release click"
+},
+"kenney/ui-switch34.wav": {
+"designed": false,
+"hit": 0.114,
+"real": 0.979,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch35.wav": {
+"designed": false,
+"hit": 0.119,
+"real": 0.927,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch36.wav": {
+"designed": false,
+"hit": 0.122,
+"real": 0.824,
+"sounds": "a light switch flicked"
+},
+"kenney/ui-switch37.wav": {
+"designed": false,
+"hit": 0.136,
+"real": 0.935,
+"sounds": "a soft key release click"
+},
+"kenney/ui-switch38.wav": {
+"designed": false,
+"hit": 0.022,
+"real": 0.973,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/ui-switch4.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.936,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/ui-switch5.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.982,
+"sounds": "a ratchet clicking"
+},
+"kenney/ui-switch6.wav": {
+"designed": false,
+"hit": 0.053,
+"real": 0.896,
+"sounds": "a camera shutter click"
+},
+"kenney/ui-switch7.wav": {
+"designed": false,
+"hit": 0.013,
+"real": 0.98,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/ui-switch8.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.966,
+"sounds": "a single mechanical keyboard key press"
+},
+"kenney/ui-switch9.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.971,
+"sounds": "a soft key release click"
+},
+"uisfx/cinematic/achievement.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.287,
+"sounds": "a success chime"
+},
+"uisfx/cinematic/check.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.395,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/close.wav": {
+"designed": false,
+"hit": 0.074,
+"real": 0.308,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/complete.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.505,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/copy.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.119,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/drop.wav": {
+"designed": false,
+"hit": 0.064,
+"real": 0.743,
+"sounds": "a kick drum"
+},
+"uisfx/cinematic/hover.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.167,
+"sounds": "a snare hit"
+},
+"uisfx/cinematic/notification.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.231,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/open.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.141,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/press.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.922,
+"sounds": "a snare hit"
+},
+"uisfx/cinematic/reaction.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.441,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/select.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.458,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/send.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.024,
+"sounds": "a success chime"
+},
+"uisfx/cinematic/snap.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.668,
+"sounds": "a snare hit"
+},
+"uisfx/cinematic/success.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.377,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/swipe.wav": {
+"designed": false,
+"hit": 0.03,
+"real": 0.116,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/toggle-on.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.362,
+"sounds": "a kalimba note"
+},
+"uisfx/cinematic/typing.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.051,
+"sounds": "a snare hit"
+},
+"uisfx/dreamy/achievement.wav": {
+"designed": false,
+"hit": 0.011,
+"real": 0.767,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/check.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.643,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/close.wav": {
+"designed": false,
+"hit": 0.079,
+"real": 0.415,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/complete.wav": {
+"designed": false,
+"hit": 0.009,
+"real": 0.774,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/copy.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.566,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/drop.wav": {
+"designed": false,
+"hit": 0.068,
+"real": 0.521,
+"sounds": "a snare hit"
+},
+"uisfx/dreamy/hover.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.576,
+"sounds": "a triangle hit"
+},
+"uisfx/dreamy/notification.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.853,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/open.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.48,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/press.wav": {
+"designed": false,
+"hit": 0.009,
+"real": 0.211,
+"sounds": "a snare hit"
+},
+"uisfx/dreamy/reaction.wav": {
+"designed": false,
+"hit": 0.009,
+"real": 0.638,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/select.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.673,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/send.wav": {
+"designed": false,
+"hit": 0.009,
+"real": 0.363,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/snap.wav": {
+"designed": false,
+"hit": 0.009,
+"real": 0.548,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/success.wav": {
+"designed": false,
+"hit": 0.011,
+"real": 0.696,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/swipe.wav": {
+"designed": false,
+"hit": 0.036,
+"real": 0.159,
+"sounds": "a success chime"
+},
+"uisfx/dreamy/toggle-on.wav": {
+"designed": false,
+"hit": 0.01,
+"real": 0.592,
+"sounds": "a kalimba note"
+},
+"uisfx/dreamy/typing.wav": {
+"designed": false,
+"hit": 0.009,
+"real": 0.079,
+"sounds": "a digital glitch"
+},
+"uisfx/glass/achievement.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.669,
+"sounds": "a success chime"
+},
+"uisfx/glass/check.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.841,
+"sounds": "a kalimba note"
+},
+"uisfx/glass/close.wav": {
+"designed": false,
+"hit": 0.069,
+"real": 0.204,
+"sounds": "a success chime"
+},
+"uisfx/glass/complete.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.551,
+"sounds": "a success chime"
+},
+"uisfx/glass/copy.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.554,
+"sounds": "a success chime"
+},
+"uisfx/glass/drop.wav": {
+"designed": false,
+"hit": 0.056,
+"real": 0.362,
+"sounds": "a kalimba note"
+},
+"uisfx/glass/hover.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.366,
+"sounds": "a triangle hit"
+},
+"uisfx/glass/notification.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.659,
+"sounds": "a success chime"
+},
+"uisfx/glass/open.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.295,
+"sounds": "a success chime"
+},
+"uisfx/glass/press.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.091,
+"sounds": "a snare hit"
+},
+"uisfx/glass/reaction.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.891,
+"sounds": "a success chime"
+},
+"uisfx/glass/select.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.625,
+"sounds": "a success chime"
+},
+"uisfx/glass/send.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.254,
+"sounds": "a success chime"
+},
+"uisfx/glass/snap.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.474,
+"sounds": "a success chime"
+},
+"uisfx/glass/success.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.783,
+"sounds": "a success chime"
+},
+"uisfx/glass/swipe.wav": {
+"designed": false,
+"hit": 0.026,
+"real": 0.164,
+"sounds": "a success chime"
+},
+"uisfx/glass/toggle-on.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.56,
+"sounds": "a kalimba note"
+},
+"uisfx/glass/typing.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.066,
+"sounds": "a snare hit"
+},
+"uisfx/mechanical/achievement.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.114,
+"sounds": "a success chime"
+},
+"uisfx/mechanical/check.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.112,
+"sounds": "a kalimba note"
+},
+"uisfx/mechanical/close.wav": {
+"designed": false,
+"hit": 0.04,
+"real": 0.114,
+"sounds": "a snare hit"
+},
+"uisfx/mechanical/complete.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.125,
+"sounds": "a snare hit"
+},
+"uisfx/mechanical/copy.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.037,
+"sounds": "a kalimba note"
+},
+"uisfx/mechanical/drop.wav": {
+"designed": false,
+"hit": 0.033,
+"real": 0.175,
+"sounds": "a digital glitch"
+},
+"uisfx/mechanical/hover.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.021,
+"sounds": "a wooden block hit"
+},
+"uisfx/mechanical/notification.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.14,
+"sounds": "a success chime"
+},
+"uisfx/mechanical/open.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.014,
+"sounds": "a snare hit"
+},
+"uisfx/mechanical/press.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.055,
+"sounds": "a snare hit"
+},
+"uisfx/mechanical/reaction.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.126,
+"sounds": "a success chime"
+},
+"uisfx/mechanical/select.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.06,
+"sounds": "a snare hit"
+},
+"uisfx/mechanical/send.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.018,
+"sounds": "a kalimba note"
+},
+"uisfx/mechanical/snap.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.108,
+"sounds": "a snare hit"
+},
+"uisfx/mechanical/success.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.102,
+"sounds": "a success chime"
+},
+"uisfx/mechanical/swipe.wav": {
+"designed": false,
+"hit": 0.015,
+"real": 0.012,
+"sounds": "a snare hit"
+},
+"uisfx/mechanical/toggle-on.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.087,
+"sounds": "a snare hit"
+},
+"uisfx/mechanical/typing.wav": {
+"designed": false,
+"hit": 0.0,
+"real": 0.111,
+"sounds": "a soft key release click"
+},
+"uisfx/minimal/achievement.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.123,
+"sounds": "a success chime"
+},
+"uisfx/minimal/check.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.104,
+"sounds": "a kalimba note"
+},
+"uisfx/minimal/close.wav": {
+"designed": false,
+"hit": 0.045,
+"real": 0.037,
+"sounds": "a kalimba note"
+},
+"uisfx/minimal/complete.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.059,
+"sounds": "a success chime"
+},
+"uisfx/minimal/copy.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.086,
+"sounds": "a kalimba note"
+},
+"uisfx/minimal/drop.wav": {
+"designed": false,
+"hit": 0.037,
+"real": 0.285,
+"sounds": "a snare hit"
+},
+"uisfx/minimal/hover.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.025,
+"sounds": "a kalimba note"
+},
+"uisfx/minimal/notification.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.054,
+"sounds": "a success chime"
+},
+"uisfx/minimal/open.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.021,
+"sounds": "a kalimba note"
+},
+"uisfx/minimal/press.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.029,
+"sounds": "a snare hit"
+},
+"uisfx/minimal/reaction.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.067,
+"sounds": "a success chime"
+},
+"uisfx/minimal/select.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.072,
+"sounds": "a kalimba note"
+},
+"uisfx/minimal/send.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.03,
+"sounds": "a success chime"
+},
+"uisfx/minimal/snap.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.02,
+"sounds": "a kalimba note"
+},
+"uisfx/minimal/success.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.091,
+"sounds": "a success chime"
+},
+"uisfx/minimal/swipe.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.068,
+"sounds": "a bubble pop"
+},
+"uisfx/minimal/toggle-on.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.145,
+"sounds": "a kalimba note"
+},
+"uisfx/minimal/typing.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.151,
+"sounds": "a mouth pop"
+},
+"uisfx/organic/achievement.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.353,
+"sounds": "a success chime"
+},
+"uisfx/organic/check.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.662,
+"sounds": "a kalimba note"
+},
+"uisfx/organic/close.wav": {
+"designed": false,
+"hit": 0.075,
+"real": 0.102,
+"sounds": "a kalimba note"
+},
+"uisfx/organic/complete.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.385,
+"sounds": "a success chime"
+},
+"uisfx/organic/copy.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.161,
+"sounds": "a kalimba note"
+},
+"uisfx/organic/drop.wav": {
+"designed": false,
+"hit": 0.065,
+"real": 0.447,
+"sounds": "a snare hit"
+},
+"uisfx/organic/hover.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.296,
+"sounds": "a snare hit"
+},
+"uisfx/organic/notification.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.565,
+"sounds": "a kalimba note"
+},
+"uisfx/organic/open.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.186,
+"sounds": "a success chime"
+},
+"uisfx/organic/press.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.231,
+"sounds": "a snare hit"
+},
+"uisfx/organic/reaction.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.463,
+"sounds": "a success chime"
+},
+"uisfx/organic/select.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.418,
+"sounds": "a kalimba note"
+},
+"uisfx/organic/send.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.039,
+"sounds": "a success chime"
+},
+"uisfx/organic/snap.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.346,
+"sounds": "a snare hit"
+},
+"uisfx/organic/success.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.478,
+"sounds": "a success chime"
+},
+"uisfx/organic/swipe.wav": {
+"designed": false,
+"hit": 0.027,
+"real": 0.082,
+"sounds": "a bubble pop"
+},
+"uisfx/organic/toggle-on.wav": {
+"designed": false,
+"hit": 0.004,
+"real": 0.708,
+"sounds": "a kalimba note"
+},
+"uisfx/organic/typing.wav": {
+"designed": false,
+"hit": 0.003,
+"real": 0.111,
+"sounds": "a snare hit"
+},
+"uisfx/rubber/achievement.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.083,
+"sounds": "a success chime"
+},
+"uisfx/rubber/check.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.261,
+"sounds": "a kalimba note"
+},
+"uisfx/rubber/close.wav": {
+"designed": false,
+"hit": 0.053,
+"real": 0.045,
+"sounds": "a kalimba note"
+},
+"uisfx/rubber/complete.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.154,
+"sounds": "a success chime"
+},
+"uisfx/rubber/copy.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.053,
+"sounds": "a success chime"
+},
+"uisfx/rubber/drop.wav": {
+"designed": false,
+"hit": 0.044,
+"real": 0.115,
+"sounds": "a snare hit"
+},
+"uisfx/rubber/hover.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.036,
+"sounds": "a snare hit"
+},
+"uisfx/rubber/notification.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.054,
+"sounds": "a success chime"
+},
+"uisfx/rubber/open.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.079,
+"sounds": "a success chime"
+},
+"uisfx/rubber/press.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.042,
+"sounds": "a snare hit"
+},
+"uisfx/rubber/reaction.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.138,
+"sounds": "a success chime"
+},
+"uisfx/rubber/select.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.096,
+"sounds": "a success chime"
+},
+"uisfx/rubber/send.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.025,
+"sounds": "a success chime"
+},
+"uisfx/rubber/snap.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.197,
+"sounds": "a snare hit"
+},
+"uisfx/rubber/success.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.095,
+"sounds": "a success chime"
+},
+"uisfx/rubber/swipe.wav": {
+"designed": false,
+"hit": 0.019,
+"real": 0.019,
+"sounds": "a snare hit"
+},
+"uisfx/rubber/toggle-on.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.143,
+"sounds": "a kalimba note"
+},
+"uisfx/rubber/typing.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.092,
+"sounds": "a soft key release click"
+},
+"uisfx/scifi/achievement.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.223,
+"sounds": "a success chime"
+},
+"uisfx/scifi/check.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.16,
+"sounds": "a success chime"
+},
+"uisfx/scifi/close.wav": {
+"designed": false,
+"hit": 0.052,
+"real": 0.232,
+"sounds": "a kalimba note"
+},
+"uisfx/scifi/complete.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.151,
+"sounds": "a success chime"
+},
+"uisfx/scifi/copy.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.105,
+"sounds": "a success chime"
+},
+"uisfx/scifi/drop.wav": {
+"designed": false,
+"hit": 0.043,
+"real": 0.236,
+"sounds": "a snare hit"
+},
+"uisfx/scifi/hover.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.117,
+"sounds": "a snare hit"
+},
+"uisfx/scifi/notification.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.157,
+"sounds": "a success chime"
+},
+"uisfx/scifi/open.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.145,
+"sounds": "a kalimba note"
+},
+"uisfx/scifi/press.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.184,
+"sounds": "a snare hit"
+},
+"uisfx/scifi/reaction.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.375,
+"sounds": "a success chime"
+},
+"uisfx/scifi/select.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.422,
+"sounds": "a snare hit"
+},
+"uisfx/scifi/send.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.092,
+"sounds": "a success chime"
+},
+"uisfx/scifi/snap.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.067,
+"sounds": "a snare hit"
+},
+"uisfx/scifi/success.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.2,
+"sounds": "a success chime"
+},
+"uisfx/scifi/swipe.wav": {
+"designed": false,
+"hit": 0.018,
+"real": 0.04,
+"sounds": "a snare hit"
+},
+"uisfx/scifi/toggle-on.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.315,
+"sounds": "a kalimba note"
+},
+"uisfx/scifi/typing.wav": {
+"designed": false,
+"hit": 0.001,
+"real": 0.015,
+"sounds": "a snare hit"
+},
+"uisfx/soft/achievement.wav": {
+"designed": false,
+"hit": 0.007,
+"real": 0.26,
+"sounds": "a success chime"
+},
+"uisfx/soft/check.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.402,
+"sounds": "a success chime"
+},
+"uisfx/soft/close.wav": {
+"designed": false,
+"hit": 0.075,
+"real": 0.299,
+"sounds": "a success chime"
+},
+"uisfx/soft/complete.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.164,
+"sounds": "a success chime"
+},
+"uisfx/soft/copy.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.308,
+"sounds": "a success chime"
+},
+"uisfx/soft/drop.wav": {
+"designed": false,
+"hit": 0.065,
+"real": 0.154,
+"sounds": "a kalimba note"
+},
+"uisfx/soft/hover.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.245,
+"sounds": "a triangle hit"
+},
+"uisfx/soft/notification.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.297,
+"sounds": "a success chime"
+},
+"uisfx/soft/open.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.155,
+"sounds": "a success chime"
+},
+"uisfx/soft/press.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.06,
+"sounds": "a snare hit"
+},
+"uisfx/soft/reaction.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.574,
+"sounds": "a success chime"
+},
+"uisfx/soft/select.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.233,
+"sounds": "a success chime"
+},
+"uisfx/soft/send.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.14,
+"sounds": "a success chime"
+},
+"uisfx/soft/snap.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.357,
+"sounds": "a success chime"
+},
+"uisfx/soft/success.wav": {
+"designed": false,
+"hit": 0.007,
+"real": 0.308,
+"sounds": "a success chime"
+},
+"uisfx/soft/swipe.wav": {
+"designed": false,
+"hit": 0.03,
+"real": 0.113,
+"sounds": "an error buzz"
+},
+"uisfx/soft/toggle-on.wav": {
+"designed": false,
+"hit": 0.006,
+"real": 0.455,
+"sounds": "a success chime"
+},
+"uisfx/soft/typing.wav": {
+"designed": false,
+"hit": 0.005,
+"real": 0.302,
+"sounds": "an error buzz"
+},
+"uisfx/studio/achievement.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.184,
+"sounds": "a success chime"
+},
+"uisfx/studio/check.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.169,
+"sounds": "a success chime"
+},
+"uisfx/studio/close.wav": {
+"designed": false,
+"hit": 0.043,
+"real": 0.071,
+"sounds": "a snare hit"
+},
+"uisfx/studio/complete.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.113,
+"sounds": "a success chime"
+},
+"uisfx/studio/copy.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.055,
+"sounds": "a success chime"
+},
+"uisfx/studio/drop.wav": {
+"designed": false,
+"hit": 0.037,
+"real": 0.019,
+"sounds": "a snare hit"
+},
+"uisfx/studio/hover.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.033,
+"sounds": "a snare hit"
+},
+"uisfx/studio/notification.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.026,
+"sounds": "a success chime"
+},
+"uisfx/studio/open.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.039,
+"sounds": "a success chime"
+},
+"uisfx/studio/press.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.029,
+"sounds": "a snare hit"
+},
+"uisfx/studio/reaction.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.25,
+"sounds": "a success chime"
+},
+"uisfx/studio/select.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.093,
+"sounds": "a success chime"
+},
+"uisfx/studio/send.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.033,
+"sounds": "a success chime"
+},
+"uisfx/studio/snap.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.175,
+"sounds": "a snare hit"
+},
+"uisfx/studio/success.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.151,
+"sounds": "a success chime"
+},
+"uisfx/studio/swipe.wav": {
+"designed": false,
+"hit": 0.017,
+"real": 0.043,
+"sounds": "a snare hit"
+},
+"uisfx/studio/toggle-on.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.148,
+"sounds": "a kalimba note"
+},
+"uisfx/studio/typing.wav": {
+"designed": false,
+"hit": 0.002,
+"real": 0.072,
+"sounds": "a soft key release click"
+}
+}
