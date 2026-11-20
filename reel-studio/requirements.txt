@@ -11,3 +11,7 @@ opencv-python-headless>=4.8
 gdown>=5
 gradio_client>=1.3
 rembg[cpu]>=2.0
+librosa>=0.10            # ISC — music beat grid: photo/brand/memory reels cut on the beat (engine/beatsync.py)
+scenedetect>=0.6         # BSD-3 (PySceneDetect) — shot changes when chopping long b-roll (engine/chop.py)
+# Optional, for whoever maintains the sound library (not needed by customers):
+#   pip install git+https://github.com/Leonxlnx/earshot@v0.4.1   (MIT) → python scripts/sound_audit.py

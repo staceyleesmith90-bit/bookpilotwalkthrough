@@ -103,6 +103,9 @@ def build_timeline(slug):
     made_for = (load(slug, "project.json") or {}).get("brand")
     if made_for and made_for != active() and p.get("pack") in (None, "brand"):
         p = dict(p, pack="brand:" + made_for)              # a project always keeps the brand it was made for
+    if not src:                                          # photo / brand / memory reels: cuts land on the music's beat
+        from . import beatsync
+        p = beatsync.apply(p)
     tl = planner.to_timeline(p, rc if src else None, os.path.relpath(src, ROOT) if src else None)
     save(slug, "timeline.json", tl)
     return tl

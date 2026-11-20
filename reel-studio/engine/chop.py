@@ -29,7 +29,23 @@ def _scores(source):
     shake = np.clip(diff / (np.median(diff) * 3 + 1e-6), 0, 3)
     score = (sharp / (np.percentile(sharp, 90) + 1e-6)) * 0.5 + expo * 0.3 + (1 - np.clip(shake / 3, 0, 1)) * 0.2
     cut = diff > max(25.0, np.median(diff) * 6)          # scene changes
+    for c in scene_cuts(source):                          # PySceneDetect (BSD-3): also catches fades and soft cuts
+        k = int(round(c * AFPS))
+        if 0 <= k < len(cut):
+            cut[k] = True
     return t, score, cut, AFPS
+
+
+def scene_cuts(source):
+    """Shot changes in seconds, found by PySceneDetect's adaptive detector. [] if it isn't installed."""
+    try:
+        from scenedetect import AdaptiveDetector, detect
+    except Exception:
+        return []
+    try:
+        return [round(s[0].get_seconds(), 3) for s in detect(source, AdaptiveDetector(), show_progress=False)[1:]]
+    except Exception:
+        return []
 
 
 def best_windows(source, seconds=6.0, max_n=None):

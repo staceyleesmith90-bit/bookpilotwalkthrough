@@ -29,5 +29,8 @@ Third-party material it uses:
 | MediaPipe BlazeFace face detector | Apache 2.0 | downloaded on first use |
 | Poppins Medium/SemiBold/Bold | SIL OFL 1.1 | `library/fonts/` |
 | ffmpeg, yt-dlp, faster-whisper, Pillow, resvg-py, NumPy, MediaPipe | their own open-source licences | installed as tools/libraries, not bundled |
+| earshot (Leon Lin) — sound library audit + designed sound bank — github.com/Leonxlnx/earshot | MIT | sounds rendered to `library/sfx/earshot/`, audit in `library/sfx/audit.json` |
+| librosa — music beat grid (cut on the beat) | ISC | installed via requirements.txt |
+| PySceneDetect — shot changes in long b-roll | BSD-3-Clause | installed via requirements.txt |
 
 Users are responsible for rights to the footage, music, fonts and logos they bring.
