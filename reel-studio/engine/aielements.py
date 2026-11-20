@@ -29,13 +29,15 @@ from PIL import Image, ImageFilter
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 STYLES = {
-    "paper":      "paper cut-out collage stickers, layered craft paper with visible paper grain, slightly uneven scissor-cut edges",
-    "clay":       "cute 3D clay / plasticine figures, soft studio light, matte, rounded and chunky",
-    "watercolour": "loose watercolour illustration stickers with soft washes and fine ink outlines",
-    "doodle":     "hand-drawn marker doodles, thick wobbly outlines, flat fills, playful",
-    "retro":      "retro risograph print stickers, grainy halftone, limited 2-3 ink colours, slight misregistration",
-    "realistic":  "photo-realistic product shot of a real object, soft natural shadow, studio light",
-    "3d":         "glossy 3D render icons, soft gradients, gentle shadow, like premium app emoji",
+    "paper":      "layered cut-paper craft: every object built from pieces of coloured construction paper, visible paper texture, "
+                  "soft shadows between the layers, slightly uneven scissor-cut edges, papercraft",
+    "clay":       "handmade plasticine claymation: chunky rounded shapes sculpted from matte pastel clay, visible fingerprints "
+                  "and tool marks, toy-like, soft studio light",
+    "watercolour": "loose watercolour painting with soft colour washes, paper bleeding at the edges, fine ink outlines",
+    "doodle":     "hand-drawn with a thick black marker: wobbly outlines, flat bright colour fills, playful sketchbook doodle",
+    "retro":      "vintage 1970s screen-print sticker: grainy halftone dots, only orange, teal and cream inks, slightly off-register",
+    "realistic":  "photo-realistic product photo of the real object, soft natural shadow, studio light",
+    "3d":         "glossy 3D render: rounded inflated shapes, soft pastel gradients, gentle shadow, like premium app emoji",
 }
 DEFAULT_STYLE = "paper"
 
@@ -129,7 +131,7 @@ def prompt(items, style=DEFAULT_STYLE, colors=None, story=""):
             f"top to bottom: " + ", then ".join(items) + ". Draw exactly these objects and nothing else — no people, "
             f"no extra objects. Each one isolated with lots of empty space around it, nothing touching. "
             f"Style: {look}.{pal} " + (f"Mood: {story}. " if story else "") +
-            "Flat pure white background, no drop shadows, no numbers, no letters, no labels, no border, high detail.")
+            "Flat pure white background, no drop shadows, no numbers, no letters, no labels, no logos or brand names, no border, high detail.")
 
 
 def chatgpt_prompt(about, items, style=DEFAULT_STYLE, colors=None, reference=False):
@@ -151,7 +153,7 @@ def chatgpt_prompt(about, items, style=DEFAULT_STYLE, colors=None, reference=Fal
     lines += ["", "Important rules (an app cuts the stickers out automatically):",
               "- a plain, pure white background",
               "- every sticker separate, with lots of space around it: nothing touching or overlapping",
-              "- no words, letters, numbers, labels, people, frames or shadows",
+              "- no words, letters, numbers, labels, logos, brand names, people, frames or shadows",
               "- high detail, centred, the whole object visible"]
     return "\n".join(lines)
 
