@@ -31,8 +31,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STYLES = {
     "paper":      "layered cut-paper craft: every object built from pieces of coloured construction paper, visible paper texture, "
                   "soft shadows between the layers, slightly uneven scissor-cut edges, papercraft",
-    "clay":       "handmade plasticine claymation: chunky rounded shapes sculpted from matte pastel clay, visible fingerprints "
-                  "and tool marks, toy-like, soft studio light",
+    "clay":       "bright modelling clay figurines, handmade from lumpy hand-pressed playdough in pastel colours, thick "
+                  "rounded cartoon proportions, matte clay texture with fingerprints, stop-motion clay style",
     "watercolour": "loose watercolour painting with soft colour washes, paper bleeding at the edges, fine ink outlines",
     "doodle":     "hand-drawn with a thick black marker: wobbly outlines, flat bright colour fills, playful sketchbook doodle",
     "retro":      "vintage 1970s screen-print sticker: grainy halftone dots, only orange, teal and cream inks, slightly off-register",
