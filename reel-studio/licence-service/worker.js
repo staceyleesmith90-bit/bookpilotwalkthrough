@@ -2,7 +2,7 @@
 // away: a ZIP they unzip and install. No licence keys, no accounts, nothing paid inside the app. Updates included.
 //
 // Your landing page's buy buttons link to:
-//   GET  /buy                      -> (optional) pick how to pay: PayFast (rand, South Africa) or PayPal (dollars, worldwide)
+//   (the landing page itself lives on your own website, LANDING_URL; /buy and / just send people there)
 //   GET  /buy/payfast              -> PayFast once-off checkout (PRICE_ZAR)
 //   GET  /buy/paypal               -> PayPal checkout (PRICE_USD), Orders API
 // After paying:
@@ -26,7 +26,7 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     try {
-      if (url.pathname === "/buy") return choose(env);
+      if (url.pathname === "/buy" || url.pathname === "/") return Response.redirect(env.LANDING_URL || "https://systemspilot.co.za", 302);
       if (url.pathname === "/buy/payfast") return buy(url, env);
       if (url.pathname === "/buy/paypal") return await paypalBuy(env);
       if (url.pathname === "/paypal/return") return await paypalReturn(url, env);
@@ -36,7 +36,7 @@ export default {
       if (url.pathname === "/api/update/latest") return json(JSON.parse(await env.LICENCES.get("release:latest") || "{}"));
       if (url.pathname === "/api/update/download" && req.method === "POST") return await updateZip(req, env);
       if (url.pathname.startsWith("/api/admin/") && req.method === "POST") return await admin(req, env, url);
-      return new Response("Reelmate", { status: 200 });
+      return new Response("Not found", { status: 404 });
     } catch (e) {
       return json({ error: "server_error" }, 500);
     }
@@ -75,7 +75,7 @@ function buy(url, env) {
   const ref = newRef();
   const pairs = [
     ["merchant_id", env.PAYFAST_MERCHANT_ID], ["merchant_key", env.PAYFAST_MERCHANT_KEY],
-    ["return_url", `${env.PUBLIC_URL}/welcome?ref=${ref}`], ["cancel_url", env.LANDING_URL || `${env.PUBLIC_URL}/buy`],
+    ["return_url", `${env.PUBLIC_URL}/welcome?ref=${ref}`], ["cancel_url", env.LANDING_URL || env.PUBLIC_URL],
     ["notify_url", `${env.PUBLIC_URL}/api/payfast/itn`],
     ["m_payment_id", ref], ["amount", env.PRICE_ZAR], ["item_name", env.PRODUCT],
   ];                                                                       // once-off: no subscription fields
@@ -204,16 +204,6 @@ export function md5(str) {
 }
 export { pfSignature, pfEncode };
 
-// ---------------------------------------------------------------- choose how to pay
-function choose(env) {
-  const btn = (href, bg, label, sub) => `<a href="${href}" style="display:block;text-decoration:none;background:${bg};color:#fff;border-radius:18px;padding:16px 20px;margin:12px 0;font-weight:800;font-size:18px">${label}<span style="display:block;font-weight:600;font-size:14px;opacity:.9">${sub}</span></a>`;
-  return page("Get Reelmate", `<h1 style="color:#104631;margin-top:0">Get Reelmate</h1>
-<p>One payment. Yours forever, with every update. No subscription.</p>
-${btn("/buy/payfast", "#E8541E", `R${Number(env.PRICE_ZAR).toFixed(0)} · South Africa`, "Card, EFT, SnapScan and more (PayFast)")}
-${btn("/buy/paypal", "#104631", `$${Number(env.PRICE_USD).toFixed(0)} · Everywhere else`, "PayPal or card (PayPal)")}
-<p style="color:#5E6B63;font-size:14px">Your download starts straight after paying. Windows or Mac.</p>`);
-}
-
 // ---------------------------------------------------------------- PayPal (Orders v2)
 async function ppToken(env) {
   const r = await fetch(`https://${env.PAYPAL_API}/v1/oauth2/token`, { method: "POST",
@@ -231,7 +221,7 @@ async function paypalBuy(env) {
       purchase_units: [{ reference_id: ref, custom_id: ref, description: env.PRODUCT,
                          amount: { currency_code: "USD", value: Number(env.PRICE_USD).toFixed(2) } }],
       application_context: { brand_name: "Reelmate", user_action: "PAY_NOW", shipping_preference: "NO_SHIPPING",
-                             return_url: `${env.PUBLIC_URL}/paypal/return`, cancel_url: env.LANDING_URL || `${env.PUBLIC_URL}/buy` } }) });
+                             return_url: `${env.PUBLIC_URL}/paypal/return`, cancel_url: env.LANDING_URL || env.PUBLIC_URL } }) });
   const order = await r.json();
   const approve = (order.links || []).find(l => l.rel === "approve" || l.rel === "payer-action");
   if (!approve) return page("Reelmate — PayPal", "<h1>PayPal is busy</h1><p>Please try again in a minute.</p>");
@@ -240,7 +230,7 @@ async function paypalBuy(env) {
 
 async function paypalReturn(url, env) {
   const id = url.searchParams.get("token") || "";
-  if (!/^[A-Z0-9]{5,40}$/.test(id)) return page("Reelmate", "<h1>Something went wrong</h1><p>Start again at /buy.</p>");
+  if (!/^[A-Z0-9]{5,40}$/.test(id)) return page("Reelmate", "<h1>Something went wrong</h1><p>Nothing was charged. Go back to the Reelmate page and try again.</p>");
   const done = await env.LICENCES.get(`pp:${id}`);              // refreshed the page: same welcome page again
   if (done) return Response.redirect(`${env.PUBLIC_URL}/welcome?ref=${done}`, 302);
   const tok = await ppToken(env);
@@ -251,7 +241,7 @@ async function paypalReturn(url, env) {
   const pay = ((unit.payments || {}).captures || [])[0] || {};
   if (cap.status !== "COMPLETED" || pay.status !== "COMPLETED" || pay.amount?.currency_code !== "USD"
       || Math.abs(parseFloat(pay.amount?.value) - parseFloat(env.PRICE_USD)) > 0.01)
-    return page("Reelmate — payment not finished", "<h1>Payment not finished</h1><p>Nothing was charged. <a href='/buy'>Try again</a>.</p>");
+    return page("Reelmate — payment not finished", "<h1>Payment not finished</h1><p>Nothing was charged. Go back to the Reelmate page and try again.</p>");
   const ref = refOk(unit.reference_id || "") ? unit.reference_id : newRef();
   await recordPurchase(ref, env, { email: cap.payer?.email_address || "", source: "paypal", paypal_order: id });
   await env.LICENCES.put(`pp:${id}`, ref);

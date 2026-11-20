@@ -33,7 +33,7 @@ the local editor without uploading videos to a server. Not offered (keeps the "n
 2. `npx wrangler secret put PAYFAST_MERCHANT_ID` (and PAYFAST_MERCHANT_KEY, PAYFAST_PASSPHRASE, ADMIN_TOKEN).
 3. `npx wrangler deploy`, point reelstudio.systemspilot.co.za at it (Cloudflare custom domain).
    On your landing page, the buy buttons link to `https://reelstudio.systemspilot.co.za/buy/payfast` (rand) and
-   `/buy/paypal` (dollars), or one button to `/buy` (it asks which). Set LANDING_URL in wrangler.toml.
+   `/buy/paypal` (dollars). The landing page is on your own website: put its address in LANDING_URL (wrangler.toml).
    Upload the ZIP: `npx wrangler r2 object put reel-releases/releases/<version>.zip --file Reelmate.zip`, then
    `POST /api/admin/release {version, sha256}` (Bearer ADMIN_TOKEN). The newest release is what buyers download.
 4. Test with PAYFAST_HOST = sandbox.payfast.co.za first, then switch to www.payfast.co.za.

@@ -42,9 +42,9 @@ await call("/api/admin/restore", { ref }, "t0k");
 ok((await call("/api/update/download", { link: welcome })).status === 200, "restored: updates again");
 const page = await (await call("/buy/payfast")).text(); ok(page.includes("sandbox.payfast.co.za/eng/process") && page.includes('name="signature"'), "checkout form");
 ok(!page.includes("subscription_type") && !page.includes('name="frequency"'), "checkout is once-off (no subscription)");
-// choose page shows both prices
-const choose = await (await call("/buy")).text();
-ok(choose.includes("R1000") && choose.includes("$59") && choose.includes("/buy/paypal") && choose.includes("/buy/payfast"), "choose page: rand + dollars");
+// no landing page here: /buy and / send people to your own landing page
+env.LANDING_URL = "https://reelmate.example";
+const lb = await call("/buy"); ok(lb.status === 302 && lb.headers.get("location").startsWith("https://reelmate.example"), "/buy → your landing page");
 // PayPal: create order → approve → return → capture → forever key
 let captured = 0;
 globalThis.fetch = async (u, o = {}) => {
